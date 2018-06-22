@@ -64,9 +64,13 @@ today!
 ### Setup
 
 1. **Provision the Vagrant box**. The first thing we'll need is a running
-   Sensu installation.
+   Sensu installation. Replace the `REPLACEME` strings below with your Sensu
+   Enterprise repository username and password, and then run `vagrant up`. 
 
    ```
+   $ export VAGRANT_DEFAULT_PROVIDER=vmware_fusion
+   $ export SE_USER=REPLACEME
+   $ export SE_PASS=REPLACEME
    $ vagrant up
    ```
 

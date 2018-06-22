@@ -1,0 +1,15 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: InfluxDB
+    orgId: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    orgId: 1
+    database: sensu
+    user: grafana
+    password: grafana
+    url: http://localhost:8086

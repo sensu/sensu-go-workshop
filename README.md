@@ -1,31 +1,120 @@
 # Monitoring Event Pipeline Demo
 
-## Overview
+## What is Sensu?
 
-- Configure one or more handlers
-- Publish some events
-  - First publish an event that does not get processed (no `"handler"` attribute)
-  - Then publish the same event with a `"handlers"` attribute
-  - Then modify the event `"source"` attribute
-  - Then publish a discovery event
-  - Then publish some telemetry events
-- Configure a filter
-  - Publish some events, demonstrating filtering capabilities
-  - Send a discovery event to update sever-01 metadata
-  - Send some more events from server-01
-- Done
+Sensu is _the_ cloud native infrastructure and application monitoring event
+pipeline. Get complete visibility from bare metal to kubernetes &ndash; **every
+system, every protocol, every time**. Sensu is the solution to the monitoring
+problems facing modern enterprises today, and the right foundation for your
+organization tomorrow.
+
+### What is a monitoring event pipeline?
+
+![](docs/images/sensu-server.png)
+
+### What can you do with a monitoring event pipeline?
+
+Sensu is a framework for hybrid cloud infrastructure and application _monitoring
+workflow automation_.
+
+- **Consolidate monitoring tools** (Nagios, synthetics, etc)
+- Automate system reliability & **improve SRE retention**
+- Automated **compliance monitoring** (inspec, osquery)
+- Enterprise monitoring **governance solution**
+
+Here are just a few example workflows:
+
+![](docs/images/sensu-server-example-pipelines.png)
+
+### What are monitoring events?
+
+Monitoring events are an abstraction for service health information, telemetry
+data, discovery, and alerts.
+
+```
+{
+  "source": "web-server-01",
+  "name": "web_service",
+  "environment": "production",
+  "region": "us-west-1",
+  "status": 2,
+  "output": "HTTP/1.1 404 Not Found",
+  "handlers": ["pagerduty","influxdb"],
+  "contacts": ["web_team"]
+}
+```
+
+### The Sensu Agent &ndash; a powerful event producer
+
+The Sensu Agent provides compatibility with popular and standards-based
+interfaces, and converts their outputs into monitoring events that can be
+processed by the Sensu backend.
+
+Some example interfaces include Nagios/Icinga/Zabbix plugins, Prometheus
+endpoints (exporting Prometheus metrics), StatsD, SNMP, and more.
+
+![](docs/images/monitoring-event-pipeline.png)
 
 ## Demo
 
-1. **Configure one or more handlers**.
+Enough talk, let's walk through a hands-on demo. Clone this repository, and
+follow along this guide to get started automating your monitoring workflows
+today!
 
-   Copy the following configuration to a file located at
+### Setup
+
+1. **Provision the Vagrant box**. The first thing we'll need is a running
+   Sensu installation.
+
+   ```
+   $ vagrant up
+   ```
+
+   That's it! You should now have a complete Sensu server installation running
+   locally, with Sensu's API and other ports mapped to you localhost address
+   space for further testing beyond this guide. This Vagrant VM also has a few
+   extras installed, including [InfluxDB][1] and [Grafana][2], which we will use during
+   this guide.
+
+   _NOTE: installing Vagrant is left as an exercise for the reader; please
+   visit [vagrantup.com](vagrantup.com) for more information._
+
+   [1]: https://influxdata.com
+   [2]: https://grafana.com
+
+1. **Connect to the virtual machine**. The remainder of this guide assumes you
+   are editing files and executing commands from the Sensu Vagrant VM.
+
+   ```
+   $ vagrant ssh
+   ```
+
+   References to viewing dashboards (including Sensu and Grafana dashboards;
+   e.g. http://localhost:3000) should be accessible from your host system due to
+   the above stated port mappings.
+
+   OK &ndash; LET'S HAVE SOME FUN!
+
+### Workshop
+
+The following guide will walk you through the basic Sensu concepts and prepare
+you to start configuration your own monitoring workflow automations. The guide
+starts with a fresh Sensu installation, and assumes some extra niceties are
+installed (e.g. `jq`), as provided for in the Sensu Vagrant VM and installation
+guide, above.
+
+1. **Configure one or more handlers**. The first thing we need to do with a
+   fresh Sensu installation is configure the handlers that will perform the
+   actions in our workflows (e.g. sending an email or slack notification).
+
+   For this workshop, we're going to use the Sensu Slack hander. Copy the
+   following configuration to a file located at
    `/etc/sensu/conf.d/handlers/slack.json`:
 
    ```
    {
      "slack": {
-       "webhook_url": "https://hooks.slack.com/services/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",
+       "webhook_url": "REPLACEME",
        "username": "Sensu",
        "icon_url": "http://www.gravatar.com/avatar/9b37917076cee4e2d331a785f3426640",
        "channel": "#demo",
@@ -34,8 +123,8 @@
    }
    ```
 
-   Let's create a second handler for sending telemetry data to InfluxDB. Copy
-   the following configuration to a file located at
+   Let's also create a second handler for sending telemetry data to InfluxDB.
+   Copy the following configuration to a file located at
    `/etc/sensu/conf.d/handlers/influxdb.json`:
 
    ```
@@ -54,11 +143,11 @@
    }
    ```
 
-   Restart the Sensu server.
+   Restart the Sensu server. You now have a pipeline with two workflows, ready
+   to accept incoming events.
 
-2. **Publish some events to the pipeline**.
-
-   Let's publish an event to the pipeline, via the Sensu Results API.
+2. **Publish some events to the pipeline**. Let's publish our first events to
+   the pipeline, via the Sensu Results API.
 
    ```
    $ curl -s -XPOST -H 'Content-Type: application/json' \

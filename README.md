@@ -65,7 +65,7 @@ today!
 
 1. **Provision the Vagrant box**. The first thing we'll need is a running
    Sensu installation. Replace the `REPLACEME` strings below with your Sensu
-   Enterprise repository username and password, and then run `vagrant up`. 
+   Enterprise repository username and password, and then run `vagrant up`.
 
    ```
    $ export VAGRANT_DEFAULT_PROVIDER=vmware_fusion
@@ -410,19 +410,12 @@ guide, above.
 
    ```
    $ curl -s -XPOST -H 'Content-Type: application/json' \
-   -d '{"name": "web_service", "output": "'`/usr/lib64/nagios/plugins/check_http -H localhost -N`'", "refresh": 1, "status": '`echo $?`', "handlers": ["slack"]}' \
-   http://127.0.0.1:4567/results
-   ```   
-
-   Now let's use Sensu to schedule this check to run every ten seconds, and
-
-   ```
-   $ curl -s -XPOST -H 'Content-Type: application/json' \
    -d '{"source": "web-server-01", "name": "web_service", "output": "'`/usr/lib64/nagios/plugins/check_http -H localhost -N`'", "refresh": 1, "status": '`echo $?`', "handlers": ["slack"]}' \
    http://127.0.0.1:4567/results
    ```
 
-   Let's use the Sensu server and agent together to solve this problem. Copy the
+   Now let's use Sensu to schedule this check to run every ten seconds. We'll
+   use the Sensu server and agent together to solve this problem. Copy the
    following configuration to a file located at
    `/etc/sensu/conf.d/checks/check_http.json`:
 

@@ -324,8 +324,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    linux system in the world:
    >
    > ```
-   $ echo 'web_service value='`echo $RANDOM`' '`date +%s`
-   web_service value=7835 1531372345
+   > $ echo 'web_service value='`echo $RANDOM`' '`date +%s`
+   > web_service value=7835 1531372345
    > ```
    >
    > In the real world you probably won't and/or shouldn't be sending metrics

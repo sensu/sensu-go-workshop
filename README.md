@@ -152,7 +152,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    }
    ```
 
-   > **A note about hand-editing JSON files:** Since we're hand-editing JSON 
+   > **A note about hand-editing JSON files:** Since we're hand-editing JSON
    configuration files, it's usually a good idea to make sure our files are
    valid JSON (i.e. no syntax errors). We can do this pretty easily with a handy
    little utility called `jq`:
@@ -172,7 +172,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    >     }
    >   }
    > }
-   ```
+   > ```
    >
    > If you see nicely formatted JSON output, you're all set! However, if you
    see a message like `parse error: Expected separator between values at line 7,

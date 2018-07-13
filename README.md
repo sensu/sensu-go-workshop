@@ -152,43 +152,43 @@ for in the Sensu Vagrant VM and installation guide, above.
    }
    ```
 
-   Since we're hand editing JSON configuration files, it's usually a good idea
-   to make sure our files are valid JSON (i.e. no syntax errors). We can do this
-   pretty easily with a handy little utility called `jq`:
-
+   > **A note about hand-editing JSON files:** Since we're hand-editing JSON 
+   configuration files, it's usually a good idea to make sure our files are
+   valid JSON (i.e. no syntax errors). We can do this pretty easily with a handy
+   little utility called `jq`:
+   >
+   > ```
+   > $ cat /etc/sensu/conf.d/influxdb.json | jq .
+   > {
+   >   "influxdb": {
+   >     "host": "127.0.0.1",
+   >     "port": 8086,
+   >     "database": "sensu",
+   >     "username": "admin",
+   >     "password": "admin",
+   >     "api_version": "0.9",
+   >     "tags": {
+   >       "dc": "us-central-1"
+   >     }
+   >   }
+   > }
    ```
-   $ cat /etc/sensu/conf.d/influxdb.json | jq .
-   {
-    "influxdb": {
-      "host": "127.0.0.1",
-      "port": 8086,
-      "database": "sensu",
-      "username": "admin",
-      "password": "admin",
-      "api_version": "0.9",
-      "tags": {
-        "dc": "us-central-1"
-      }
-    }
-   }
-   ```
-
-   If you see nicely formatted JSON output, you're all set! However, if you see \
-   a message like `parse error: Expected separator between values at line 7,
+   >
+   > If you see nicely formatted JSON output, you're all set! However, if you
+   see a message like `parse error: Expected separator between values at line 7,
    column 13` you have an invalid JSON file (e.g. you could be missing a
    quotation mark or a comma, etc); compare your file with the examples we
    provided above and try again.  
-
-   Do this for both of the `slack.json` and `influxdb.json` files to make sure
+   >
+   > Do this for both of the `slack.json` and `influxdb.json` files to make sure
    we get things off to a good start. We won't remind you to do this for the
    rest of this tutorial, but it's a pretty good habit to get into. Once you're
    ready to start deploying Sensu into a production environment, you'll probably
    want to use a configuration management solution like [Puppet][puppet],
    [Chef][chef], or [Ansible][ansible] to manage these files automatically.
 
-   Once you have confirmed your JSON files are valid, let's go ahead and reload
-   or restart the Sensu server. You now have a pipeline with two workflows,
-   ready to accept incoming events!
+   Let's go ahead and reload or restart the Sensu server. You now have a
+   pipeline with two workflows, ready to accept incoming events!
 
    ```
    $ sudo systemctl reload sensu-enterprise

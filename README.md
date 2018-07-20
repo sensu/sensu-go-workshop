@@ -68,7 +68,6 @@ today!
    Enterprise repository username and password, and then run `vagrant up`.
 
    ```
-   $ export VAGRANT_DEFAULT_PROVIDER=vmware_fusion
    $ export SE_USER=REPLACEME
    $ export SE_PASS=REPLACEME
    $ vagrant up
@@ -80,15 +79,19 @@ today!
    extras installed, including [InfluxDB][1] and [Grafana][2], which we will use during
    this guide.
 
-   _NOTE: if you are using [Virtual Box][virtualbox] you do not need to export
-   `VANGRANT_DEFAULT_PROVIDER`. If you are using `direnv` along with virtualbox
-   you will need to remove the first line in `.direnv`, `export VAGRANT_DEFAULT_PROVIDER=vmware_fusion`._
-
    _NOTE: installing Vagrant is left as an exercise for the reader; please
-   visit [vagrantup.com](vagrantup.com) for more information._
+   visit [vagrantup.com][3] for more information. This `VagrantFile` provides
+   support for the `virtualbox` (default) and `vmware_fusion` [Vagrant
+   providers][4]; to use the `vmware_fusion` provider, set the
+   `VAGRANT_DEFAULT_PROVIDER` environment variable (i.e. `export
+   VAGRANT_DEFAULT_PROVIDER=vmware_fusion`), or indicate the provider using the
+   `--provider` flag at provisioning time (i.e. `vagrant up --provider
+   vmware_fusion`)._
 
    [1]: https://influxdata.com
    [2]: https://grafana.com
+   [3]: https://vagrantup.com
+   [4]: https://www.vagrantup.com/docs/providers/
 
 1. **Connect to the virtual machine**. The remainder of this guide assumes you
    are editing files and executing commands from the Sensu Vagrant VM.

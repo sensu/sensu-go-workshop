@@ -83,7 +83,7 @@ today!
    _NOTE: if you are using [Virtual Box][virtualbox] you do not need to export
    `VANGRANT_DEFAULT_PROVIDER`. If you are using `direnv` along with virtualbox
    you will need to remove the first line in `.direnv`, `export VAGRANT_DEFAULT_PROVIDER=vmware_fusion`._
-   
+
    _NOTE: installing Vagrant is left as an exercise for the reader; please
    visit [vagrantup.com](vagrantup.com) for more information._
 
@@ -576,6 +576,7 @@ endpoint for routing events back to the event pipeline.
 [puppet]: https://puppet.com
 [chef]: https://chef.io
 [ansible]: https://ansible.com  
+[virtualbox]: https://www.virtualbox.org/
 [results-api]: https://docs.sensu.io/sensu-core/latest/api/results/
 [clients-api]: https://docs.sensu.io/sensu-core/latest/api/clients/
 [influx-line-protocol]: https://docs.influxdata.com/influxdb/v1.6/write_protocols/line_protocol_tutorial/

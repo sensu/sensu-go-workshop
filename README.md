@@ -80,6 +80,10 @@ today!
    extras installed, including [InfluxDB][1] and [Grafana][2], which we will use during
    this guide.
 
+   _NOTE: if you are using [Virtual Box][virtualbox] you do not need to export
+   `VANGRANT_DEFAULT_PROVIDER`. If you are using `direnv` along with virtualbox
+   you will need to remove the first line in `.direnv`, `export VAGRANT_DEFAULT_PROVIDER=vmware_fusion`._
+   
    _NOTE: installing Vagrant is left as an exercise for the reader; please
    visit [vagrantup.com](vagrantup.com) for more information._
 

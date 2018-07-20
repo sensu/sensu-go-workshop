@@ -14,10 +14,15 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "centos/7"
   config.vm.hostname = "vagrant-centos7-x86-64"
-  config.vm.provider "vmware_fusion" do |vmware|
-    vmware.cpus = "2"
-    vmware.memory = "4096"
-    vmware.name = "vagrant-centos7-x86-64"
+  config.vm.provider "vmware_fusion" do |vmw, vmwoverride|
+    vmw.cpus = 2
+    vmw.memory = 4096
+    vmw.name = "vagrant-centos7-x86-64"
+  end
+  config.vm.provider "virtualbox" do |vb, vboxoverride|
+    vb.cpus = 2
+    vb.memory = 4096
+    vb.name = "vagrant-centos7-x86-64"
   end
 
   # Disable automatic box update checking. If you disable this, then

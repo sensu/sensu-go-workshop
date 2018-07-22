@@ -1,4 +1,4 @@
-# Monitoring Event Pipeline Demo
+# Monitoring Event Pipeline
 
 ## What is Sensu?
 
@@ -55,9 +55,9 @@ endpoints (exporting Prometheus metrics), StatsD, SNMP, and more.
 
 ![](docs/images/monitoring-event-pipeline.png)
 
-## Demo
+## Workshop
 
-Enough talk, let's walk through a hands-on demo. Clone this repository, and
+Enough talk, let's walk through a hands-on workshop. Clone this repository, and
 follow along this guide to get started automating your monitoring workflows
 today!
 
@@ -73,11 +73,11 @@ today!
    $ vagrant up
    ```
 
-   That's it! You should now have a complete Sensu server installation running
-   locally, with Sensu's API and other ports mapped to you localhost address
-   space for further testing beyond this guide. This Vagrant VM also has a few
-   extras installed, including [InfluxDB][1] and [Grafana][2], which we will use during
-   this guide.
+   That's it! You should now have a complete Sensu Enterprise installation
+   running locally, with Sensu's API and other ports mapped to you localhost
+   address space for further testing beyond this guide. This Vagrant VM also has
+   a few extras installed, including [InfluxDB][1] and [Grafana][2], which we
+   will use during this workshop.
 
    _NOTE: installing Vagrant is left as an exercise for the reader; please
    visit [vagrantup.com][3] for more information. This `VagrantFile` provides
@@ -106,9 +106,7 @@ today!
 
    OK &ndash; LET'S HAVE SOME FUN!
 
-### Workshops
-
-#### Introducing the Monitoring Event Pipeline
+### Introducing the Monitoring Event Pipeline
 
 The following guide will walk you through the basic monitoring event pipeline
 concepts and prepare you to start configuration your own monitoring workflow
@@ -137,7 +135,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    ```
 
    _**NOTE**: this might be obvious, but you'll need to replace the text `REPLACEME`
-   with a Slack ["Incoming Webhook"][incoming-webhook] URL._  
+   with a Slack ["Incoming Webhook"][1] URL._  
 
    Let's also create a second handler for sending telemetry data to InfluxDB.
    Copy the following configuration to a file located at
@@ -191,8 +189,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    we get things off to a good start. We won't remind you to do this for the
    rest of this tutorial, but it's a pretty good habit to get into. Once you're
    ready to start deploying Sensu into a production environment, you'll probably
-   want to use a configuration management solution like [Puppet][puppet],
-   [Chef][chef], or [Ansible][ansible] to manage these files automatically.
+   want to use a configuration management solution like [Puppet][2], [Chef][3],
+   or [Ansible][4] to manage these files automatically.
 
    Let's go ahead and reload or restart the Sensu server. You now have a
    pipeline with two workflows, ready to accept incoming events!
@@ -201,8 +199,13 @@ for in the Sensu Vagrant VM and installation guide, above.
    $ sudo systemctl reload sensu-enterprise
    ```
 
+   [1]: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
+   [2]: https://puppet.com
+   [3]: https://chef.io
+   [4]: https://ansible.com  
+
 1. **Publish your first event to the pipeline**. Let's publish our first events
-   to the pipeline, using `curl` and the [Sensu Results API][results-api].
+   to the pipeline, using `curl` and the [Sensu Results API][1].
 
    ```
    $ curl -s -XPOST -H 'Content-Type: application/json' \
@@ -226,6 +229,8 @@ for in the Sensu Vagrant VM and installation guide, above.
 
    Voila! A Slack notification!
 
+   [1]: https://docs.sensu.io/sensu-core/latest/api/results/
+
 1. **Modify behaviors using event attributes**. Let's see what other behaviors
    we can modify. If you take a look at your Sensu dashboard right now (by
    visiting http://localhost:3000/#/clients in your browser), you'll see that
@@ -247,7 +252,7 @@ for in the Sensu Vagrant VM and installation guide, above.
 
 1. **Provide context about the systems you're monitoring using discovery
    events**. Let's provide some "client" (host) metadata using the [Clients
-   API][clients-api]. This is effectively a "discovery event" (everything is an
+   API][1]. This is effectively a "discovery event" (everything is an
    event!).
 
    ```
@@ -280,6 +285,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    time. Later on in this tutorial we will expect for `"web-server-01"` to be
    **missing** the `"environment": "production"` attribute. Spoiler alert!_
 
+   [1]: https://docs.sensu.io/sensu-core/latest/api/clients/
+
 1. **Publish service recovery events**. Now let's send some events to indicate
    that both of our services have restored and are now healthy.
 
@@ -299,7 +306,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    "metrics") in an event, and let's process this data using our "influxdb"
    handler (to send the metrics to the InfluxDB time series database, or
    "TSDB"). To start, let's send the metric data using the [InfluxDB Line
-   Protocol][influxd-line-protocol].
+   Protocol][1].
 
    Almost all TSDB formats expect metric data points in plain text strings. For
    the InfluxDB Line Protocol that string contains a measurement name (e.g.
@@ -324,8 +331,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    it in a Sensu Event compatible JSON data payload. For our demo, we're
    creating a metric with the measurement name `web_service` and a value called
    `value`. To generate dynamic results we'll use the [`$RANDOM` environment
-   variable][random] to return a random value between 0 and 32767. Finally, to
-   generate our timestamp we'll use the [`date` command][date], with the `%s`
+   variable][2] to return a random value between 0 and 32767. Finally, to
+   generate our timestamp we'll use the [`date` command][3], with the `%s`
    format (i.e. `date +%s`, which outputs "seconds since 1970-01-01 00:00:00
    UTC"). You can recreate this output by running this command on basically any
    linux system in the world:
@@ -338,6 +345,10 @@ for in the Sensu Vagrant VM and installation guide, above.
    > In the real world you probably won't and/or shouldn't be sending metrics
    from a bash script, but in case you ever do, **it will totally work**! It
    will just need to look something like this. :)  
+
+   [1]: https://docs.influxdata.com/influxdb/v1.6/write_protocols/line_protocol_tutorial/
+   [2]: http://tldp.org/LDP/abs/html/randomvar.html
+   [3]: http://man7.org/linux/man-pages/man1/date.1.html
 
 
 1. **Modify the behavior of the pipeline with Event Filters**. In the real world
@@ -440,7 +451,7 @@ please visit the Sensu reference documentation.
 Now let's continue to learn about how we can automate many of the steps we
 worked through in our tutorial by using the Sensu Agent.
 
-#### Introducing the Sensu agent (`sensu-client`)
+### Introducing the Sensu agent (`sensu-client`)
 
 The Sensu agent is an automated event producer. It takes care for things like
 automated discovery, scheduling monitoring check executions, and converting
@@ -492,7 +503,7 @@ endpoint for routing events back to the event pipeline.
    we want to update metadata about our hosts, we can manage it with a
    configuration file instead of sending data to the HTTP API.
 
-5. Publishing events to the agent socket. Let's send that same/original event
+1. Publishing events to the agent socket. Let's send that same/original event
    payload from step 1 to our pipeline using the Sensu agent socket:
 
    ```
@@ -509,7 +520,7 @@ endpoint for routing events back to the event pipeline.
    Using the Sensu agent means your applications don't need to know where they
    are running - they can just publish events to a local socket!
 
-6. Configuring our first automated event producer. Let's install a service and
+1. Configuring our first automated event producer. Let's install a service and
    a plugin to monitor this service, and have Sensu monitor it on a 10 second interval.
 
    ```
@@ -573,15 +584,3 @@ endpoint for routing events back to the event pipeline.
    ```
    $ sudo systemctl reload sensu-enterprise
    ```
-
-
-[incoming-webhook]: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
-[puppet]: https://puppet.com
-[chef]: https://chef.io
-[ansible]: https://ansible.com  
-[virtualbox]: https://www.virtualbox.org/
-[results-api]: https://docs.sensu.io/sensu-core/latest/api/results/
-[clients-api]: https://docs.sensu.io/sensu-core/latest/api/clients/
-[influx-line-protocol]: https://docs.influxdata.com/influxdb/v1.6/write_protocols/line_protocol_tutorial/
-[random]: http://tldp.org/LDP/abs/html/randomvar.html
-[date]: http://man7.org/linux/man-pages/man1/date.1.html

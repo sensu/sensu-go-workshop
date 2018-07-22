@@ -143,17 +143,17 @@ for in the Sensu Vagrant VM and installation guide, above.
 
    ```
    {
-    "influxdb": {
-      "host": "127.0.0.1",
-      "port": 8086,
-      "database": "sensu",
-      "username": "admin",
-      "password": "admin",
-      "api_version": "0.9",
-      "tags": {
-        "dc": "us-central-1"
-      }
-    }
+     "influxdb": {
+       "host": "127.0.0.1",
+       "port": 8086,
+       "database": "sensu",
+       "username": "admin",
+       "password": "admin",
+       "api_version": "0.9",
+       "tags": {
+         "dc": "us-central-1"
+       }
+     }
    }
    ```
 
@@ -328,7 +328,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    > **HUH?**: in case you are looking at this event and scratching your head,
    this sidebar is for you. For our tutorial, we're using a few basic Bash shell
    tricks to generate an InfluxDB Line Protocol compatible metric, and wrapping
-   it in a Sensu Event compatible JSON data payload. For our demo, we're
+   it in a Sensu Event compatible JSON data payload. For our workshop, we're
    creating a metric with the measurement name `web_service` and a value called
    `value`. To generate dynamic results we'll use the [`$RANDOM` environment
    variable][2] to return a random value between 0 and 32767. Finally, to

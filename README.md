@@ -493,10 +493,10 @@ endpoint for routing events back to the event pipeline.
    }
    ```
 
-   _NOTE: the Sensu services (i.e. `sensu-enterprise` and `sensu-client`) don't
-   actually communicate directly with each other; they do so via a message bus
-   or `"transport"`. The default [Sensu Transport][14] is RabbitMQ, but Redis is
-   also supported and that's what we're using here._
+   > _WHAT IS THE SENSU TRANSPORT? The Sensu services (i.e. `sensu-enterprise`
+   and `sensu-client`) don't actually communicate directly with each other; they
+   do so via a message bus or `"transport"`. The default [Sensu Transport][14]
+   is RabbitMQ, but Redis is also supported and that's what we're using here._
 
    Now we just need to start the agent:
 
@@ -504,11 +504,12 @@ endpoint for routing events back to the event pipeline.
    $ sudo systemctl start sensu-client
    ```
 
-   If you look at your Sensu dashboard again you'll notice that the Sensu client
-   is now sending discovery events for us (e.g. see the updated IP Address, and
-   other attributes from the `"client"` scope of our config file, above)! Now if
-   we want to update metadata about our hosts, we can manage it with a
-   configuration file instead of sending data to the HTTP API.
+   If you look at your Sensu dashboard again (http://127.0.0.1:3000) you'll
+   notice that the Sensu client is now sending discovery events for us (e.g. see
+   the updated IP Address, and other attributes from the `"client"` scope of our
+   config file, above)! Now if we want to update metadata about our hosts, we
+   can manage it with a configuration file instead of sending data to the HTTP
+   API.
 
    [14]: https://docs.sensu.io/sensu-core/latest/reference/transport/#reference-documentation
 
@@ -589,9 +590,58 @@ endpoint for routing events back to the event pipeline.
    $ sudo systemctl reload sensu-enterprise
    ```
 
+   **Look ma! No hands!** At this point Sensu should be monitoring your locally
+   running HTTP service (a default Nginx server), and will notify you via Slack
+   if/when it detects a failure.  
+
    > _DID YOU NOTICE? We didn't have to reload our Sensu agent configuration, but
    the checks are starting to get scheduled and executed. This is because the
    Sensu server (i.e. `sensu-enterprise`) is publishing this request to the
    `"webserver"` subscription (i.e. a message bus "topic" or "channel") that the
    Sensu agent is subscribed to (see the `client.json` file we configured
    together, above)._
+
+## Next Steps
+
+Thank you for your time in working through this guide and learning more about
+Sensu, the Monitoring Event Pipeline. At this point we've covered enough topics
+to give you a general sense of how Sensu works, but we've only really scratched
+the surface. If you're interested in continuing your evaluation of Sensu, please
+consider the following:
+
+- **Join the Sensu Community!** Join the discussion on Slack and meet other
+  Sensu users by visiting [https://slack.sensu.io][15].
+
+  [15]: https://slack.sensu.io
+
+- **Occurrence filtering**. We're sure you've noticed by now that Sensu is
+  sending notifications to Slack for _every occurrence_ of an event. This is
+  just about the worst case scenario for a modern monitoring solution, but it
+  was intentional for the purposes of our tutorial/workshop. Because we were
+  using Sensu Enterprise for this exercise, which has a [built-in occurrence
+  filter][16], we were explicitly disabling occurrence filtering by setting the
+  `"refresh": 1` attribute in our events (telling Sensu how often to "refresh"
+  the occurrence counter; i.e. "notify on every 1 new occurrence").
+
+  The [Sensu Filters][17] reference documentation provides a working example of
+  occurrence filtering that can you can use as a helpful next step here.
+
+  [16]: https://docs.sensu.io/sensu-enterprise/latest/filters/handle-when/
+  [17]: https://docs.sensu.io/sensu-core/latest/reference/filters/#example-handling-repeated-events
+
+- **Add more/remote Sensu agents**. The configuration provided by this workshop
+  has the Sensu backend (`sensu-enterprise`) and the Sensu agent process
+  (`sensu-client`) running on the same system. In order to start getting value
+  out of Sensu you may need to deploy Sensu agents on remote systems.
+
+  The Sensu [installation guide][18] provides a helpful reference for installing
+  and configuring the Sensu agent on additional systems.
+
+  [18]: https://docs.sensu.io/sensu-core/latest/installation/install-sensu-client/
+
+- **Reference & API documentation**. For more information on Sensu's complete
+  capabilities, please review the [reference documentation][19] and [API
+  reference][20]. Some
+
+  [19]: https://docs.sensu.io/sensu-core/latest/reference/
+  [20]: https://docs.sensu.io/sensu-core/latest/api/overview/

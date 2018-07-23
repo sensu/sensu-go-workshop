@@ -529,11 +529,12 @@ endpoint for routing events back to the event pipeline.
    Using the Sensu agent means your applications don't need to know where they
    are running - they can just publish events to a local socket!
 
-1. Configuring our first automated event producer. Let's install a service and
-   a plugin to monitor this service, and have Sensu monitor it on a 10 second interval.
+1. **Configuring our first automated event producer**. Let's install a service
+   and a plugin to monitor this service, and have Sensu monitor it on a 10
+   second interval.
 
    ```
-   $ sudo yum install -y nginx nagios-plugins-all
+   $ sudo yum install -y nginx nagios-plugins-http
    ```
 
    Let's start Nginx and make sure it is up and running.
@@ -543,34 +544,28 @@ endpoint for routing events back to the event pipeline.
    $ curl -I http://localhost:80
    ```
 
-   Now let's use the Nagios check_http plugin to check our local web service:
+   Now let's use the Nagios `check_http` plugin to check our local web service:
 
    ```
    $ /usr/lib64/nagios/plugins/check_http -H localhost -N
    ```
 
-   At this point, if we really wanted to, we could write a little wrapper to
-   run this check as a cron job, and send the result to Sensu. It could look
-   something like this:
+   > SIDEBAR: At this point, if we really wanted to avoid using the Sensu agent, we
+   could write a little wrapper to run this check as a cron job, and send Nagios
+   check results (i.e. events) to the Sensu Results API. It could look something
+   like this:
+   >
+   > ```
+   > $ curl -s -XPOST -H 'Content-Type: application/json' \
+   > -d '{"source": "web-server-01", "name": "web_service", "output": "'`/usr/lib64/nagios/plugins/check_http -H localhost -N`'", "refresh": 1, "status": '`echo $?`', "handlers": ["slack"]}' \
+   > http://127.0.0.1:4567/results
+   > ```
+   >
+   > This would work, but we're not recommending it.
 
-   ```
-   $ curl -s -XPOST -H 'Content-Type: application/json' \
-   -d '{"source": "web-server-01", "name": "web_service", "output": "'`/usr/lib64/nagios/plugins/check_http -H localhost -N`", "refresh": 1, "status": 0, "handlers": ["slack"]}' \
-   http://127.0.0.1:4567/results
-   ```
-
-   But then we'd have to solve for updating the status... techincally, this
-   would do the trick:
-
-   ```
-   $ curl -s -XPOST -H 'Content-Type: application/json' \
-   -d '{"source": "web-server-01", "name": "web_service", "output": "'`/usr/lib64/nagios/plugins/check_http -H localhost -N`'", "refresh": 1, "status": '`echo $?`', "handlers": ["slack"]}' \
-   http://127.0.0.1:4567/results
-   ```
-
-   Now let's use Sensu to schedule this check to run every ten seconds. We'll
-   use the Sensu server and agent together to solve this problem. Copy the
-   following configuration to a file located at
+   Let's use Sensu to schedule this check to run every ten seconds. We'll use
+   the Sensu server and agent together to solve this problem. Copy the following
+   configuration to a file located at
    `/etc/sensu/conf.d/checks/check_http.json`:
 
    ```
@@ -588,8 +583,15 @@ endpoint for routing events back to the event pipeline.
    }
    ```
 
-   Now let's reload our configuration and let Sensu do the rest:
+   Now let's reload our server configuration and let Sensu do the rest:
 
    ```
    $ sudo systemctl reload sensu-enterprise
    ```
+
+   > _DID YOU NOTICE? We didn't have to reload our Sensu agent configuration, but
+   the checks are starting to get scheduled and executed. This is because the
+   Sensu server (i.e. `sensu-enterprise`) is publishing this request to the
+   `"webserver"` subscription (i.e. a message bus "topic" or "channel") that the
+   Sensu agent is subscribed to (see the `client.json` file we configured
+   together, above)._

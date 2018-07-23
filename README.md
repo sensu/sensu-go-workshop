@@ -419,7 +419,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    > PROTIP: The coolest thing about this is that this `"environment"` attribute
    isn't part of the Sensu event specification &ndash; in other words it's not a
    built-in attribute that Sensu expects; it's just a custom JSON
-   attribute &ndsah; so we can leverage any number of custom attributes in
+   attribute &ndash; so we can leverage any number of custom attributes in
    filters.  
 
    Now let's update `"server-01"` with the `"environment": "production"`

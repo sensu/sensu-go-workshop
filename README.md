@@ -517,14 +517,14 @@ endpoint for routing events back to the event pipeline.
    event payload from step 1 to our pipeline using the Sensu agent socket:
 
    ```
-   $ echo '{"source": "web-server-01", "name": "web_service", "output": "error!", "refresh": 1, "status": 1}' | nc localhost 3030
+   $ echo '{"source": "web-server-01", "name": "web_service", "output": "error!", "refresh": 1, "status": 1, "handlers": ["slack"]}' | nc localhost 3030
    ```
 
    ...now let's remove the `"source"` attribute and see what happens. The Sensu
    agent automatically decorates our events with its local metadata.
 
    ```
-   $ echo '{"name": "web_service", "output": "hello world!", "refresh": 0, "status": 1}' | nc localhost 3030
+   $ echo '{"name": "web_service", "output": "hello world!", "refresh": 1, "status": 1, "handlers": ["slack"]}' | nc localhost 3030
    ```
 
    Using the Sensu agent means your applications don't need to know where they

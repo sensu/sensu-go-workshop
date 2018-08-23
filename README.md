@@ -69,7 +69,8 @@ instructions. Linux users can find installation instructions from the
    $ mv sensu-backend /usr/local/bin/
    ```
 
-   Linux and Windows users can find [`sensuctl` installation instructions here][sensuctl-install]
+   Linux and Windows users can find [`sensuctl` installation instructions
+   here][sensuctl-install].
 
    Configure your `sensuctl`:
 

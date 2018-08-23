@@ -1,0 +1,15 @@
+{
+    "type": "Check",
+    "spec": {
+        "organization": "default",
+        "environment": "default",
+        "name": "check_sensu_io",
+        "command": "check_http -H sensu.io -N",
+        "runtime_assets": ["check_http_1_0"],
+        "publish": true,
+        "interval": 10,
+        "subscriptions": ["docker"],
+        "output_metric_format": "graphite_plaintext",
+        "output_metric_handlers": ["influxdb"]
+    }
+}

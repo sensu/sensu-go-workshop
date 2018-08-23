@@ -1,0 +1,13 @@
+{
+    "type": "Check",
+    "spec": {
+        "organization": "default",
+        "environment": "default",
+        "name": "helloworld",
+        "command": "helloworld.rb",
+        "runtime_assets": ["ruby-2.4.4","helloworld-0.1"],
+        "publish": true,
+        "interval": 10,
+        "subscriptions": ["docker"]
+    }
+}

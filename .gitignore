@@ -1,0 +1,3 @@
+.vagrant
+*.tar.*
+data/

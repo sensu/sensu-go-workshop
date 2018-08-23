@@ -1,0 +1,1 @@
+1b57158dafbb8fb30df50cd6d91774c34156a05dfcaf1a5b534bbc5af32acb20c3e65e642214b26aca7162a21618c5c23732629aa4cfe8e8871a39bc7a35fafe  assets/sensu-ruby_v2.4.4.tar.gz

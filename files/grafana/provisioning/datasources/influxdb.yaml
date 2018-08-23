@@ -1,0 +1,16 @@
+apiVersion: 1
+
+deleteDatasources:
+- name: InfluxDB
+  orgId: 1
+
+datasources:
+- name: InfluxDB
+  type: influxdb
+  access: proxy
+  orgId: 1
+  isDefault: true
+  database: sensu
+  user: admin
+  password: admin
+  url: http://influxdb:8086

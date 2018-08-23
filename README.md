@@ -59,6 +59,10 @@ instructions. Linux users can find installation instructions from the
 
    ![Sensu 2.0 dashboard login screen](docs/images/login.png "Sensu 2.0 dashboard login screen")
 
+   _NOTE: you may login to the dashboard using the default username and password
+   for a fresh Sensu 2.0 installation; username: `admin` and password:
+   `P@ssw0rd!`._
+
 2. Install and configure a local `sensuctl` (the new Sensu 2.0 CLI)
 
    Mac users:
@@ -104,3 +108,43 @@ instructions. Linux users can find installation instructions from the
    $ sensuctl create -f config/checks/check_sensu_io.json
    $ sensuctl create -f config/checks/helloworld.json
    ```
+
+## Helpful tips
+
+### Local HTTP server for hosting Sensu Assets
+
+This project provides a local HTTP server for hosting Sensu Assets. This will
+allow you to test new assets by dropping them into the `./assets` directory. You
+can view your assets from your browser by visiting http://localhost:8000/assets.
+To view the HTTP server logs, simply use `docker logs` to follow the NGINX
+container logs:
+
+```
+$ docker logs -f $(docker ps --filter "name=sensu-asset-server" --format {{.ID}})
+172.28.0.1 - - [23/Aug/2018:22:15:30 +0000] "GET /assets/ HTTP/1.1" 200 955 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
+```
+
+### Interact with the Sensu API
+
+The Sensu 2.0 API, like the rest of Sensu 2.0, provides full support for role
+based access controls (RBAC). This also means that authentication is required
+to make API calls.
+
+The `GET /auth` endpoint can be used to get an authentication token for the
+Sensu 2.0 HTTP API.
+
+```
+export SENSU_USER=admin
+export SENSU_PASS=P@ssw0rd!
+export SENSU_TOKEN=`curl -XGET -u "$SENSU_USER:$SENSU_PASS" -s http://localhost:8080/auth | jq -r ".access_token"`
+```
+
+I've also provided a simple bash script that can do this for you (as your token)
+will expire from time to time and need to be refreshed. Simply run
+`source sensu-backend-token.sh` to set a `$SENSU_TOKEN` environment variable
+that can be used make API requests.
+
+```
+$ source sensu-backend-token.sh
+$ curl -XGET -s -H "Content-Type: application/json" -H "Authorization: $SENSU_TOKEN"  http://localhost:8080/entities | jq .
+```

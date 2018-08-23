@@ -66,7 +66,7 @@ instructions. Linux users can find installation instructions from the
    ```
    $ curl -LO https://storage.googleapis.com/sensu-binaries/$(curl -s https://storage.googleapis.com/sensu-binaries/latest.txt)/darwin/amd64/sensuctl
    $ chmod +x sensuctl
-   $ mv sensu-backend /usr/local/bin/
+   $ mv sensuctl /usr/local/bin/
    ```
 
    Linux and Windows users can find [`sensuctl` installation instructions

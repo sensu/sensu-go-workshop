@@ -64,8 +64,8 @@ instructions. Linux users can find installation instructions from the
    Mac users:
 
    ```
-   $ curl -LO https://storage.googleapis.com/sensu-binaries/$(curl -s https://storage.googleapis.com/sensu-binaries/latest.txt)/darwin/amd64/sensu-backend
-   $ chmod +x sensu-backend
+   $ curl -LO https://storage.googleapis.com/sensu-binaries/$(curl -s https://storage.googleapis.com/sensu-binaries/latest.txt)/darwin/amd64/sensuctl
+   $ chmod +x sensuctl
    $ mv sensu-backend /usr/local/bin/
    ```
 

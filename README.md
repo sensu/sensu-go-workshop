@@ -85,6 +85,9 @@ instructions. Linux users can find installation instructions from the
    ? Preferred output format: none
    ```
 
+   _NOTE: the default username and password for a fresh Sensu 2.0 installation
+   are username: `admin` and password: `P@ssw0rd!`._
+
    [sensuctl-install]: https://docs.sensu.io/sensu-core/2.0/getting-started/configuring-sensuctl/#installation
 
 3. Register some Sensu 2.0 Assets

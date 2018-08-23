@@ -73,9 +73,9 @@ instructions. Linux users can find installation instructions from the
 
    Configure your `sensuctl`:
 
+   ```
    $ sensuctl configure
 
-   ```
    ? Sensu Backend URL: (http://localhost:8080)
    ? Username: admin
    ? Password: *********

@@ -148,3 +148,16 @@ that can be used make API requests.
 $ source sensu-backend-token.sh
 $ curl -XGET -s -H "Content-Type: application/json" -H "Authorization: $SENSU_TOKEN"  http://localhost:8080/entities | jq .
 ```
+
+Example API requests:
+
+- `GET /entities`
+- `GET /assets`
+- `GET /checks`
+- `GET /handlers`
+
+Example `POST /entities` for registering proxy entities in Sensu 2.0:
+
+```
+$ curl -XPOST -s -H "Authorization: $SENSU_TOKEN" -H "Content-Type: application/json" -d '{"id": "web-server-01", "class": "proxy", "environment": "default", "organization": "default", "extended_attributes": {"foo": "bar"}, "keepalive_timeout": 30}' http://localhost:8080/entities | jq .
+```

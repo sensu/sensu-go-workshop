@@ -1,8 +1,8 @@
 # 2018 Sensu Summit Workshops
 
 Hi! Something something example configuration files for playing with the Sensu
-2.0 beta, new [Sensu Assets][], and a [prototype Ruby Runtime asset][sensu-ruby]
-(!), something something.
+2.0 beta, new [Sensu Assets][sensu-assets], and a [prototype Ruby Runtime
+asset][sensu-ruby] (!), something something.
 
 [sensu-assets]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
 [sensu-ruby]:   https://github.com/calebhailey/sensu-ruby

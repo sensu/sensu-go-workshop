@@ -5,7 +5,7 @@
         "environment": "default",
         "name": "check_sensu_io",
         "command": "check_http -H sensu.io -N",
-        "runtime_assets": ["check_http_1_0"],
+        "runtime_assets": ["check_http_v0.1"],
         "publish": true,
         "interval": 10,
         "subscriptions": ["docker"],

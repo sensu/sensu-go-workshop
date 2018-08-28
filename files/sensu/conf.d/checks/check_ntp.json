@@ -1,10 +1,10 @@
 {
   "checks": {
-    "check_name": {
-      "command": "",
-      "interval": "",
-      "subscribers": [],
-      "publish": "",
+    "ntp_config": {
+      "command": "/opt/sensu/embedded/bin/check-ntp.rb",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
       "contacts": [],
       "type": "standard",
       "ttl": 90,
@@ -21,7 +21,36 @@
       },
       "occurrences": 1,
       "refresh": 1,
-      "notification": ""
+      "plugin": {
+        "source": "https://github.com/sensu-plugins/sensu-plugins-ntp",
+        "install": "sudo sensu-install -p ntp"
+      }
+    },
+    "ntp_config_pattern": {
+      "command": "perl plugins/check_file_content.pl -f ntpd.config -i config -n 0",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 180,
+      "handlers": [],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1,
+      "plugin": {
+        "source": "https://exchange.nagios.org/directory/Addons/Log-File-Management/check_file_content/details",
+        "install": "curl -o check_file_content.pl -L 'https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=4508&cf_id=24'"
+      }
     }
   }
 }

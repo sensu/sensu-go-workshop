@@ -1,14 +1,14 @@
 {
   "checks": {
-    "check_name": {
-      "command": "",
-      "interval": "",
-      "subscribers": [],
-      "publish": "",
-      "contacts": [],
+    "antivirus_process": {
+      "command": "/opt/sensu/embedded/bin/check-process.rb -p clamav",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
       "type": "standard",
-      "ttl": 90,
-      "handlers": [],
+      "ttl": 180,
+      "handlers": ["slack"],
       "hooks": {
         "warning": {
           "command": "",
@@ -21,7 +21,36 @@
       },
       "occurrences": 1,
       "refresh": 1,
-      "notification": ""
+      "plugin": {
+        "source": "https://github.com/sensu-plugins/sensu-plugins-process-checks",
+        "install": "sudo sensu-install -p process-checks"
+      }
+    },
+    "antivirus_version": {
+      "command": "/etc/sensu/plugins/nagios/check_clamav",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 180,
+      "handlers": ["slack"],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1,
+      "plugin": {
+        "source": "https://exchange.nagios.org/directory/Plugins/Anti-2DVirus/ClamAV/ClamAV-check-plugin/details",
+        "install": "curl -o check_clamav -L 'https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=1260&cf_id=24' && chmod +x check_clamav"
+      }
     }
   }
 }

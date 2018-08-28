@@ -1,13 +1,13 @@
 {
   "checks": {
-    "syslog_checksum": {
+    "syslog_config_checksum": {
       "command": "/opt/sensu/embedded/bin/check-checksums.rb -f log_file  -h 05cda4cb5dafb50c8712a1b4cfe893b2e08b335b29f9a102a8aee061f85f364b",
       "interval": 60,
       "subscribers": ["compliance"],
       "publish": true,
       "contacts": ["grc-team"],
       "type": "standard",
-      "ttl": 90,
+      "ttl": 180,
       "handlers": ["slack"],
       "hooks": {
         "warning": {
@@ -20,7 +20,11 @@
         }
       },
       "occurrences": 1,
-      "refresh": 1
+      "refresh": 1,
+      "plugin": {
+        "source": "https://github.com/sensu-plugins/sensu-plugins-filesystem-checks",
+        "install": "sudo sensu-install -p filesystem-checks"
+      }
     },
     "syslog_config_pattern": {
       "command": "perl plugins/check_file_content.pl -f log_file -i config -n 0",
@@ -29,7 +33,7 @@
       "publish": true,
       "contacts": ["grc-team"],
       "type": "standard",
-      "ttl": 90,
+      "ttl": 180,
       "handlers": ["slack"],
       "hooks": {
         "warning": {
@@ -42,7 +46,11 @@
         }
       },
       "occurrences": 1,
-      "refresh": 1
+      "refresh": 1,
+      "plugin": {
+        "source": "https://exchange.nagios.org/directory/Addons/Log-File-Management/check_file_content/details",
+        "install": "curl -o check_file_content.pl -L 'https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=4508&cf_id=24'"
+      }
     },
     "syslog_process": {
       "command": "/opt/sensu/embedded/bin/check-process.rb -p syslog",
@@ -51,7 +59,7 @@
       "publish": true,
       "contacts": ["grc-team"],
       "type": "standard",
-      "ttl": 90,
+      "ttl": 180,
       "handlers": ["slack"],
       "hooks": {
         "warning": {
@@ -64,7 +72,11 @@
         }
       },
       "occurrences": 1,
-      "refresh": 1
+      "refresh": 1,
+      "plugin": {
+        "source": "https://github.com/sensu-plugins/sensu-plugins-process-checks",
+        "install": "sudo sensu-install -p process-checks"
+      }
     }
   }
 }

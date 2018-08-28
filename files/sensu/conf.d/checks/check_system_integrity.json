@@ -1,14 +1,14 @@
 {
   "checks": {
-    "check_name": {
-      "command": "",
-      "interval": "",
-      "subscribers": [],
-      "publish": "",
-      "contacts": [],
+    "system_integrity_kernel_modules": {
+      "command": "check_osquery.rb -c \"select * from kernel_modules where name = 'dm_mod'\" -f address -m 0xffffffffc0114000",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
       "type": "standard",
-      "ttl": 90,
-      "handlers": [],
+      "ttl": 180,
+      "handlers": ["slack"],
       "hooks": {
         "warning": {
           "command": "",
@@ -21,7 +21,37 @@
       },
       "occurrences": 1,
       "refresh": 1,
-      "notification": ""
+      "notification": "",
+      "plugin": {
+        "source": "/etc/sensu/plugins/check_osquery.rb",
+        "install": "sudo yum install osquery"
+      }
+    },
+    "system_integrity_kernel_hash": {
+      "command": "/opt/sensu/embedded/bin/check-checksums.rb -f system_file  -h 05cda4cb5dafb50c8712a1b4cfe893b2e08b335b29f9a102a8aee061f85f364b",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 180,
+      "handlers": ["slack"],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1,
+      "plugin": {
+        "source": "https://github.com/sensu-plugins/sensu-plugins-filesystem-checks",
+        "install": "sudo sensu-install -p filesystem-checks"
+      }
     }
   }
 }

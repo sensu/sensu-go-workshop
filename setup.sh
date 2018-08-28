@@ -53,6 +53,18 @@ yum install -y curl jq nc vim ntp redis sensu-enterprise sensu-enterprise-dashbo
 systemctl stop firewalld
 systemctl disable firewalld
 
+# Install Osqueryi
+yum install osquery
+
+# Install wget
+yum install wget
+
+# Install ntp
+sudo  yum -y install ntp
+
+# Install eq
+sudo yum install  eq
+
 # Update Redis "bind" and "protected-mode" configs to allow external connections
 sed -i 's/^bind 127.0.0.1/bind 0.0.0.0/' /etc/redis.conf
 sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
@@ -83,6 +95,8 @@ systemctl start influxdb
 chkconfig influxdb on
 systemctl start grafana-server
 systemctl enable grafana-server.service
+sudo service  ntp start
+sudo service  ntpd start
 
 # Create the InfluxDB database
 influx -execute "CREATE DATABASE sensu;"

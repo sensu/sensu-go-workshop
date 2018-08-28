@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "check_name": {
+      "command": "",
+      "interval": "",
+      "subscribers": [],
+      "publish": "",
+      "contacts": [],
+      "type": "standard",
+      "ttl": 90,
+      "handlers": [],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1,
+      "notification": ""
+    }
+  }
+}

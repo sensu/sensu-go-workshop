@@ -1,0 +1,70 @@
+{
+  "checks": {
+    "syslog_checksum": {
+      "command": "/opt/sensu/embedded/bin/check-checksums.rb -f log_file  -h 05cda4cb5dafb50c8712a1b4cfe893b2e08b335b29f9a102a8aee061f85f364b",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 90,
+      "handlers": ["slack"],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1
+    },
+    "syslog_config_pattern": {
+      "command": "perl plugins/check_file_content.pl -f log_file -i config -n 0",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 90,
+      "handlers": ["slack"],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1
+    },
+    "syslog_process": {
+      "command": "/opt/sensu/embedded/bin/check-process.rb -p syslog",
+      "interval": 60,
+      "subscribers": ["compliance"],
+      "publish": true,
+      "contacts": ["grc-team"],
+      "type": "standard",
+      "ttl": 90,
+      "handlers": ["slack"],
+      "hooks": {
+        "warning": {
+          "command": "",
+          "timeout": 10
+        },
+        "critical": {
+          "command": "",
+          "timeout": 10
+        }
+      },
+      "occurrences": 1,
+      "refresh": 1
+    }
+  }
+}

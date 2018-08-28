@@ -134,9 +134,9 @@ The `GET /auth` endpoint can be used to get an authentication token for the
 Sensu 2.0 HTTP API.
 
 ```
-export SENSU_USER=admin
-export SENSU_PASS=P@ssw0rd!
-export SENSU_TOKEN=`curl -XGET -u "$SENSU_USER:$SENSU_PASS" -s http://localhost:8080/auth | jq -r ".access_token"`
+$ export SENSU_USER=admin
+$ export SENSU_PASS=P@ssw0rd!
+$ export SENSU_TOKEN=`curl -XGET -u "$SENSU_USER:$SENSU_PASS" -s http://localhost:8080/auth | jq -r ".access_token"`
 ```
 
 I've also provided a simple bash script that can do this for you (as your token)

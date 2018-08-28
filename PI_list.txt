@@ -1,0 +1,15 @@
+sudo sensu-install -p process-checks
+sensu-install -p sensu-plugins-ntp
+sudo sensu-install -p check-ssh
+sudo sensu-install -p check-ssh.rb
+sudo sensu-install -p disk-checks
+sudo sensu-install -p ssh
+sudo sensu-install -p process-checks
+sudo sensu-install -p network
+sudo sensu-install -p net
+
+wget "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=1990&cf_id=24"
+wget "https://www.nagios.com/downloads/nagios-xi/?utm_campaign=cross-site&utm_source=exchange&utm_medium=banner&utm_content=scott&__hstc=118811158.a6206c9d2714366d483c03d7c4ab5ecb.1534447852669.1534522859155.1534525802905.4&__hssc=118811158.3.1534525802905&__hsfp=1438573455#_ga=2.4919795.1377395528.1534447852-1916276500.1529440402"
+wget "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=1259&cf_id=24"
+wget "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=5955&cf_id=24"
+wget "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=5955&cf_id=29"

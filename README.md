@@ -2,11 +2,10 @@
 
 ## What is Sensu?
 
-Sensu is _the_ cloud native infrastructure and application monitoring event
-pipeline. Get complete visibility from bare metal to kubernetes &ndash; **every
-system, every protocol, every time**. Sensu is the solution to the monitoring
-problems facing modern enterprises today, and the right foundation for your
-organization tomorrow.
+Sensu is _the_ cloud native monitoring event pipeline. Get complete visibility
+from bare metal to kubernetes &ndash; **every system, every protocol, every
+time**. Sensu is the solution to the monitoring problems facing modern
+enterprises today, and the right foundation for your organization tomorrow.
 
 ### What is a monitoring event pipeline?
 
@@ -63,7 +62,27 @@ today!
 
 ### Setup
 
-1. **Provision the Vagrant box**. The first thing we'll need is a running
+1. **Sign up for a FREE 30-day trial of Sensu Enterprise**. This workshop is
+   based on [Sensu Enterprise][sensu-enterprise], which ships with a number of
+   [built-in integrations][sensu-integrations] (i.e. built-in
+   [Sensu Handlers][sensu-handlers]) that make things easier for first-time
+   Sensu users. To get a Sensu Enterprise repository username and password,
+   please visit: https://account.sensu.io/users/sign_up?plan=gold (**no credit
+   card required**).
+
+   _NOTE: none of the actual features used in this workshop are unique to Sensu
+   Enterprise outside of the built-in Slack and InfluxDB integrations, so this
+   same workflow should be possible using Sensu Core (with some slight
+   modifications for installing a community Slack and InfluxDB handler, and
+   configuring them accordingly). In fact, a workshop based on Sensu Core is
+   coming soon, and will be available at https://github.com/sensu/sandbox when
+   it is completed._
+
+   [sensu-enterprise]:   https://sensu.io/features/enterprise
+   [sensu-integrations]: https://docs.sensu.io/sensu-enterprise/3.1/integrations/
+   [sensu-handlers]:     https://docs.sensu.io/sensu-core/1.4/reference/handlers/
+
+2. **Provision the Vagrant box**. The first thing we'll need is a running
    Sensu installation. Replace the `REPLACEME` strings below with your Sensu
    Enterprise repository username and password, and then run `vagrant up`.
 
@@ -74,7 +93,7 @@ today!
    ```
 
    That's it! You should now have a complete Sensu Enterprise installation
-   running locally, with Sensu's API and other ports mapped to you localhost
+   running locally, with Sensu's API and other ports mapped to your localhost
    address space for further testing beyond this guide. This Vagrant VM also has
    a few extras installed, including [InfluxDB][1] and [Grafana][2], which we
    will use during this workshop.
@@ -93,7 +112,7 @@ today!
    [3]: https://vagrantup.com
    [4]: https://www.vagrantup.com/docs/providers/
 
-1. **Connect to the virtual machine**. The remainder of this guide assumes you
+3. **Connect to the virtual machine**. The remainder of this guide assumes you
    are editing files and executing commands from the Sensu Vagrant VM.
 
    ```

@@ -63,12 +63,11 @@ today!
 ### Setup
 
 1. **Sign up for a FREE 30-day trial of Sensu Enterprise**. This workshop is
-   based on [Sensu Enterprise][sensu-enterprise], which ships with a number of
-   [built-in integrations][sensu-integrations] (i.e. built-in
-   [Sensu Handlers][sensu-handlers]) that make things easier for first-time
-   Sensu users. To get a Sensu Enterprise repository username and password,
-   please visit: https://account.sensu.io/users/sign_up?plan=gold (**no credit
-   card required**).
+   based on [Sensu Enterprise][0], which ships with a number of [built-in
+   integrations][1] (i.e. built-in [Sensu Handlers][2]) that make things easier
+   for first-time Sensu users. To get a Sensu Enterprise repository username and
+   password, please visit: https://account.sensu.io/users/sign_up?plan=gold
+   (**no credit card required**).
 
    _NOTE: none of the actual features used in this workshop are unique to Sensu
    Enterprise outside of the built-in Slack and InfluxDB integrations, so this
@@ -78,9 +77,9 @@ today!
    coming soon, and will be available at https://github.com/sensu/sandbox when
    it is completed._
 
-   [sensu-enterprise]:   https://sensu.io/features/enterprise
-   [sensu-integrations]: https://docs.sensu.io/sensu-enterprise/3.1/integrations/
-   [sensu-handlers]:     https://docs.sensu.io/sensu-core/1.4/reference/handlers/
+   [0]: https://sensu.io/features/enterprise
+   [1]: https://docs.sensu.io/sensu-enterprise/3.1/integrations/
+   [2]: https://docs.sensu.io/sensu-core/1.4/reference/handlers/
 
 2. **Provision the Vagrant box**. The first thing we'll need is a running
    Sensu installation. Replace the `REPLACEME` strings below with your Sensu
@@ -95,22 +94,22 @@ today!
    That's it! You should now have a complete Sensu Enterprise installation
    running locally, with Sensu's API and other ports mapped to your localhost
    address space for further testing beyond this guide. This Vagrant VM also has
-   a few extras installed, including [InfluxDB][1] and [Grafana][2], which we
+   a few extras installed, including [InfluxDB][3] and [Grafana][4], which we
    will use during this workshop.
 
    _NOTE: installing Vagrant is left as an exercise for the reader; please
-   visit [vagrantup.com][3] for more information. This `VagrantFile` provides
+   visit [vagrantup.com][5] for more information. This `VagrantFile` provides
    support for the `virtualbox` (default) and `vmware_fusion` [Vagrant
-   providers][4]; to use the `vmware_fusion` provider, set the
+   providers][6]; to use the `vmware_fusion` provider, set the
    `VAGRANT_DEFAULT_PROVIDER` environment variable (i.e. `export
    VAGRANT_DEFAULT_PROVIDER=vmware_fusion`), or indicate the provider using the
    `--provider` flag at provisioning time (i.e. `vagrant up --provider
    vmware_fusion`)._
 
-   [1]: https://influxdata.com
-   [2]: https://grafana.com
-   [3]: https://vagrantup.com
-   [4]: https://www.vagrantup.com/docs/providers/
+   [3]: https://influxdata.com
+   [4]: https://grafana.com
+   [5]: https://vagrantup.com
+   [6]: https://www.vagrantup.com/docs/providers/
 
 3. **Connect to the virtual machine**. The remainder of this guide assumes you
    are editing files and executing commands from the Sensu Vagrant VM.
@@ -134,7 +133,7 @@ assumes some extra niceties are installed (e.g. the `jq` utility), as provided
 for in the Sensu Vagrant VM and installation guide, above.
 
 1. **Configure one or more handlers**. The first thing we need to do with a
-   fresh Sensu installation is configure the handlers that will perform the
+   fresh Sensu installation is configure the [handlers][2] that will perform the
    actions in our workflows (e.g. sending an email or slack notification).
 
    For this workshop, we're going to use the Sensu Slack hander. Copy the
@@ -154,7 +153,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    ```
 
    _**NOTE**: this might be obvious, but you'll need to replace the text `REPLACEME`
-   with a Slack ["Incoming Webhook"][5] URL._  
+   with a Slack ["Incoming Webhook"][7] URL._  
 
    Let's also create a second handler for sending telemetry data to InfluxDB.
    Copy the following configuration to a file located at
@@ -208,8 +207,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    we get things off to a good start. We won't remind you to do this for the
    rest of this tutorial, but it's a pretty good habit to get into. Once you're
    ready to start deploying Sensu into a production environment, you'll probably
-   want to use a configuration management solution like [Puppet][6], [Chef][7],
-   or [Ansible][8] to manage these files automatically.
+   want to use a configuration management solution like [Puppet][8], [Chef][9],
+   or [Ansible][10] to manage these files automatically.
 
    Let's go ahead and reload or restart the Sensu server. You now have a
    pipeline with two workflows, ready to accept incoming events!
@@ -218,13 +217,13 @@ for in the Sensu Vagrant VM and installation guide, above.
    $ sudo systemctl reload sensu-enterprise
    ```
 
-   [5]: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
-   [6]: https://puppet.com
-   [7]: https://chef.io
-   [8]: https://ansible.com  
+   [7]:  https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
+   [8]:  https://puppet.com
+   [9]:  https://chef.io
+   [10]: https://ansible.com  
 
 1. **Publish your first event to the pipeline**. Let's publish our first events
-   to the pipeline, using `curl` and the [Sensu Results API][9].
+   to the pipeline, using `curl` and the [Sensu Results API][11].
 
    ```
    $ curl -s -XPOST -H 'Content-Type: application/json' \
@@ -248,7 +247,7 @@ for in the Sensu Vagrant VM and installation guide, above.
 
    Voila! A Slack notification!
 
-   [9]: https://docs.sensu.io/sensu-core/latest/api/results/
+   [11]: https://docs.sensu.io/sensu-core/latest/api/results/
 
 1. **Modify behaviors using event attributes**. Let's see what other behaviors
    we can modify. If you take a look at your Sensu dashboard right now (by
@@ -271,7 +270,7 @@ for in the Sensu Vagrant VM and installation guide, above.
 
 1. **Provide context about the systems you're monitoring using discovery
    events**. Let's provide some "client" (host) metadata using the [Clients
-   API][10]. This is effectively a "discovery event" (everything is an
+   API][12]. This is effectively a "discovery event" (everything is an
    event!).
 
    ```
@@ -304,7 +303,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    time. Later on in this tutorial we will expect for `"web-server-01"` to be
    **missing** the `"environment": "production"` attribute. Spoiler alert!_
 
-   [10]: https://docs.sensu.io/sensu-core/latest/api/clients/
+   [12]: https://docs.sensu.io/sensu-core/latest/api/clients/
 
 1. **Publish service recovery events**. Now let's send some events to indicate
    that both of our services have restored and are now healthy.
@@ -325,7 +324,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    "metrics") in an event, and let's process this data using our "influxdb"
    handler (to send the metrics to the InfluxDB time series database, or
    "TSDB"). To start, let's send the metric data using the [InfluxDB Line
-   Protocol][11].
+   Protocol][13].
 
    Almost all TSDB formats expect metric data points in plain text strings. For
    the InfluxDB Line Protocol that string contains a measurement name (e.g.
@@ -350,8 +349,8 @@ for in the Sensu Vagrant VM and installation guide, above.
    it in a Sensu Event compatible JSON data payload. For our workshop, we're
    creating a metric with the measurement name `web_service` and a value called
    `value`. To generate dynamic results we'll use the [`$RANDOM` environment
-   variable][12] to return a random value between 0 and 32767. Finally, to
-   generate our timestamp we'll use the [`date` command][13], with the `%s`
+   variable][14] to return a random value between 0 and 32767. Finally, to
+   generate our timestamp we'll use the [`date` command][15], with the `%s`
    format (i.e. `date +%s`, which outputs "seconds since 1970-01-01 00:00:00
    UTC"). You can recreate this output by running this command on basically any
    linux system in the world:
@@ -365,9 +364,9 @@ for in the Sensu Vagrant VM and installation guide, above.
    from a bash script, but in case you ever do, **it will totally work**! It
    will just need to look something like this. :)  
 
-   [11]: https://docs.influxdata.com/influxdb/v1.6/write_protocols/line_protocol_tutorial/
-   [12]: http://tldp.org/LDP/abs/html/randomvar.html
-   [13]: http://man7.org/linux/man-pages/man1/date.1.html
+   [13]: https://docs.influxdata.com/influxdb/v1.6/write_protocols/line_protocol_tutorial/
+   [14]: http://tldp.org/LDP/abs/html/randomvar.html
+   [15]: http://man7.org/linux/man-pages/man1/date.1.html
 
 
 1. **Modify the behavior of the pipeline with Event Filters**. In the real world
@@ -514,7 +513,7 @@ endpoint for routing events back to the event pipeline.
 
    > _WHAT IS THE SENSU TRANSPORT? The Sensu services (i.e. `sensu-enterprise`
    and `sensu-client`) don't actually communicate directly with each other; they
-   do so via a message bus or `"transport"`. The default [Sensu Transport][14]
+   do so via a message bus or `"transport"`. The default [Sensu Transport][16]
    is RabbitMQ, but Redis is also supported and that's what we're using here._
 
    Now we just need to start the agent:
@@ -530,7 +529,7 @@ endpoint for routing events back to the event pipeline.
    can manage it with a configuration file instead of sending data to the HTTP
    API.
 
-   [14]: https://docs.sensu.io/sensu-core/latest/reference/transport/#reference-documentation
+   [16]: https://docs.sensu.io/sensu-core/latest/reference/transport/#reference-documentation
 
 1. **Publishing events to the agent socket.** Let's send that same/original
    event payload from step 1 to our pipeline using the Sensu agent socket:
@@ -629,38 +628,38 @@ the surface. If you're interested in continuing your evaluation of Sensu, please
 consider the following:
 
 - **Join the Sensu Community!** Join the discussion on Slack and meet other
-  Sensu users by visiting [https://slack.sensu.io][15].
+  Sensu users by visiting [https://slack.sensu.io][17].
 
-  [15]: https://slack.sensu.io
+  [17]: https://slack.sensu.io
 
 - **Occurrence filtering**. We're sure you've noticed by now that Sensu is
   sending notifications to Slack for _every occurrence_ of an event. This is
   just about the worst case scenario for a modern monitoring solution, but it
   was intentional for the purposes of our tutorial/workshop. Because we were
   using Sensu Enterprise for this exercise, which has a [built-in occurrence
-  filter][16], we were explicitly disabling occurrence filtering by setting the
+  filter][18], we were explicitly disabling occurrence filtering by setting the
   `"refresh": 1` attribute in our events (telling Sensu how often to "refresh"
   the occurrence counter; i.e. "notify on every 1 new occurrence").
 
-  The [Sensu Filters][17] reference documentation provides a working example of
+  The [Sensu Filters][19] reference documentation provides a working example of
   occurrence filtering that can you can use as a helpful next step here.
 
-  [16]: https://docs.sensu.io/sensu-enterprise/latest/filters/handle-when/
-  [17]: https://docs.sensu.io/sensu-core/latest/reference/filters/#example-handling-repeated-events
+  [18]: https://docs.sensu.io/sensu-enterprise/latest/filters/handle-when/
+  [19]: https://docs.sensu.io/sensu-core/latest/reference/filters/#example-handling-repeated-events
 
 - **Add more/remote Sensu agents**. The configuration provided by this workshop
   has the Sensu backend (`sensu-enterprise`) and the Sensu agent process
   (`sensu-client`) running on the same system. In order to start getting value
   out of Sensu you may need to deploy Sensu agents on remote systems.
 
-  The Sensu [installation guide][18] provides a helpful reference for installing
+  The Sensu [installation guide][20] provides a helpful reference for installing
   and configuring the Sensu agent on additional systems.
 
-  [18]: https://docs.sensu.io/sensu-core/latest/installation/install-sensu-client/
+  [20]: https://docs.sensu.io/sensu-core/latest/installation/install-sensu-client/
 
 - **Reference & API documentation**. For more information on Sensu's complete
-  capabilities, please review the [reference documentation][19] and [API
-  reference][20]. Some
+  capabilities, please review the [reference documentation][21] and [API
+  reference][22]. Some
 
-  [19]: https://docs.sensu.io/sensu-core/latest/reference/
-  [20]: https://docs.sensu.io/sensu-core/latest/api/overview/
+  [21]: https://docs.sensu.io/sensu-core/latest/reference/
+  [22]: https://docs.sensu.io/sensu-core/latest/api/overview/

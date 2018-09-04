@@ -181,7 +181,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    little utility called `jq`:
    >
    > ```
-   > $ cat /etc/sensu/conf.d/influxdb.json | jq .
+   > $ cat /etc/sensu/conf.d/handlers/influxdb.json | jq .
    > {
    >   "influxdb": {
    >     "host": "127.0.0.1",

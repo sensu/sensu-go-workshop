@@ -9,7 +9,7 @@
         "publish": true,
         "interval": 10,
         "subscriptions": ["docker"],
-        "output_metric_format": "graphite_plaintext",
+        "output_metric_format": "nagios_perfdata",
         "output_metric_handlers": ["influxdb"]
     }
 }

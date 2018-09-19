@@ -400,7 +400,7 @@ for in the Sensu Vagrant VM and installation guide, above.
    ```
    {
      "slack": {
-       "webhook_url": "https://hooks.slack.com/services/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",
+       "webhook_url": "REPLACEME",
        "username": "Sensu",
        "icon_url": "http://www.gravatar.com/avatar/9b37917076cee4e2d331a785f3426640",
        "channel": "#demo",

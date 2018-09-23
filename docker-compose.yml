@@ -28,6 +28,7 @@ services:
     ports:
     - 4000:3000
     volumes:
+    - "./data/grafana:/var/lib/grafana"
     - "$PWD/files/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
 
   sensu-backend:

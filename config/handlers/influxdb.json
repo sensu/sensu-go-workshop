@@ -3,11 +3,8 @@
     "spec": {
         "name": "influxdb",
         "type": "pipe",
-        "command": "/usr/bin/sensu-influxdb-handler --addr 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'",
+        "command": "/usr/bin/sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'",
         "timeout": 10,
-        "filters": [
-            "has_metrics"
-        ],
         "organization": "default",
         "environment": "default"
     }

@@ -49,7 +49,7 @@ rpm -Uvh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-
 
 # Install our packages
 yum update
-yum install -y curl jq nc vim ntp redis sensu-enterprise sensu-enterprise-dashboard influxdb grafana
+yum install -y yum-utils curl jq nc vim ntp redis sensu-enterprise sensu-enterprise-dashboard influxdb grafana
 systemctl stop firewalld
 systemctl disable firewalld
 
@@ -86,6 +86,9 @@ systemctl enable grafana-server.service
 
 # Create the InfluxDB database
 influx -execute "CREATE DATABASE sensu;"
+
+# Just in case, download the other packages we'll need for offline installation
+yumdownloader sensu nginx nagios-plugins-http
 
 # Print the VM IP Address and exit
 echo

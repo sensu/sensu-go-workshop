@@ -59,11 +59,11 @@ sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
 sed -i 's/^;http_port = 3000/http_port = 4000/' /etc/grafana/grafana.ini
 
 # Copy Sensu configuration files
-cp -r /vagrant/files/sensu/* /etc/sensu/
+cp -r /vagrant/files/etc/* /etc/
 chmod +x /etc/sensu/plugins/*
 chown -R sensu:sensu /etc/sensu
-cp -r /vagrant/files/grafana/* /etc/grafana/
 chown -R grafana:grafana /etc/grafana
+cp -r /vagrant/files/var/* /var/
 
 # Configure the shell
 echo 'export PS1="demo $ "' >> ~/.bash_profile

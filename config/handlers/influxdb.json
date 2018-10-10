@@ -1,0 +1,11 @@
+{
+    "type": "Handler",
+    "spec": {
+        "name": "influxdb",
+        "type": "pipe",
+        "command": "/usr/bin/sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'",
+        "timeout": 10,
+        "organization": "default",
+        "environment": "default"
+    }
+}

@@ -19,7 +19,7 @@ services:
     - "monitoring"
     depends_on:
     - "influxdb"
-    command: "curl -XPOST http://influxdb:8086 --data-urlencode 'q=CREATE DATABASE sensu'"
+    command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
 
   grafana:
     image: "grafana/grafana:latest"
@@ -28,6 +28,7 @@ services:
     ports:
     - 4000:3000
     volumes:
+    - "./data/grafana:/var/lib/grafana"
     - "$PWD/files/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
 
   sensu-backend:

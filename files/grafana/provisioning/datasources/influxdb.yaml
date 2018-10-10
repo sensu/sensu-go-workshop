@@ -9,7 +9,6 @@ datasources:
   type: influxdb
   access: proxy
   orgId: 1
-  isDefault: true
   database: sensu
   user: admin
   password: admin

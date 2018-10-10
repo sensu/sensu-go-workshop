@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+WORK_DIR=/tmp/sensu-assets
+BUILD_DIR=$WORK_DIR/build
+OUTPUT_DIR=$WORK_DIR/assets
+mkdir -p $BUILD_DIR $OUTPUT_DIR
+
+# Read arguments
+while getopts ha:v:b:l:i:e:o: argument;
+do
+  case "${argument}"
+    in
+      h)
+        echo "NAME"
+        echo "  create-sensu-asset -- creates Sensu 2 asset packages (tarballs)."
+        echo
+        echo "SYNOPSIS"
+        echo "  create-sensu-asset -a ASSET_NAME -v ASSET_VERSION -b /path/to/executable/script/or/binary"
+        echo
+        echo "DESCRIPTION"
+        echo "  The create-sensu-asset utility builds Sensu 2 assets containing"
+        echo "  /bin /lib and /include subdirectories, copying the user-"
+        echo "  provided -b BINARY -l LIBRARIES -i INCLUDES files, and"
+        echo "  compressing them as a gzipped tarball."
+        echo
+        echo "  The options are as follows:"
+        echo
+        echo "  -h      Prints this help!"
+        echo "  -a ASSET_NAME"
+        echo "          The asset package file name prefix (i.e. tarball file"
+        echo "          name). REQUIRED"
+        echo "  -v ASSET_VERSION"
+        echo "          The asset package file name suffix (i.e. the tarball "
+        echo "          file name suffix). OPTIONAL"
+        echo "  -b BINARIES"
+        echo "          The path(s) to executable scripts or binary files,"
+        echo "          which will be packaged in the asset /bin directory, and"
+        echo "          added to the Sensu Agent \$PATH environment variable at"
+        echo "          runtime. Multiple files may be specified as a"
+        echo "          comma-separated list. OPTIONAL"
+        echo "  -l LIBRARIES"
+        echo "          The path(s) to linked library files, which will be"
+        echo "          packaged in the asset /lib directory, and added to the"
+        echo "          Sensu Agent \$LD_LIBRARY_PATH environment variable at."
+        echo "          runtime. Multiple files may be specified as a comma-"
+        echo "          separated. OPTIONAL"
+        echo "  -i INCLUDES"
+        echo "          The path(s) to any additional files, which will be"
+        echo "          packaged in the asset /include directory and accessible"
+        echo "          Multiple files may be specified as a comma-separated list."
+        echo "          OPTIONAL"
+        echo "  -e EXTRA"
+        echo "          The path(s) to any additional files or directories,"
+        echo "          which will be packaged in the asset / (root) directory."
+        echo "          Multiple files or directories may be specified as a"
+        echo "          comma-separated list. OPTIONAL"
+        exit 0;
+        ;;
+      a)
+        ASSET_NAME=${OPTARG}
+        ;;
+      v)
+        ASSET_VERSION="_${OPTARG}"
+        ;;
+      b)
+        BINS=${OPTARG}
+        ;;
+      l)
+        LIBS=${OPTARG}
+        ;;
+      i)
+        INCLUDES=${OPTARG}
+        ;;
+      e)
+        EXTRA=${OPTARG}
+        ;;
+      o)
+        OUTPUT_DIR=${OPTARG}
+        ;;
+
+  esac
+done;
+
+# Build the asset
+if [[ -n $ASSET_NAME ]];
+  then
+    PKG_DIR="${BUILD_DIR}/${ASSET_NAME}${ASSET_VERSION}";
+    if [[ -d $PKG_DIR ]]; then
+      echo "Cleaning up pre-existing build directory: ${PKG_DIR}";
+      rm -rf $PKG_DIR;
+    fi
+    echo "Creating asset build directory: ${PKG_DIR}.";
+    mkdir -p $PKG_DIR/bin $PKG_DIR/lib $PKG_DIR/include;
+  else
+    echo "ERROR: no option -a provided. Please provide an asset package name.";
+    exit 2;
+fi
+if [[ -n $BINS ]]; then
+  IFS=',' read -r -a BINARIES <<< "${BIN}"
+  for INDEX in "${!BINARIES[@]}"
+  do
+    BINARY="${BINARIES[$INDEX]}"
+    if [[ -e $BINARY ]]; then
+      cp $BINARY $PKG_DIR/bin/;
+      LINKED_LIBRARIES=($(ldd $BINARY | awk '{print $3}'))
+      for INDEX in "${!LINKED_LIBRARIES[@]}"
+      do
+        LINKED_LIBRARY="${LINKED_LIBRARIES[$INDEX]}"
+        echo "Including linked library: $LINKED_LIBRARY"
+        cp $LINKED_LIBRARY $PKG_DIR/lib/
+      done
+    else
+      echo "ERROR: file not found: ${BINARY}"
+      exit 2;
+    fi
+  done
+fi
+if [[ -n $LIBS ]]; then
+  IFS=',' read -r -a LIBRARIES <<< "${LIB}"
+  for INDEX in "${!LIBRARIES[@]}"
+  do
+    LIBRARY="${LIBRARIES[$INDEX]}";
+    if [[ -e $LIBRARY ]]; then
+      cp $LIBRARY $PKG_DIR/lib/;
+    else
+      echo "ERROR: file not found: ${LIBRARY}"
+      exit 2;
+    fi
+  done
+fi
+if [[ -n $INCLUDES ]]; then
+  IFS=',' read -r -a INCLUDED <<< "${INCLUDES}"
+  for INDEX in "${!INCLUDED[@]}"
+  do
+    INCLUDE="${INCLUDED[$INDEX]}"
+    if [[ -e $INCLUDE ]]; then
+      cp $INCLUDE $PKG_DIR/include/;
+    else
+      echo "ERROR: file not found: ${INCLUDE}"
+      exit 2;
+    fi
+  done
+fi
+if [[ -n $EXTRAS ]]; then
+  IFS=',' read -r -a EXTRAS <<< "${EXTRA}"
+  for INDEX in "${!EXTRAS[@]}"
+  do
+    EXTRA="${EXTRAS[$INDEX]}"
+    if [[ -d $EXTRA ]]; then
+        echo "Adding extra directory: $EXTRA"
+        cp -r $EXTRA $PKG_DIR/;
+    elif [[ -f $EXTRA ]]; then
+        echo "Adding extra file: $EXTRA"
+        cp $EXTRA $PKG_DIR/;
+    else
+        echo "Extra file not found: $EX"
+        exit 1
+    fi
+  done
+fi
+
+ASSET="${OUTPUT_DIR}/${ASSET_NAME}${ASSET_VERSION}_$(uname -s)-$(uname -m).tar.gz"
+echo "";
+echo "Packaging contents of ${PKG_DIR} into ${ASSET}";
+echo "";
+tar -zcf $ASSET -C $PKG_DIR .
+if [[ -e $ASSET ]]; then
+  sha512sum $ASSET;
+fi

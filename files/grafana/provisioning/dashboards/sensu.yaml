@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+- name: 'sensu'
+  orgId: 1
+  folder: 'Sensu'
+  type: file
+  updateIntervalSeconds: 10
+  options:
+    path: /var/lib/grafana/dashboards

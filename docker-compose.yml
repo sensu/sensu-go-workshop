@@ -8,8 +8,8 @@ services:
     ports:
     - 8086:8086
     volumes:
-    - "./data/influxdb:/var/lib/influxdb"
-    - "./files/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf"
+    - "$PWD/data/influxdb:/var/lib/influxdb"
+    - "$PWD/files/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf"
 
   influxdb-init:
     build:
@@ -22,14 +22,16 @@ services:
     command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
 
   grafana:
-    image: "grafana/grafana:latest"
+    build:
+      context: "docker/grafana/"
+    user: "1000"
     networks:
     - "monitoring"
     ports:
     - 4000:3000
     volumes:
-    - "./data/grafana:/var/lib/grafana"
     - "$PWD/files/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
+    - "$PWD/files/grafana/provisioning/dashboards/sensu.yaml:/etc/grafana/provisioning/dashboards/sensu.yaml"
 
   sensu-backend:
     build:
@@ -42,7 +44,7 @@ services:
     - 8080:8080
     - 8081:8081
     volumes:
-    - "./data/sensu/etcd:/var/lib/sensu/etcd"
+    - "$PWD/data/sensu/etcd:/var/lib/sensu/etcd"
     labels:
     - "io.sensu.description: The Sensu 2.0 backend"
     - "io.sensu.version: 2.0.0-beta.4.1"

@@ -120,7 +120,7 @@ To view the HTTP server logs, simply use `docker logs` to follow the NGINX
 container logs:
 
 ```
-$ docker logs -f $(docker ps --filter "name=sensu-asset-server" --format {{.ID}})
+$ docker logs -f $(docker ps --format {{.ID}} --filter "name=sensu-asset-server")
 172.28.0.1 - - [23/Aug/2018:22:15:30 +0000] "GET /assets/ HTTP/1.1" 200 955 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 ```
 

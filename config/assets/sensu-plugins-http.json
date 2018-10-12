@@ -1,0 +1,14 @@
+{
+    "type": "Asset",
+    "spec": {
+      "organization": "default",
+      "name": "sensu-plugins-http",
+      "url": "http://sensu-asset-server/assets/sensu-plugins-http-3.0.1-debian.tar.gz",
+      "sha512": "cd9f3b756e110d5d68af9b9235eb9e38efaf7ea118ce0d6ce2ff1a4049d205e417495c962585d160a534088eb2c1390672116a75c7a667d49cd5fbcf70d102c9",
+      "filters": [
+        "System.Platform=='debian'",
+        "System.OS=='linux'", 
+        "System.Arch=='amd64'"
+      ]
+    }
+  }

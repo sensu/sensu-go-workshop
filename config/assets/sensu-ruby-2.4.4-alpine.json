@@ -1,0 +1,14 @@
+{
+  "type": "Asset",
+  "spec": {
+    "organization": "default",
+    "name": "sensu-ruby-2.4.4",
+    "url": "https://github.com/calebhailey/sensu-ruby/releases/download/v0.2/sensu-ruby-2.4.4-alpine-linux-x86_64.tar.gz",
+    "sha512": "318a7bcd34d92532d8e8949e51dc310bd514dea7104bcb797ba481c89b786a0e1b5431266e997878b38b12ad70917fca5a70834c0c948982fe72d88dec53f596",
+    "filters": [
+      "System.Platform=='alpine'",
+      "System.OS=='linux'", 
+      "System.Arch=='amd64'"
+    ]
+  }
+}

@@ -145,16 +145,16 @@ will expire from time to time and need to be refreshed. Simply run
 that can be used make API requests.
 
 ```
-$ source sensu-backend-token.sh
-$ curl -XGET -s -H "Content-Type: application/json" -H "Authorization: $SENSU_TOKEN"  http://localhost:8080/entities | jq .
+$ source scripts/sensu-environment.sh
+$ curl -XGET -s -H "Content-Type: application/json" -H "Authorization: $SENSU_TOKEN"  http://localhost:8080/api/core/v2/namespaces/default/entities | jq .
 ```
 
 Example API requests:
 
-- `GET /entities`
-- `GET /assets`
-- `GET /checks`
-- `GET /handlers`
+- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/entities`
+- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/assets`
+- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/checks`
+- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/handlers`
 
 Example `POST /entities` for registering proxy entities in Sensu 2.0:
 

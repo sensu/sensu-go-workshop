@@ -1,15 +1,17 @@
-{
-    "type": "Check",
-    "spec": {
-        "organization": "default",
-        "environment": "default",
-        "name": "check_sensu_io",
-        "command": "check_http -u https://sensu.io/ -H sensu.io -N",
-        "runtime_assets": ["check_http_v0.1"],
-        "publish": true,
-        "interval": 10,
-        "subscriptions": ["docker"],
-        "output_metric_format": "nagios_perfdata",
-        "output_metric_handlers": ["influxdb"]
-    }
-}
+type: Check
+api_version: core/v2
+metadata:
+  namespace: default
+  name: check_sensu_io
+spec:
+  command: "check-http.rb -u https://sensu.io/"
+  runtime_assets:
+  - sensu-ruby-2.4.4
+  - sensu-plugins-http-v0.1
+  publish: true
+  interval: 10
+  subscriptions:
+  - docker
+  output_metric_format: nagios_perfdata
+  output_metric_handlers:
+  - influxdb

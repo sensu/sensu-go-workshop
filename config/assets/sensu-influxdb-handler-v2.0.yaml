@@ -1,0 +1,9 @@
+---
+type: Asset
+api_version: core/v2
+metadata:
+  namespace: default
+  name: sensu-influxdb-handler-v2.0
+spec:
+  url: http://sensu-asset-server/assets/sensu-influxdb-handler-v2.0-linux-x86_64.tar.gz
+  sha512: 136670c2c2468aba3ee9b259245336692681f5e525aaf9805279e3cab2ea1ef719864ce06dafd5c1452ad767d5ce4e79edb965c38b30ae5aedde14417f86e262

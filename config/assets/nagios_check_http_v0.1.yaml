@@ -1,9 +1,9 @@
-{
-    "type": "Asset",
-    "spec": {
-        "organization": "default",
-        "name": "check_http_v0.1",
-        "url": "http://sensu-asset-server/assets/check_http_v0.1.tar.gz",
-        "sha512": "dd799e938a8136fdbc3fdf8b9d21184ddea8bd13676901a05ed60497804aadcb8316a93b066aab75ff54a7ae0226fff0196add1a202c6533e6a608931e2d55f0"
-    }
-}
+---
+type: Asset
+api_version: core/v2
+metadata:
+  namespace: default
+  name: nagios_check_http_v0.1
+spec:
+  url: http://sensu-asset-server/assets/nagios_check_http_v0.1_debian_linux_x86_64.tar.gz
+  sha512: fbc385037b202fc3daed546b76ba037715d1f2d6319fec03fb8ca4e97fcd84c716e12be5bf28325f77e47f62d106eaf5784e5e89bed61a01c5c5ee7a3365cd72

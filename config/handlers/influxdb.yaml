@@ -1,11 +1,11 @@
-{
-    "type": "Handler",
-    "spec": {
-        "name": "influxdb",
-        "type": "pipe",
-        "command": "/usr/bin/sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'",
-        "timeout": 10,
-        "organization": "default",
-        "environment": "default"
-    }
-}
+type: Handler
+api_version: core/v2
+metadata:
+  namespace: default
+  name: influxdb
+spec:
+  type: pipe
+  command: "sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'"
+  timeout: 10
+  runtime_assets:
+  - sensu-influxdb-handler-v2.0

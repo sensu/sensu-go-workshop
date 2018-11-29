@@ -1,9 +1,0 @@
-{
-    "type": "Asset",
-    "spec": {
-        "organization": "default",
-        "name": "helloworld_v0.1",
-        "url": "http://sensu-asset-server/assets/helloworld_v0.1.tar.gz",
-        "sha512": "895091ee7e0e8f6c21c6289501ce44d31740da63acdb560e9224a54aabed8162874ebe2d4528f7f17bf5e40f0c467257e4d34c747f8982ca52e644b33e2f3530"
-    }
-}

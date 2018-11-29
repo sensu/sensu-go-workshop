@@ -2,8 +2,8 @@
 
 WORK_DIR=/tmp/sensu-assets
 BUILD_DIR=$WORK_DIR/build
-OUTPUT_DIR=$WORK_DIR/assets
-mkdir -p $BUILD_DIR $OUTPUT_DIR
+OUTPUT_DIR=$PWD
+mkdir -p $BUILD_DIR
 
 # Read arguments
 while getopts ha:v:b:l:i:e:o: argument;
@@ -47,20 +47,23 @@ do
         echo "  -i INCLUDES"
         echo "          The path(s) to any additional files, which will be"
         echo "          packaged in the asset /include directory and accessible"
-        echo "          Multiple files may be specified as a comma-separated list."
-        echo "          OPTIONAL"
+        echo "          Multiple files may be specified as a comma-separated"
+        echo "          list. OPTIONAL"
         echo "  -e EXTRA"
         echo "          The path(s) to any additional files or directories,"
         echo "          which will be packaged in the asset / (root) directory."
         echo "          Multiple files or directories may be specified as a"
         echo "          comma-separated list. OPTIONAL"
+        echo "  -o OUTPUT_DIR"
+        echo "          The directory where the asset should be created"
+        echo "          (output). Defaults to \$PWD"
         exit 0;
         ;;
       a)
         ASSET_NAME=${OPTARG}
         ;;
       v)
-        ASSET_VERSION="_${OPTARG}"
+        ASSET_VERSION="-${OPTARG}"
         ;;
       b)
         BINS=${OPTARG}
@@ -90,25 +93,29 @@ if [[ -n $ASSET_NAME ]];
       rm -rf $PKG_DIR;
     fi
     echo "Creating asset build directory: ${PKG_DIR}.";
+    echo ""
     mkdir -p $PKG_DIR/bin $PKG_DIR/lib $PKG_DIR/include;
   else
     echo "ERROR: no option -a provided. Please provide an asset package name.";
     exit 2;
 fi
 if [[ -n $BINS ]]; then
-  IFS=',' read -r -a BINARIES <<< "${BIN}"
+  IFS=',' read -r -a BINARIES <<< "${BINS}"
   for INDEX in "${!BINARIES[@]}"
   do
     BINARY="${BINARIES[$INDEX]}"
     if [[ -e $BINARY ]]; then
+      echo "Copying: $BINARY into the asset bin/$BINARY"
       cp $BINARY $PKG_DIR/bin/;
-      LINKED_LIBRARIES=($(ldd $BINARY | awk '{print $3}'))
-      for INDEX in "${!LINKED_LIBRARIES[@]}"
-      do
-        LINKED_LIBRARY="${LINKED_LIBRARIES[$INDEX]}"
-        echo "Including linked library: $LINKED_LIBRARY"
-        cp $LINKED_LIBRARY $PKG_DIR/lib/
-      done
+      if [[ $(which ldd) ]]; then
+        LINKED_LIBRARIES=($(ldd $BINARY | awk '{print $3}'))
+        for INDEX in "${!LINKED_LIBRARIES[@]}"
+        do
+          LINKED_LIBRARY="${LINKED_LIBRARIES[$INDEX]}"
+          echo "Including linked library: $LINKED_LIBRARY"
+          cp $LINKED_LIBRARY $PKG_DIR/lib/
+        done
+      fi;
     else
       echo "ERROR: file not found: ${BINARY}"
       exit 2;
@@ -116,11 +123,12 @@ if [[ -n $BINS ]]; then
   done
 fi
 if [[ -n $LIBS ]]; then
-  IFS=',' read -r -a LIBRARIES <<< "${LIB}"
+  IFS=',' read -r -a LIBRARIES <<< "${LIBS}"
   for INDEX in "${!LIBRARIES[@]}"
   do
     LIBRARY="${LIBRARIES[$INDEX]}";
     if [[ -e $LIBRARY ]]; then
+      echo "Copying: $LIBRARY into the asset lib/$LIBRARY"
       cp $LIBRARY $PKG_DIR/lib/;
     else
       echo "ERROR: file not found: ${LIBRARY}"
@@ -134,6 +142,7 @@ if [[ -n $INCLUDES ]]; then
   do
     INCLUDE="${INCLUDED[$INDEX]}"
     if [[ -e $INCLUDE ]]; then
+      echo "Copying: $INCLUDE into the asset include/$INCLUDE"
       cp $INCLUDE $PKG_DIR/include/;
     else
       echo "ERROR: file not found: ${INCLUDE}"
@@ -142,28 +151,35 @@ if [[ -n $INCLUDES ]]; then
   done
 fi
 if [[ -n $EXTRAS ]]; then
-  IFS=',' read -r -a EXTRAS <<< "${EXTRA}"
+  IFS=',' read -r -a EXTRAS <<< "${EXTRAS}"
   for INDEX in "${!EXTRAS[@]}"
   do
     EXTRA="${EXTRAS[$INDEX]}"
     if [[ -d $EXTRA ]]; then
-        echo "Adding extra directory: $EXTRA"
+        echo "Copying: $EXTRA (a directory) into the asset $EXTRA"
         cp -r $EXTRA $PKG_DIR/;
     elif [[ -f $EXTRA ]]; then
-        echo "Adding extra file: $EXTRA"
+        echo "Copying: $EXTRA (a file) into the asset $EXTRA"
         cp $EXTRA $PKG_DIR/;
     else
-        echo "Extra file not found: $EX"
+        echo "Extra file not found: $EXTRA"
         exit 1
     fi
   done
 fi
 
-ASSET="${OUTPUT_DIR}/${ASSET_NAME}${ASSET_VERSION}_$(uname -s)-$(uname -m).tar.gz"
+export ASSET_OS="-$(uname -s | tr '[:upper:]' '[:lower:]')"
+export ASSET_ARCH="-$(uname -m)"
+
+ASSET="${OUTPUT_DIR}/${ASSET_NAME}${ASSET_VERSION}${ASSET_OS}${ASSET_ARCH}.tar.gz"
 echo "";
 echo "Packaging contents of ${PKG_DIR} into ${ASSET}";
 echo "";
 tar -zcf $ASSET -C $PKG_DIR .
 if [[ -e $ASSET ]]; then
-  sha512sum $ASSET;
+  if [[ $(which sha512sum) ]]; then
+    sha512sum $ASSET;
+  elif [[ $(which shasum) ]]; then
+    shasum -a 512 $ASSET;
+  fi;
 fi

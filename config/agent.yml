@@ -4,12 +4,22 @@
 ##
 backend-url:
 - "ws://sensu-backend:8081"
-organization: "default"
-environment: "default"
-#id: ""
+namespace: "default"
+# name: demo-agent
 subscriptions:
 - "docker"
 - "poller"
+labels:
+  region: us-west-1
+  demo: https://github.com/calebhailey/sensu-demo
+keepalive-interval: 5
+keepalive-timeout: 10
+deregister: true
+#deregistration-handler: "deregister"
+#cache-dir: "/var/cache/sensu/sensu-agent"
+#config-file: ""
+#log-level: "warn"
+#redact: ""
 
 ##
 # authentication configuration
@@ -39,22 +49,3 @@ socket-port: 3030
 #statsd-flush-interval: 10
 #statsd-metrics-host: "127.0.0.1"
 #statsd-metrics-port: 8125
-
-
-##
-# other
-##
-#cache-dir: "/var/cache/sensu/sensu-agent"
-#config-file: ""
-deregister: true
-#deregistration-handler: ""
-keepalive-timeout: 60
-#keepalive-interval: 20
-#custom-attributes: ""
-#log-level: "warn"
-#redact: ""
-
-##
-# extended attributes
-##
-extended_attributes: "team:ops"

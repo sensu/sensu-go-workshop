@@ -6,7 +6,7 @@ metadata:
 spec:
   command: "check-http.rb -u https://sensu.io/"
   runtime_assets:
-  - sensu-ruby-2.4.4
+  - sensu-ruby-2.4.4-debian
   - sensu-plugins-http-v0.1
   publish: true
   interval: 10

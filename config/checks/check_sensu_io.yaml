@@ -1,8 +1,11 @@
+---
 type: Check
 api_version: core/v2
 metadata:
   namespace: default
   name: check_sensu_io
+  labels:
+    aggregate: http_service
 spec:
   command: "check-http.rb -u https://sensu.io/"
   runtime_assets:

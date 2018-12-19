@@ -1,0 +1,9 @@
+FROM debian:stretch
+
+WORKDIR /build
+RUN \
+  apt-get update && apt-get install -y curl ca-certificates && \
+  curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.0.0/sensu-go-5.0.0-linux-amd64.tar.gz && \
+  tar -xzf sensu-go-5.0.0-linux-amd64.tar.gz && \
+  cp bin/sensu-backend /usr/bin/sensu-backend && \
+  rm sensu-go-5.0.0-linux-amd64.tar.gz

@@ -22,16 +22,19 @@ asset][sensu-ruby] (!), something something.
    - The Nagios `check_http` C Plugin packaged as a Sensu Asset
    - A prototype Ruby Runtime packaged as a Sensu Asset (for running ruby
      plugins!)
-   - A `helloworld.rb` Ruby script packaged as a Sensu Asset
+   - The [sensu-plugins-http][sensu-plugins-http] plugin gem packaged as a Sensu
+     Asset.
 5. Some helper Bash scripts for working with your own assets and the Sensu 2.0
    API
 
+[sensu-plugins-http]: https://github.com/sensu-plugins/sensu-plugins-http
+
 ## Prerequisites
 
-You'll need a working Docker environment to run this demo. If you're using a
-Mac, head on over to the [Docker CE for Mac][docker-ce-for-mac] page for more
-instructions. Linux users can find installation instructions from the
-[Docker CE installation guide][docker-ce].
+You'll need a working Docker environment with Docker Compose to run this demo.
+If you're using a Mac, head on over to the [Docker CE for
+Mac][docker-ce-for-mac] page for more instructions. Linux users can find
+installation instructions from the [Docker CE installation guide][docker-ce].
 
 [docker-ce-for-mac]: https://store.docker.com/editions/community/docker-ce-desktop-mac
 [docker-ce]: https://docs.docker.com/install/
@@ -43,12 +46,12 @@ instructions. Linux users can find installation instructions from the
    ```
    $ docker-compose up -d
    Creating network "sensu-demo_monitoring" with driver "bridge"
-   Creating sensu-demo_sensu-backend_1      ... done
-   Creating sensu-demo_grafana_1            ... done
-   Creating sensu-demo_sensu-asset-server_1 ... done
-   Creating sensu-demo_influxdb_1           ... done
-   Creating sensu-demo_sensu-agent_1        ... done
-   Creating sensu-demo_influxdb-init_1      ... done
+   Creating sensu-demo_sensu-asset-server_1_ea8078731137 ... done
+   Creating sensu-demo_influxdb_1_e355beba89f5           ... done
+   Creating sensu-demo_sensu-backend_1_47d6bfc38825      ... done
+   Creating sensu-demo_grafana_1_a17197fa7683            ... done
+   Creating sensu-demo_influxdb-init_1_d341615a9ea4      ... done
+   Creating sensu-demo_sensu-agent_1_b42bbbf94935        ... done
    ```
 
    _NOTE: you may see some `docker pull` and `docker build` output on your first
@@ -97,16 +100,16 @@ instructions. Linux users can find installation instructions from the
 3. Register some Sensu 2.0 Assets
 
    ```
-   $ sensuctl create -f config/assets/check_http_v0.1.json
-   $ sensuctl create -f config/assets/sensu-ruby_v2.4.4.json
-   $ sensuctl create -f config/assets/helloworld_v0.1.json
+   $ sensuctl create -f manifests/assets/check_http_v0.1.json
+   $ sensuctl create -f manifests/assets/sensu-ruby_v2.4.4.json
+   $ sensuctl create -f manifests/assets/helloworld_v0.1.json
    ```
 
 4. Configure a check
 
    ```
-   $ sensuctl create -f config/checks/check_sensu_io.json
-   $ sensuctl create -f config/checks/helloworld.json
+   $ sensuctl create -f manifests/checks/check_sensu_io.json
+   $ sensuctl create -f manifests/checks/helloworld.json
    ```
 
 ## Helpful tips

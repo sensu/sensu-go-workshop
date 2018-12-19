@@ -36,6 +36,7 @@ services:
   sensu-backend:
     build:
       context: "docker/sensu-backend/"
+      dockerfile: "Dockerfile"
     image: "sensu-backend:latest"
     networks:
     - "monitoring"
@@ -65,6 +66,7 @@ services:
   sensu-agent:
     build:
       context: "docker/sensu-agent/"
+      dockerfile: "Dockerfile"
     image: "sensu-agent:latest"
     networks:
     - "monitoring"

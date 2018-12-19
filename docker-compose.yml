@@ -3,8 +3,6 @@ version: "3"
 services:
   influxdb:
     image: "influxdb:latest"
-    networks:
-    - "monitoring"
     ports:
     - 8086:8086
     volumes:
@@ -15,8 +13,6 @@ services:
     build:
       context: "docker/influxdb-init/"
     image: "influxdb-init:latest"
-    networks:
-    - "monitoring"
     depends_on:
     - "influxdb"
     command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
@@ -24,8 +20,6 @@ services:
   grafana:
     image: "grafana/grafana:5.1.0"
     user: "1000"
-    networks:
-    - "monitoring"
     ports:
     - 4000:3000
     volumes:
@@ -38,8 +32,6 @@ services:
       context: "docker/sensu-backend/"
       dockerfile: "Dockerfile.debian"
     image: "sensu-backend:latest"
-    networks:
-    - "monitoring"
     ports:
     - 3000:3000
     - 8080:8080
@@ -55,8 +47,6 @@ services:
 
   sensu-asset-server:
     image: "nginx:latest"
-    networks:
-    - "monitoring"
     ports:
     - 8000:80
     volumes:
@@ -68,11 +58,8 @@ services:
       context: "docker/sensu-agent/"
       dockerfile: "Dockerfile.debian"
     image: "sensu-agent:latest"
-    networks:
-    - "monitoring"
     volumes:
     - "$PWD/config/sensu/agent.yml:/etc/sensu/agent.yml"
-    # privileged: true
     depends_on:
     - "sensu-backend"
     labels:
@@ -80,7 +67,3 @@ services:
     - "io.sensu.version: 2.0.0-beta.4.1"
     - "io.sensu.role: agent"
     command: "sensu-agent start --backend-url ws://sensu-backend:8081 --log-level debug"
-
-networks:
-  monitoring:
-    driver: "bridge"

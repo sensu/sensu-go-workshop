@@ -19,9 +19,8 @@ services:
 
   grafana:
     image: "grafana/grafana:5.1.0"
-    user: "1000"
     ports:
-    - 4000:3000
+    - 3001:3000
     volumes:
     - "$PWD/config/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
     - "$PWD/config/grafana/provisioning/dashboards/sensu.yaml:/etc/grafana/provisioning/dashboards/sensu.yaml"
@@ -43,7 +42,7 @@ services:
     - "io.sensu.description: The Sensu 2.0 backend"
     - "io.sensu.version: 2.0.0-beta.4.1"
     - "io.sensu.role: backend"
-    command: "sensu-backend start --log-level debug"
+    command: "sensu-backend start"
 
   sensu-asset-server:
     image: "nginx:latest"

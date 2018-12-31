@@ -1,3 +1,4 @@
+---
 type: Handler
 api_version: core/v2
 metadata:
@@ -7,5 +8,6 @@ spec:
   type: pipe
   command: "sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'"
   timeout: 10
+  mutator: event-enrichment
   runtime_assets:
-  - sensu-influxdb-handler-v2.0
+  - sensu-influxdb-handler

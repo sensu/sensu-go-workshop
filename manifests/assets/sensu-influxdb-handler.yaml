@@ -2,8 +2,8 @@
 type: Asset
 api_version: core/v2
 metadata:
-  namespace: demo
-  name: influxdb-handler
+  namespace: default
+  name: sensu-influxdb-handler
 spec:
   url: https://github.com/sensu/sensu-influxdb-handler/releases/download/3.0.1/sensu-influxdb-handler_3.0.1_linux_amd64.tar.gz
   sha512: 52dd78712a208ca78368d68223e7d4231cad9ed18784c98fdecb29f93fc6581d4264d116cff1324f05041142732af3b485115baa6e6bb512cf17af62da3ee19e

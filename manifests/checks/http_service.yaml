@@ -3,9 +3,11 @@ type: CheckConfig
 api_version: core/v2
 metadata:
   namespace: default
-  name: influxdb_metrics
+  name: http_service
+  labels:
+    aggregate: http_service
 spec:
-  command: echo 'web_service value='`echo $RANDOM`' '`date +%s`
+  command: echo 'http_service value='`echo $RANDOM`' '`date +%s`
   publish: true
   interval: 10
   subscriptions:

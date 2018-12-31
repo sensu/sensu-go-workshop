@@ -1,6 +1,6 @@
 {
-  "title": "Web Service",
-  "uid": "web_service",
+  "title": "HTTP Service",
+  "uid": "http_service",
   "version": 6,
   "timezone": "America/Los_Angeles",
   "time": {

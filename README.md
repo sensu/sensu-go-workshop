@@ -1,11 +1,7 @@
-# 2018 Sensu Summit Workshops
+# Sensu Go Demo
 
-Hi! Something something example configuration files for playing with the Sensu
-2.0 beta, new [Sensu Assets][sensu-assets], and a [prototype Ruby Runtime
-asset][sensu-ruby] (!), something something.
-
-[sensu-assets]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
-[sensu-ruby]:   https://github.com/calebhailey/sensu-ruby
+Something something Docker Compose environment for trying Sensu Go something
+something.
 
 ## Workshop contents
 
@@ -20,14 +16,16 @@ asset][sensu-ruby] (!), something something.
 3. Sensu resource configuration templates (e.g. asset and check definitions)
 4. Example Sensu Assets
    - The Nagios `check_http` C Plugin packaged as a Sensu Asset
-   - A prototype Ruby Runtime packaged as a Sensu Asset (for running ruby
-     plugins!)
+   - A prototype [Ruby Runtime][sensu-ruby] packaged as a Sensu Asset (for
+     running ruby plugins!)
    - The [sensu-plugins-http][sensu-plugins-http] plugin gem packaged as a Sensu
      Asset.
 5. Some helper Bash scripts for working with your own assets and the Sensu 2.0
    API
 
+[sensu-assets]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
 [sensu-plugins-http]: https://github.com/sensu-plugins/sensu-plugins-http
+[sensu-ruby]:   https://github.com/calebhailey/sensu-ruby
 
 ## Prerequisites
 

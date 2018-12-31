@@ -1,13 +1,36 @@
 {
-  "timezone": "America/Los_Angeles",
-  "title": "web_service",
+  "title": "Web Service",
   "uid": "web_service",
-  "version": 1,
+  "version": 6,
+  "timezone": "America/Los_Angeles",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "refresh": "5s",
+  "schemaVersion": 16,
+  "style": "dark",
+  "tags": [],
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
   "id": 2,
+  "iteration": 1546276861205,
   "links": [],
+  "annotations": {
+    "list": [
+      {
+        "$$hashKey": "object:155",
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
   "panels": [
     {
       "aliasColors": {},
@@ -24,10 +47,12 @@
       },
       "id": 2,
       "legend": {
+        "alignAsTable": true,
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
+        "rightSide": true,
         "show": true,
         "total": false,
         "values": false
@@ -46,7 +71,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "$$hashKey": "object:191",
+          "$$hashKey": "object:224",
+          "alias": "Response Time ($tag_entity)",
           "groupBy": [
             {
               "params": [
@@ -56,40 +82,9 @@
             },
             {
               "params": [
-                "linear"
+                "entity"
               ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "[[Host]].web_service.time",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "$$hashKey": "object:224",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
+              "type": "tag"
             },
             {
               "params": [
@@ -119,9 +114,15 @@
           ],
           "tags": [
             {
-              "key": "host",
-              "operator": "=",
-              "value": "[[Host]]"
+              "key": "entity",
+              "operator": "=~",
+              "value": "/^$Entity$/"
+            },
+            {
+              "condition": "AND",
+              "key": "region",
+              "operator": "=~",
+              "value": "/^$Region$/"
             }
           ]
         }
@@ -129,7 +130,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "web_service",
+      "title": "Web Service",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -145,6 +146,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:1024",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -153,6 +155,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:1025",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -167,27 +170,22 @@
       }
     }
   ],
-  "refresh": "5s",
-  "schemaVersion": 16,
-  "style": "dark",
-  "tags": [],
   "templating": {
     "list": [
       {
-        "allValue": null,
+        "allValue": "*",
         "current": {
-          "isNone": true,
-          "text": "None",
-          "value": ""
+          "text": "us-west-1",
+          "value": "us-west-1"
         },
         "datasource": "InfluxDB",
         "hide": 0,
-        "includeAll": false,
-        "label": "DC",
-        "multi": false,
-        "name": "DC",
+        "includeAll": true,
+        "label": "Region",
+        "multi": true,
+        "name": "Region",
         "options": [],
-        "query": "SHOW TAG VALUES WITH KEY = \"dc\"",
+        "query": "SHOW TAG VALUES WITH KEY = \"region\"",
         "refresh": 2,
         "regex": "",
         "sort": 0,
@@ -198,20 +196,21 @@
         "useTags": false
       },
       {
-        "allValue": null,
+        "allValue": "*",
         "current": {
-          "isNone": true,
-          "text": "None",
-          "value": ""
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
         "datasource": "InfluxDB",
         "hide": 0,
-        "includeAll": false,
-        "label": "Host",
-        "multi": false,
-        "name": "Host",
+        "includeAll": true,
+        "label": "Entity",
+        "multi": true,
+        "name": "Entity",
         "options": [],
-        "query": "SHOW TAG VALUES WITH KEY = \"host\"",
+        "query": "SHOW TAG VALUES WITH KEY = \"entity\"",
         "refresh": 2,
         "regex": "",
         "sort": 0,
@@ -222,10 +221,6 @@
         "useTags": false
       }
     ]
-  },
-  "time": {
-    "from": "now-5m",
-    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [

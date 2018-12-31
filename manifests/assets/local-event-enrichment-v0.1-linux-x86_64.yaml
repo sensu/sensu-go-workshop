@@ -1,0 +1,9 @@
+---
+type: Asset
+api_version: core/v2
+metadata:
+  name: event-enrichment-v0.1
+  namespace: default
+spec:
+  url: http://sensu-asset-server/assets/event-enrichment-v0.1-linux-x86_64.tar.gz.tar.gz
+  sha512: 784e584895d4c61f7d41fd66c9eb28425634e14f01d829fdb67daa94e755aab29d0b3e47dec3b58adb4545b4c12e0021b7eb521a13139d1f5c49c5554046955f 

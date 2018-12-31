@@ -1,3 +1,4 @@
 .vagrant
 data/
+assets/*.tar.gz
 manifests/assets/local-*.yaml

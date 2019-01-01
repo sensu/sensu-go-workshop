@@ -9,7 +9,7 @@ metadata:
 spec:
   command: check_http -H sensu-asset-server -N
   runtime_assets:
-  - nagios_check_http_v0.1
+  - nagios-check-http-v0.1
   publish: true
   interval: 10
   subscriptions:

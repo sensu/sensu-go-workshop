@@ -2,8 +2,8 @@
 type: Handler
 api_version: core/v2
 metadata:
-  namespace: default
   name: influxdb
+  namespace: default
 spec:
   type: pipe
   command: "sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'"

@@ -12,6 +12,6 @@ metadata:
   name: $ASSET_NAME
   namespace: default
 spec:
-  url: $ASSET_SERVER_URL/assets/$ASSET_FILE.tar.gz
+  url: $ASSET_SERVER_URL/assets/$ASSET_FILE
   sha512: $SHASUM " | tee $MANIFEST_FILE
 done

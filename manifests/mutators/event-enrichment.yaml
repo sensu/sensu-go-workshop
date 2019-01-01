@@ -1,0 +1,11 @@
+---
+type: Mutator
+api_version: core/v2
+metadata:
+  namespace: default
+  name: event-enrichment
+spec:
+  command: "transformer"
+  timeout: 10
+  runtime_assets:
+  - event-enrichment-v0.1

@@ -1,9 +1,0 @@
----
-type: Asset
-api_version: core/v2
-metadata:
-  name: sensu-plugins-http-v0.1
-  namespace: default
-spec:
-  url: http://sensu-asset-server/assets/sensu-plugins-http-v0.1.tar.gz.tar.gz
-  sha512: fc5ac7e85d0576133ebfd66ba02740b9611c694f614cb5c2dde1ca03ea8a41d1b96d1d733e502e809459510463d46717837feed3b95732fcb1722ea41fe19ea4 

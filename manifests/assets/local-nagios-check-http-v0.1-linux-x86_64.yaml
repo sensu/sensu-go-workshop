@@ -5,5 +5,5 @@ metadata:
   name: nagios-check-http-v0.1
   namespace: default
 spec:
-  url: http://sensu-asset-server/assets/nagios-check-http-v0.1-linux-x86_64.tar.gz.tar.gz
+  url: http://sensu-asset-server/assets/nagios-check-http-v0.1-linux-x86_64.tar.gz
   sha512: fbc385037b202fc3daed546b76ba037715d1f2d6319fec03fb8ca4e97fcd84c716e12be5bf28325f77e47f62d106eaf5784e5e89bed61a01c5c5ee7a3365cd72 

@@ -2,21 +2,21 @@
 type: Asset
 api_version: core/v2
 metadata:
-  namespace: default
   name: event-enrichment-v0.1
+  namespace: default
 spec:
   url: http://sensu-asset-server/assets/event-enrichment-v0.1-linux-x86_64.tar.gz
-  sha512: 784e584895d4c61f7d41fd66c9eb28425634e14f01d829fdb67daa94e755aab29d0b3e47dec3b58adb4545b4c12e0021b7eb521a13139d1f5c49c5554046955f
+  sha512: 784e584895d4c61f7d41fd66c9eb28425634e14f01d829fdb67daa94e755aab29d0b3e47dec3b58adb4545b4c12e0021b7eb521a13139d1f5c49c5554046955f 
 
 ---
 type: Asset
 api_version: core/v2
 metadata:
+  name: nagios-check-http-v0.1
   namespace: default
-  name: nagios_check_http_v0.1
 spec:
-  url: http://sensu-asset-server/assets/nagios_check_http_v0.1_debian_linux_x86_64.tar.gz
-  sha512: fbc385037b202fc3daed546b76ba037715d1f2d6319fec03fb8ca4e97fcd84c716e12be5bf28325f77e47f62d106eaf5784e5e89bed61a01c5c5ee7a3365cd72
+  url: http://sensu-asset-server/assets/nagios-check-http-v0.1-linux-x86_64.tar.gz
+  sha512: fbc385037b202fc3daed546b76ba037715d1f2d6319fec03fb8ca4e97fcd84c716e12be5bf28325f77e47f62d106eaf5784e5e89bed61a01c5c5ee7a3365cd72 
 
 ---
 type: Asset
@@ -59,7 +59,7 @@ metadata:
 spec:
   command: check_http -H sensu-asset-server -N
   runtime_assets:
-  - nagios_check_http_v0.1
+  - nagios-check-http-v0.1
   publish: true
   interval: 10
   subscriptions:
@@ -74,8 +74,6 @@ api_version: core/v2
 metadata:
   namespace: default
   name: check_sensu_io
-  labels:
-    aggregate: http_service
 spec:
   command: "check-http.rb -u https://sensu.io/"
   runtime_assets:
@@ -94,9 +92,11 @@ type: CheckConfig
 api_version: core/v2
 metadata:
   namespace: default
-  name: influxdb_metrics
+  name: http_service
+  labels:
+    aggregate: http_service
 spec:
-  command: echo 'web_service value='`echo $RANDOM`' '`date +%s`
+  command: echo 'http_service value='`echo $RANDOM`' '`date +%s`
   publish: true
   interval: 10
   subscriptions:
@@ -109,8 +109,8 @@ spec:
 type: Handler
 api_version: core/v2
 metadata:
-  namespace: default
   name: influxdb
+  namespace: default
 spec:
   type: pipe
   command: "sensu-influxdb-handler -a 'http://influxdb:8086' -d 'sensu' -u 'admin' -p 'admin'"

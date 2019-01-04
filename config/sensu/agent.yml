@@ -11,7 +11,6 @@ subscriptions:
 - "poller"
 labels:
   region: us-west-1
-  demo: https://github.com/calebhailey/sensu-demo
 keepalive-interval: 5
 keepalive-timeout: 10
 deregister: true

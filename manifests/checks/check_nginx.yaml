@@ -4,8 +4,6 @@ api_version: core/v2
 metadata:
   namespace: default
   name: sensu_asset_index_response
-  labels:
-    aggregate: http_service
 spec:
   command: check_http -H sensu-asset-server -N
   runtime_assets:

@@ -5,5 +5,5 @@ metadata:
   namespace: default
   name: sensu-ruby-2.4.4-debian
 spec:
-  url: https://github.com/sensu/sensu-ruby-asset-builder/releases/download/v0.2/sensu-ruby-2.4.4-debian-linux-x86_64.tar.gz
-  sha512: a37e528a7e6c4c976ef7bbc68fe06d8cc1c2ac5944452e0a7e7e742b23a555fdc57510875b6f9c351600d203c91b9f1c5e6039c20b563ab598e539bd96a374f3
+  url: https://github.com/sensu/sensu-ruby-runtime/releases/download/0.0.4/sensu-ruby-runtime_0.0.4_debian_linux_amd64.tar.gz
+  sha512: a2162dd34d1805a06a5fe29558ccc2d99bc87209d01a639af8bb3a47df6dd0efa7040dbf0ad44bcf23cc95e8205eb21ca3e783ef20fabbc17cdda9b33f90e255

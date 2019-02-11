@@ -7,8 +7,9 @@ backend-url:
 namespace: "default"
 # name: demo-agent
 subscriptions:
-- "docker"
-- "poller"
+- linux
+- docker
+- poller
 labels:
   region: us-west-1
 keepalive-interval: 5

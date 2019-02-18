@@ -1,44 +1,11 @@
 ---
 version: "3"
 services:
-  influxdb:
-    image: "influxdb:latest"
-    ports:
-    - 8086:8086
-    volumes:
-    - "influxdb-data:/var/lib/influxdb"
-    - "./config/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf"
-
-  influxdb-init:
-    build:
-      context: "docker/influxdb-init/"
-    image: "influxdb-init:latest"
-    depends_on:
-    - "influxdb"
-    command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
-
-  grafana:
-    image: "grafana/grafana:5.1.0"
-    ports:
-    - 3001:3000
-    volumes:
-    - "./config/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
-    - "./config/grafana/provisioning/dashboards/sensu.yaml:/etc/grafana/provisioning/dashboards/sensu.yaml"
-    - "./config/grafana/dashboards:/var/lib/grafana/dashboards"
-
-  sensu-asset-server:
-    image: "nginx:latest"
-    ports:
-    - 8000:80
-    volumes:
-    - "./config/nginx/nginx.conf:/etc/nginx/nginx.conf"
-    - "./assets:/usr/share/nginx/html/assets"
-
   sensu-backend:
     build:
-      context: "docker/sensu-backend/"
-      dockerfile: "Dockerfile.debian"
-    image: "sensu-backend:latest"
+      context: docker/sensu-backend/
+      dockerfile: Dockerfile.debian
+    image: sensu-backend:latest
     ports:
     - 3000:3000
     - 8080:8080
@@ -53,22 +20,73 @@ services:
     command: "sensu-backend start --log-level info"
 
   sensu-agent:
-    # build:
-    #   context: "docker/sensu-agent/"
-    #   dockerfile: "Dockerfile.debian"
-    image: "sensu/sensu:5.2.0"
+    image: sensu/sensu:5.2.0
     volumes:
     - "./config/sensu/agent.yml:/etc/sensu/agent.yml"
     depends_on:
-    - "sensu-backend"
+    - sensu-backend
     labels:
     - "io.sensu.description: The Sensu Go agent"
     - "io.sensu.version: 5.2.0"
     - "io.sensu.role: agent"
     command: "sensu-agent start --backend-url ws://sensu-backend:8081 --log-level debug"
 
+  sensu-asset-server:
+    image: nginx:latest
+    ports:
+    - 8000:80
+    volumes:
+    - "./config/nginx/nginx.conf:/etc/nginx/nginx.conf"
+    - "./assets:/usr/share/nginx/html/assets"
+
+  influxdb:
+    image: influxdb:latest
+    ports:
+    - 8086:8086
+    volumes:
+    - "influxdb-data:/var/lib/influxdb"
+    - "./config/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf"
+
+  influxdb-init:
+    build:
+      context: docker/influxdb-init/
+    image: influxdb-init:latest
+    depends_on:
+    - influxdb
+    command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
+
+  grafana:
+    image: grafana/grafana:5.1.0
+    ports:
+    - 3001:3000
+    volumes:
+    - "./config/grafana/provisioning/datasources/influxdb.yaml:/etc/grafana/provisioning/datasources/influxdb.yaml"
+    - "./config/grafana/provisioning/dashboards/sensu.yaml:/etc/grafana/provisioning/dashboards/sensu.yaml"
+    - "./config/grafana/dashboards:/var/lib/grafana/dashboards"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    ports:
+    - 9200:9200
+    - 9300:9300
+    environment:
+    - "discovery.type=single-node"
+    volumes:
+    - "elasticsearch-data:/data"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.6.0
+    ports:
+    - 5601:5601
+    depends_on:
+    - elasticsearch
+    volumes:
+    - "./config/elasticsearch/kibana.yml:/usr/share/kibana/config/kibana.yml"
+
 volumes:
+  sensu-backend-data:
+    driver: local
   influxdb-data:
     driver: local
-  sensu-backend-data:
+  elasticsearch-data:
     driver: local

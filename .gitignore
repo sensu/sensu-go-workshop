@@ -1,4 +1,7 @@
 .vagrant
-data/
+.envrc
 assets/*.tar.gz
 manifests/assets/local-*.yaml
+license.json
+ldap/*.crt
+ldap/*.key

@@ -44,6 +44,21 @@ services:
     depends_on:
     - sensu-agent # not actually true; only used for demo purposes
 
+  sensu-ldap-server:
+    build:
+      context: docker/stunnel/
+      dockerfile: Dockerfile.alpine
+    image: sensu-ldap-server:latest
+    ports:
+    - 1636:1636
+    volumes:
+    - "./config/stunnel/gsuite-ldap.conf:/etc/stunnel/gsuite-ldap.conf"
+    - "./ldap/gsuite-ldap.crt:/etc/stunnel/gsuite-ldap.crt"
+    - "./ldap/gsuite-ldap.key:/etc/stunnel/gsuite-ldap.key"
+    depends_on:
+    - sensu-backend # not actually true; only used for demo purposes
+    command: "stunnel /etc/stunnel/gsuite-ldap.conf"
+
   influxdb:
     image: influxdb:latest
     ports:

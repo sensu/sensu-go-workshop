@@ -5,23 +5,15 @@ something.
 
 ## Workshop contents
 
-1. A `docker-compose.yaml` for provisioning a copmlete Sensu 2.0 test
-   environment, including:
-   - A Sensu 2.0 backend, API, and dashboard (`sensu-backend`)
-   - A Sensu 2.0 agent (`sensu-agent`)
+1. A `docker-compose.yaml` for provisioning a simple Sensu Go demo environment,
+   including:
+   - A Sensu Go backend, API, and dashboard (`sensu-backend`)
+   - A Sensu Go agent (`sensu-agent`)
    - An HTTP file server for hosting [Sensu Assets][sensu-assets]
    - InfluxDB
    - Grafana
 2. Configuration files for NGINX, InfluxDB, and Grafana
 3. Sensu resource configuration templates (e.g. asset and check definitions)
-4. Example Sensu Assets
-   - The Nagios `check_http` C Plugin packaged as a Sensu Asset
-   - A prototype [Ruby Runtime][sensu-ruby] packaged as a Sensu Asset (for
-     running ruby plugins!)
-   - The [sensu-plugins-http][sensu-plugins-http] plugin gem packaged as a Sensu
-     Asset.
-5. Some helper Bash scripts for working with your own assets and the Sensu 2.0
-   API
 
 [sensu-assets]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
 [sensu-plugins-http]: https://github.com/sensu-plugins/sensu-plugins-http
@@ -39,32 +31,33 @@ installation instructions from the [Docker CE installation guide][docker-ce].
 
 ## Workshop
 
-1. Bootstrap our Sensu 2.0 environment!
+1. Bootstrap our Sensu Go environment!
 
    ```
    $ docker-compose up -d
-   Creating network "sensu-demo_monitoring" with driver "bridge"
-   Creating sensu-demo_sensu-asset-server_1_ea8078731137 ... done
-   Creating sensu-demo_influxdb_1_e355beba89f5           ... done
-   Creating sensu-demo_sensu-backend_1_47d6bfc38825      ... done
-   Creating sensu-demo_grafana_1_a17197fa7683            ... done
-   Creating sensu-demo_influxdb-init_1_d341615a9ea4      ... done
-   Creating sensu-demo_sensu-agent_1_b42bbbf94935        ... done
+   Creating network "sensu-go-demo_default" with the default driver
+   Creating volume "sensu-go-demo_sensu-backend-data" with local driver
+   Creating volume "sensu-go-demo_influxdb-data" with local driver
+   Creating sensu-go-demo_sensu-backend_1 ... done
+   Creating sensu-go-demo_sensu-agent_1        ... done
+   Creating sensu-go-demo_sensu-asset-server_1 ... done
+   Creating sensu-go-demo_influxdb_1           ... done
+   Creating sensu-go-demo_grafana_1            ... done
    ```
 
    _NOTE: you may see some `docker pull` and `docker build` output on your first
    run as Docker pulls down our base images and builds a few custom images._
 
    Once `docker-compose` is done standing up our systems we should be able to
-   login to the Sensu 2.0 dashboard!
+   login to the Sensu Go dashboard!
 
-   ![Sensu 2.0 dashboard login screen](docs/images/login.png "Sensu 2.0 dashboard login screen")
+   ![Sensu Go dashboard login screen](docs/images/login.png "Sensu Go dashboard login screen")
 
    _NOTE: you may login to the dashboard using the default username and password
-   for a fresh Sensu 2.0 installation; username: `admin` and password:
+   for a fresh Sensu Go installation; username: `admin` and password:
    `P@ssw0rd!`._
 
-2. Install and configure a local `sensuctl` (the new Sensu 2.0 CLI)
+2. Install and configure a local `sensuctl` (the new Sensu Go CLI)
 
    Mac users:
 
@@ -87,27 +80,31 @@ installation instructions from the [Docker CE installation guide][docker-ce].
    ? Password: *********
    ? Organization: default
    ? Environment: default
-   ? Preferred output format: none
+   ? Preferred output format: tabular
    ```
 
-   _NOTE: the default username and password for a fresh Sensu 2.0 installation
+   _NOTE: the default username and password for a fresh Sensu Go installation
    are username: `admin` and password: `P@ssw0rd!`._
 
    [sensuctl-install]: https://docs.sensu.io/sensu-core/2.0/getting-started/configuring-sensuctl/#installation
 
-3. Register some Sensu 2.0 Assets
+3. Register some Sensu Go Assets
 
    ```
-   $ sensuctl create -f manifests/assets/check_http_v0.1.json
-   $ sensuctl create -f manifests/assets/sensu-ruby_v2.4.4.json
-   $ sensuctl create -f manifests/assets/helloworld_v0.1.json
+   $ sensuctl create -f manifests/assets/sensu-assets-monitoring-plugins.yaml
+   $ sensuctl create -f manifests/assets/sensu-influxdb-handler.yaml
    ```
 
-4. Configure a check
+4. Configure a handler to process your monitoring data:
 
    ```
-   $ sensuctl create -f manifests/checks/check_sensu_io.json
-   $ sensuctl create -f manifests/checks/helloworld.json
+   $ sensuctl create -f manifests/handlers/influxdb.yaml
+   ```
+
+5. Configure a check to start collecting data:
+
+   ```
+   $ sensuctl create -f manifests/checks/example-http-service-check.yaml
    ```
 
 ## Helpful tips
@@ -122,17 +119,18 @@ container logs:
 
 ```
 $ docker logs -f $(docker ps --format "{{.ID}}" --filter "name=sensu-asset-server")
+
 172.28.0.1 - - [23/Aug/2018:22:15:30 +0000] "GET /assets/ HTTP/1.1" 200 955 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 ```
 
 ### Interact with the Sensu API
 
-The Sensu 2.0 API, like the rest of Sensu 2.0, provides full support for role
+The Sensu Go API, like the rest of Sensu Go, provides full support for role
 based access controls (RBAC). This also means that authentication is required
 to make API calls.
 
 The `GET /auth` endpoint can be used to get an authentication token for the
-Sensu 2.0 HTTP API.
+Sensu Go HTTP API.
 
 ```
 $ export SENSU_USER=admin
@@ -157,7 +155,7 @@ Example API requests:
 - `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/checks`
 - `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/handlers`
 
-Example `POST /entities` for registering proxy entities in Sensu 2.0:
+Example `POST /entities` for registering proxy entities in Sensu Go:
 
 ```
 $ curl -XPOST -s -H "Authorization: $SENSU_TOKEN" -H "Content-Type: application/json" -d '{"id": "web-server-01", "class": "proxy", "environment": "default", "organization": "default", "extended_attributes": {"foo": "bar"}, "keepalive_timeout": 30}' http://localhost:8080/entities | jq .

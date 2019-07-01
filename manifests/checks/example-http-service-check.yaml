@@ -2,16 +2,16 @@
 type: CheckConfig
 api_version: core/v2
 metadata:
-  namespace: default
-  name: sensu_asset_index_response
+  name: example-http-service-check
 spec:
   command: check_http -H sensu-asset-server -N
   runtime_assets:
-  - nagios-check-http-v0.1
+  - sensu-assets-monitoring-plugins
   publish: true
   interval: 10
   subscriptions:
   - docker
+  - nginx
   output_metric_format: nagios_perfdata
   output_metric_handlers:
   - influxdb

@@ -13,11 +13,7 @@ services:
     volumes:
     - "./config/sensu/backend.yml:/etc/sensu/backend.yml"
     - "sensu-backend-data:/var/lib/sensu/etcd"
-    labels:
-    - "io.sensu.description: The Sensu Go backend"
-    - "io.sensu.version: 5.2.0"
-    - "io.sensu.role: backend"
-    command: "sensu-backend start --log-level info"
+    command: "sensu-backend start --log-level debug"
 
   sensu-agent:
     build:
@@ -28,10 +24,6 @@ services:
     - "./config/sensu/agent.yml:/etc/sensu/agent.yml"
     depends_on:
     - sensu-backend
-    labels:
-    - "io.sensu.description: The Sensu Go agent"
-    - "io.sensu.version: 5.2.0"
-    - "io.sensu.role: agent"
     command: "sensu-agent start --backend-url ws://sensu-backend:8081 --log-level debug"
 
   sensu-asset-server:
@@ -42,40 +34,18 @@ services:
     - "./config/nginx/nginx.conf:/etc/nginx/nginx.conf"
     - "./assets:/usr/share/nginx/html/assets"
     depends_on:
-    - sensu-agent # not actually true; only used for demo purposes
-
-  sensu-ldap-server:
-    build:
-      context: docker/stunnel/
-      dockerfile: Dockerfile.alpine
-    image: sensu-ldap-server:latest
-    ports:
-    - 1636:1636
-    volumes:
-    - "./config/stunnel/gsuite-ldap.conf:/etc/stunnel/gsuite-ldap.conf"
-    - "./ldap/gsuite-ldap.crt:/etc/stunnel/gsuite-ldap.crt"
-    - "./ldap/gsuite-ldap.key:/etc/stunnel/gsuite-ldap.key"
-    depends_on:
     - sensu-backend # not actually true; only used for demo purposes
-    command: "stunnel /etc/stunnel/gsuite-ldap.conf"
 
   influxdb:
-    image: influxdb:latest
+    image: influxdb:1.7.7
     ports:
     - 8086:8086
     volumes:
     - "influxdb-data:/var/lib/influxdb"
     - "./config/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf"
-    depends_on:
-    - sensu-agent # not actually true; only used for demo purposes
-
-  influxdb-init:
-    build:
-      context: docker/influxdb-init/
-    image: influxdb-init:latest
-    depends_on:
-    - influxdb
-    command: "curl -i -XPOST http://influxdb:8086/query --data-urlencode 'q=CREATE DATABASE sensu'"
+    environment:
+      INFLUXDB_DB: sensu
+    command: influxd
 
   grafana:
     image: grafana/grafana:5.1.0
@@ -88,31 +58,8 @@ services:
     depends_on:
     - influxdb
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
-    ports:
-    - 9200:9200
-    - 9300:9300
-    environment:
-    - "discovery.type=single-node"
-    volumes:
-    - "elasticsearch-data:/data"
-    depends_on:
-    - sensu-agent # not actually true; only used for demo purposes
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:6.6.0
-    ports:
-    - 5601:5601
-    volumes:
-    - "./config/elasticsearch/kibana.yml:/usr/share/kibana/config/kibana.yml"
-    depends_on:
-    - elasticsearch
-
 volumes:
   sensu-backend-data:
     driver: local
   influxdb-data:
-    driver: local
-  elasticsearch-data:
     driver: local

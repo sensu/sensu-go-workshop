@@ -1,0 +1,8 @@
+---
+type: Asset
+api_version: core/v2
+metadata:
+  name: sensu-assets-monitoring-plugins
+spec:
+  url: https://github.com/calebhailey/sensu-assets-monitoring-plugins/releases/download/2.2.0/monitoring-plugins-debian_2.2.0_linux_amd64.tar.gz
+  sha512: 632366d0d55bd79762a71ef4e3209bcf6a499b6449ef6cb9471712e7799d3f6834ae7b3bafa1dfb00d4f358afed27971e7ed8b34d0424cdb31ec7a18aaf74b4f

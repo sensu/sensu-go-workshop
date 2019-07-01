@@ -1,9 +1,0 @@
----
-type: Asset
-api_version: core/v2
-metadata:
-  namespace: default
-  name: sensu-ruby-2.4.4-debian
-spec:
-  url: https://github.com/sensu/sensu-ruby-runtime/releases/download/0.0.4/sensu-ruby-runtime_0.0.4_debian_linux_amd64.tar.gz
-  sha512: a2162dd34d1805a06a5fe29558ccc2d99bc87209d01a639af8bb3a47df6dd0efa7040dbf0ad44bcf23cc95e8205eb21ca3e783ef20fabbc17cdda9b33f90e255

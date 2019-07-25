@@ -7,4 +7,4 @@ RUN \
   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-enterprise-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz && \
   tar -xzf sensu-enterprise-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz -C /usr/bin/ && \
   rm sensu-enterprise-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz
-  CMD ["sensu-agent", "start"]
+CMD ["sensu-agent", "start"]

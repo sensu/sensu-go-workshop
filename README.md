@@ -131,8 +131,15 @@ $ docker logs -f $(docker ps --format "{{.ID}}" --filter "name=sensu-asset-serve
 ```
 
 An example "helloworld-0.1.0.tar.gz" asset has been provided to demonstrate this
-workflow. To register a local asset, you'll need an asset definition that looks
-like the following:
+workflow. To register this example asset, and configure a check to use the
+example asset, run the following commands:
+
+```shell
+$ sensuctl create -f manifests/assets/helloworld.yaml
+$ sensuctl create -f manifests/checks/helloworld.yaml
+```
+
+For reference, here is an example asset definition
 
 ```yaml
 ---
@@ -142,7 +149,7 @@ metadata:
   name: helloworld:0.1.0
 spec:
   url: http://sensu-asset-server/assets/helloworld-0.1.0.tar.gz
-  sha512: 39c18e6de3c533a8f9d20ae9d74d58be5cd0834f0777ae64a3243addc81fc36bca625084fcf48211fc76b164fedf990a7c00d419878920d2576a10a222015a6a
+  sha512: 8d18d3194b94330155b004d516d4164593e40030ac80813eb3e6ba14d5f2570ed59508148890a7b0d6200148c1c0cff7cd161a26ca624aa2c8f7fc31caa3556c
   filters:
   - "entity.system.os == 'linux'"
 ```

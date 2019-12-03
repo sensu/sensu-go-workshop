@@ -8,4 +8,4 @@ spec:
   command: sensu-influxdb-handler -a http://influxdb:8086 -d 'sensu' -u 'admin' -p 'admin'
   timeout: 10
   runtime_assets:
-  - sensu-influxdb-handler
+  - sensu/sensu-influxdb-handler

@@ -6,7 +6,7 @@ metadata:
 spec:
   command: check_http -H sensu-asset-server -N
   runtime_assets:
-  - sensu-assets-monitoring-plugins
+  - sensu/monitoring-plugins
   publish: true
   interval: 10
   subscriptions:

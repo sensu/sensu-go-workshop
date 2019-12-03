@@ -1,7 +1,14 @@
 # Sensu Go Demo
 
-Something something Docker Compose environment for trying Sensu Go something
-something.
+This project was originally created to show how to quickly setup a local Sensu
+Go environment using Docker Compose. It includes an Asset server and telemetry
+pipeline for a more complete development workflow.
+
+_NOTE: Since the time this project was started (during the beta and initial GA
+releases of Sensu Go) the [Sensu website][homepage] has been updated with a simpler "quick
+start" guide, which is a better place to get started for most users._
+
+[homepage]: https://sensu.io/#getting-started
 
 ## Workshop contents
 
@@ -9,25 +16,22 @@ something.
    including:
    - A Sensu Go backend, API, and dashboard (`sensu-backend`)
    - A Sensu Go agent (`sensu-agent`)
-   - An HTTP file server for hosting [Sensu Assets][sensu-assets]
-   - InfluxDB
-   - Grafana
+   - An HTTP file server for hosting [Sensu Assets][1]
+   - A telemetry stack (InfluxDB for storage & Grafana for visualization)
 2. Configuration files for NGINX, InfluxDB, and Grafana
 3. Sensu resource configuration templates (e.g. asset and check definitions)
 
-[sensu-assets]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
-[sensu-plugins-http]: https://github.com/sensu-plugins/sensu-plugins-http
-[sensu-ruby]:   https://github.com/calebhailey/sensu-ruby
+[1]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
 
 ## Prerequisites
 
 You'll need a working Docker environment with Docker Compose to run this demo.
-If you're using a Mac, head on over to the [Docker CE for
-Mac][docker-ce-for-mac] page for more instructions. Linux users can find
-installation instructions from the [Docker CE installation guide][docker-ce].
+If you're using a Mac, head on over to the [Docker CE for Mac][2] page for more
+instructions. Linux users can find installation instructions from the [Docker CE
+installation guide][3].
 
-[docker-ce-for-mac]: https://store.docker.com/editions/community/docker-ce-desktop-mac
-[docker-ce]: https://docs.docker.com/install/
+[2]: https://store.docker.com/editions/community/docker-ce-desktop-mac
+[3]: https://docs.docker.com/install/
 
 ## Workshop
 
@@ -68,7 +72,7 @@ installation instructions from the [Docker CE installation guide][docker-ce].
    ```
 
    Linux and Windows users can find [`sensuctl` installation instructions
-   here][sensuctl-install].
+   here][4].
 
    Configure your `sensuctl`:
 
@@ -86,14 +90,17 @@ installation instructions from the [Docker CE installation guide][docker-ce].
    _NOTE: the default username and password for a fresh Sensu Go installation
    are username: `admin` and password: `P@ssw0rd!`._
 
-   [sensuctl-install]: https://docs.sensu.io/sensu-core/2.0/getting-started/configuring-sensuctl/#installation
+   [4]: https://docs.sensu.io/sensu-core/2.0/getting-started/configuring-sensuctl/#installation
 
-3. Register some Sensu Go Assets
+3. Register some Sensu Go Assets from [Bonsai][5] (i.e. the "Docker Hub" for
+   Sensu Go plugins):
 
    ```
-   $ sensuctl create -f manifests/assets/sensu-assets-monitoring-plugins.yaml
-   $ sensuctl create -f manifests/assets/sensu-influxdb-handler.yaml
+   $ sensuctl asset add sensu/monitoring-plugins:2.2.0-2
+   $ sensuctl asset add sensu/sensu-influxdb-handler
    ```
+
+   [5]: https://bonsai.sensu.io
 
 4. Configure a handler to process your monitoring data:
 
@@ -123,29 +130,42 @@ $ docker logs -f $(docker ps --format "{{.ID}}" --filter "name=sensu-asset-serve
 172.28.0.1 - - [23/Aug/2018:22:15:30 +0000] "GET /assets/ HTTP/1.1" 200 955 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 ```
 
+An example "helloworld-0.1.0.tar.gz" asset has been provided to demonstrate this
+workflow. To register a local asset, you'll need an asset definition that looks
+like the following:
+
+```yaml
+---
+type: Asset
+api_version: core/v2
+metadata:
+  name: helloworld:0.1.0
+spec:
+  url: http://sensu-asset-server/assets/helloworld-0.1.0.tar.gz
+  sha512: 39c18e6de3c533a8f9d20ae9d74d58be5cd0834f0777ae64a3243addc81fc36bca625084fcf48211fc76b164fedf990a7c00d419878920d2576a10a222015a6a
+  filters:
+  - "entity.system.os == 'linux'"
+```
+
+_NOTE: the "sensu-asset-server" host name used here will be automatically
+resolved by Docker for communication between containers (specifically from the
+sensu-agent container to the NGINX container). This same container is accessible
+from your host OS at 127.0.0.1:8080, as Docker is "publishing" port 8080 of your
+local workstation to the NGINX container port 80. See Docker's ["Container
+Networking"][6] documentation for more information._
+
+[6]: https://docs.docker.com/config/containers/container-networking/
+
 ### Interact with the Sensu API
 
-The Sensu Go API, like the rest of Sensu Go, provides full support for role
-based access controls (RBAC). This also means that authentication is required
-to make API calls.
-
-The `GET /auth` endpoint can be used to get an authentication token for the
-Sensu Go HTTP API.
-
-```
-$ export SENSU_USER=admin
-$ export SENSU_PASS=P@ssw0rd!
-$ export SENSU_TOKEN=`curl -XGET -u "$SENSU_USER:$SENSU_PASS" -s http://localhost:8080/auth | jq -r ".access_token"`
-```
-
-I've also provided a simple bash script that can do this for you (as your token)
-will expire from time to time and need to be refreshed. Simply run
-`source sensu-backend-token.sh` to set a `$SENSU_TOKEN` environment variable
-that can be used make API requests.
+The [Sensu Go API][api], like the rest of Sensu Go, provides full support for
+role-based access controls (RBAC). This also means that an authentication token
+is required to make API calls. As of version 5.13.0, the Sensu CLI provides a
+helpful [`sensuctl env` command][7] for setting local environment variables,
+including a `SENSU_ACCESS_TOKEN` which can be used to make API calls.
 
 ```
-$ source scripts/sensu-environment.sh
-$ curl -XGET -s -H "Content-Type: application/json" -H "Authorization: $SENSU_TOKEN"  http://localhost:8080/api/core/v2/namespaces/default/entities | jq .
+$ eval $(sensuctl env)
 ```
 
 Example API requests:
@@ -158,5 +178,7 @@ Example API requests:
 Example `POST /entities` for registering proxy entities in Sensu Go:
 
 ```
-$ curl -XPOST -s -H "Authorization: $SENSU_TOKEN" -H "Content-Type: application/json" -d '{"id": "web-server-01", "class": "proxy", "environment": "default", "organization": "default", "extended_attributes": {"foo": "bar"}, "keepalive_timeout": 30}' http://localhost:8080/entities | jq .
+$ curl -XPOST -s -H "Authorization: $SENSU_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"id": "web-server-01", "class": "proxy", "environment": "default", "organization": "default", "extended_attributes": {"foo": "bar"}, "keepalive_timeout": 30}' http://localhost:8080/entities
 ```
+
+[7]: https://docs.sensu.io/sensu-go/latest/sensuctl/reference/#environment-variables

@@ -1,0 +1,13 @@
+---
+type: CheckConfig
+api_version: core/v2
+metadata:
+  name: helloworld
+spec:
+  command: helloworld.sh
+  runtime_assets:
+  - helloworld:0.1.0
+  publish: true
+  subscriptions:
+  - linux
+  interval: 10

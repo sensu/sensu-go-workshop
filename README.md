@@ -21,7 +21,7 @@ start" guide, which is a better place to get started for most users._
 2. Configuration files for NGINX, InfluxDB, and Grafana
 3. Sensu resource configuration templates (e.g. asset and check definitions)
 
-[1]: https://docs.sensu.io/sensu-core/2.0/reference/assets/
+[1]: https://docs.sensu.io/sensu-go/latest/reference/assets/
 
 ## Prerequisites
 
@@ -72,7 +72,8 @@ installation guide][3].
    ```
 
    Linux and Windows users can find [`sensuctl` installation instructions
-   here][4].
+   here][4]. The complete list of Sensu downloads is available at
+   https://sensu.io/downloads 
 
    Configure your `sensuctl`:
 
@@ -90,7 +91,7 @@ installation guide][3].
    _NOTE: the default username and password for a fresh Sensu Go installation
    are username: `admin` and password: `P@ssw0rd!`._
 
-   [4]: https://docs.sensu.io/sensu-core/2.0/getting-started/configuring-sensuctl/#installation
+   [4]: https://docs.sensu.io/sensu-go/latest/installation/install-sensu/#install-sensuctl
 
 3. Register some Sensu Go Assets from [Bonsai][5] (i.e. the "Docker Hub" for
    Sensu Go plugins):
@@ -139,7 +140,7 @@ $ sensuctl create -f manifests/assets/helloworld.yaml
 $ sensuctl create -f manifests/checks/helloworld.yaml
 ```
 
-For reference, here is an example asset definition
+For reference, this is what an asset definition looks like:
 
 ```yaml
 ---

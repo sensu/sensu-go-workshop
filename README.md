@@ -66,16 +66,24 @@ installation guide][3].
    Mac users:
 
    ```
-   $ curl -LO https://storage.googleapis.com/sensu-binaries/$(curl -s https://storage.googleapis.com/sensu-binaries/latest.txt)/darwin/amd64/sensuctl
-   $ chmod +x sensuctl
-   $ mv sensuctl /usr/local/bin/
+   $ curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.15.0/sensu-go_5.15.0_darwin_amd64.tar.gz
+   $ sudo tar -xzf sensu-go_5.15.0_darwin_amd64.tar.gz -C /usr/local/bin/
    ```
 
    Linux and Windows users can find [`sensuctl` installation instructions
    here][4]. The complete list of Sensu downloads is available at
-   https://sensu.io/downloads 
+   https://sensu.io/downloads
 
-   Configure your `sensuctl`:
+   Configure `sensuctl`:
+
+   ```
+   $ sensuctl configure -n --url http://127.0.0.1:8080 \
+     --username admin \
+     --password 'P@ssw0rd!' \
+     --namespace default
+   ```
+
+   Alternatively, you may configure `sensuctl` using the interactive mode:
 
    ```
    $ sensuctl configure

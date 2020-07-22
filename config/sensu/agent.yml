@@ -13,7 +13,7 @@ subscriptions:
 labels:
   region: us-west-1
 keepalive-interval: 5
-keepalive-timeout: 10
+keepalive-warning-timeout: 10
 deregister: true
 #deregistration-handler: "deregister"
 #cache-dir: "/var/cache/sensu/sensu-agent"

@@ -1,0 +1,48 @@
+---
+type: Namespace
+api_version: core/v2 
+metadata: 
+  name: lizy
+spec:
+  name: lizy
+
+---
+type: Role
+api_version: core/v2
+metadata:
+  name: trainee:lizy
+  namespace: lizy
+spec:
+  rules:
+    - resources:
+      - "*"
+      verbs:
+      - "*"
+      resource_names: []
+
+---
+type: RoleBinding
+api_version: core/v2 
+metadata:
+  name: trainee:lizy
+  namespace: lizy
+spec:
+  role_ref:
+    name: trainee:lizy
+    type: Role
+  subjects:
+  - name: trainee:lizy
+    type: Group
+      
+---
+type: User 
+api_version: core/v2 
+metadata:
+  name: lizy
+spec:
+  disabled: false
+  username: lizy
+  password_hash: $2a$10$lztzWd1gfyXjATMYF46C3eZViZq2uhBGWXLQaZDLm4d5CC.Fz/QzW
+  groups: 
+  - trainee
+  - trainee:lizy

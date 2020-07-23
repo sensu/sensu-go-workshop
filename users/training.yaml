@@ -1,0 +1,56 @@
+---
+type: ClusterRole
+api_version: core/v2
+metadata:
+  name: trainer
+spec:
+  rules:
+    - resources: 
+      - "*"
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      resource_names: []
+
+---
+type: ClusterRole
+api_version: core/v2
+metadata:
+  name: trainee
+spec:
+  rules:
+    - resources: 
+      - "*"
+      verbs:
+      - get
+      - list
+      resource_names: []
+
+---
+type: ClusterRoleBinding
+api_version: core/v2 
+metadata:
+  name: trainer
+spec:
+  role_ref:
+    name: trainer
+    type: ClusterRole
+  subjects:
+  - name: trainer
+    type: Group
+
+---
+type: ClusterRoleBinding
+api_version: core/v2 
+metadata:
+  name: trainee
+spec:
+  role_ref:
+    name: trainee
+    type: ClusterRole
+  subjects:
+  - name: trainee
+    type: Group

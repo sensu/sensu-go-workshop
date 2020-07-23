@@ -1,85 +1,28 @@
-# Sensu Go Demo
+# Sensu Go Workshop
 
-This project was originally created to show how to quickly setup a local Sensu
-Go environment using Docker Compose. It includes an Asset server and telemetry
-pipeline for a more complete development workflow.
+## Overview 
 
-_NOTE: Since the time this project was started (during the beta and initial GA
-releases of Sensu Go) the [Sensu website][homepage] has been updated with a simpler "quick
-start" guide, which is a better place to get started for most users._
+This project is intended to provide a simple template for developing training 
+modules for Sensu Go. The workshop outlined below is effectively module #1 – 
+it's designed to introduce new Sensu users to the basic concepts of the 
+[Observability Pipeline][0] and help them get started with Sensu Go. 
 
-[homepage]: https://sensu.io/#getting-started
+This workshop is also designed to be simple enough for self-guided training, 
+while also providing a tool for trainers to host a workshop for multiple 
+attendees. See [SETUP.md][1] for more details on getting started. 
 
-## Workshop contents
+## Observability Pipeline 
 
-1. A `docker-compose.yaml` for provisioning a simple Sensu Go demo environment,
-   including:
-   - A Sensu Go backend, API, and dashboard (`sensu-backend`)
-   - A Sensu Go agent (`sensu-agent`)
-   - An HTTP file server for hosting [Sensu Assets][1]
-   - A telemetry stack (InfluxDB for storage & Grafana for visualization)
-2. Configuration files for NGINX, InfluxDB, and Grafana
-3. Sensu resource configuration templates (e.g. asset and check definitions)
+==COMING SOON==
 
-[1]: https://docs.sensu.io/sensu-go/latest/reference/assets/
+## Workshop 
 
-## Prerequisites
-
-You'll need a working Docker environment with Docker Compose to run this demo.
-If you're using a Mac, head on over to the [Docker CE for Mac][2] page for more
-instructions. Linux users can find installation instructions from the [Docker CE
-installation guide][3].
-
-[2]: https://store.docker.com/editions/community/docker-ce-desktop-mac
-[3]: https://docs.docker.com/install/
-
-## Workshop
-
-1. Bootstrap our Sensu Go environment!
-
-   ```
-   $ docker-compose up -d
-   Creating network "sensu-go-demo_default" with the default driver
-   Creating volume "sensu-go-demo_sensu-backend-data" with local driver
-   Creating volume "sensu-go-demo_influxdb-data" with local driver
-   Creating sensu-go-demo_sensu-backend_1 ... done
-   Creating sensu-go-demo_sensu-agent_1        ... done
-   Creating sensu-go-demo_sensu-asset-server_1 ... done
-   Creating sensu-go-demo_influxdb_1           ... done
-   Creating sensu-go-demo_grafana_1            ... done
-   ```
-
-   _NOTE: you may see some `docker pull` and `docker build` output on your first
-   run as Docker pulls down our base images and builds a few custom images._
-
-   Once `docker-compose` is done standing up our systems we should be able to
-   login to the Sensu Go dashboard!
-
-   ![Sensu Go dashboard login screen](docs/images/login.png "Sensu Go dashboard login screen")
-
-   _NOTE: you may login to the dashboard using the default username and password
-   for a fresh Sensu Go installation; username: `admin` and password:
-   `P@ssw0rd!`._
-
-2. Install and configure a local `sensuctl` (the new Sensu Go CLI)
-
-   Mac users:
-
-   ```
-   $ curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.15.0/sensu-go_5.15.0_darwin_amd64.tar.gz
-   $ sudo tar -xzf sensu-go_5.15.0_darwin_amd64.tar.gz -C /usr/local/bin/
-   ```
-
-   Linux and Windows users can find [`sensuctl` installation instructions
-   here][4]. The complete list of Sensu downloads is available at
-   https://sensu.io/downloads
-
-   Configure `sensuctl`:
+1. Configure `sensuctl`:
 
    ```
    $ sensuctl configure -n --url http://127.0.0.1:8080 \
-     --username admin \
-     --password 'P@ssw0rd!' \
+     --username sensu \
+     --password sensu \
      --namespace default
    ```
 
@@ -89,19 +32,17 @@ installation guide][3].
    $ sensuctl configure
 
    ? Sensu Backend URL: (http://localhost:8080)
-   ? Username: admin
-   ? Password: *********
+   ? Username: sensu
+   ? Password: *****
    ? Organization: default
    ? Environment: default
    ? Preferred output format: tabular
    ```
 
-   _NOTE: the default username and password for a fresh Sensu Go installation
-   are username: `admin` and password: `P@ssw0rd!`._
+   _NOTE: the default username and password for this workshop environment are 
+   username: `sensu` and password: `sensu`._
 
-   [4]: https://docs.sensu.io/sensu-go/latest/installation/install-sensu/#install-sensuctl
-
-3. Register some Sensu Go Assets from [Bonsai][5] (i.e. the "Docker Hub" for
+2. Register some Sensu Go Assets from [Bonsai][5] (i.e. the "Docker Hub" for
    Sensu Go plugins):
 
    ```
@@ -198,3 +139,7 @@ $ curl -XPOST -s -H "Authorization: $SENSU_ACCESS_TOKEN" -H "Content-Type: appli
 ```
 
 [7]: https://docs.sensu.io/sensu-go/latest/sensuctl/reference/#environment-variables
+
+
+[0]: #observability-pipeline 
+[1]: /docs/SETUP.md

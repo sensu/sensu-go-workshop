@@ -1,0 +1,9 @@
+{
+  "api-url": "http://127.0.0.1:8080",
+  "trusted-ca-file": "",
+  "insecure-skip-tls-verify": false,
+  "access_token": "",
+  "expires_at": 0,
+  "refresh_token": "",
+  "timeout": 0
+}

@@ -62,7 +62,14 @@
      database will be `postgres`. If provided and no such database exists, it 
      will be created. 
 
-1. Bootstrap our Sensu Go environment!
+1. Clone this repository
+
+   ```
+   $ git clone git@github.com:calebhailey/sensu-go-workshop.git
+   $ cd sensu-go-workshop/
+   ```
+     
+2. Bootstrap our Sensu Go environment!
 
    ```
    $ sudo docker-compose -f docker-compose.yaml up -d
@@ -88,7 +95,7 @@
    _NOTE: you may login to the dashboard using the username and password
    provided in the `.env` file._
 
-2. Install and configure a local `sensuctl` (the new Sensu Go CLI)
+3. Install and configure a local `sensuctl` (the new Sensu Go CLI)
 
    Mac users:
 
@@ -101,7 +108,7 @@
    [user documentation][6]. The complete list of Sensu downloads is available at
    https://sensu.io/downloads
 
-3. [OPTIONAL] Create RBAC resources
+4. [OPTIONAL] Create RBAC resources
 
    ```
    $ sensuctl create -r -f users/

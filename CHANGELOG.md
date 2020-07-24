@@ -15,6 +15,12 @@ to [Semantic Versioning][semver].
 - Moved setup instructions to a separate SETUP.md, since some workshops may be
   hosted by instructors and trainees won't have anything to setup (other than 
   installing the `sensuctl` CLI)
+- Documented `--config-dir` oriented trainee setup; added default/example 
+  `sensuctl` configs
+- Added `sensuctl` wrapper script (needs documents); which can be used as a 
+  workaround for [sensu/sensu-go#2316][2316]
+- Outlined the observability pipeline workshop lessons 1-2 
+- Added an issue tracker document (WIP)
 - Next: 
   - Start developing the "Observability Pipeline" workshop
   - Add new Sensu templates (deprecate `/manifests` in favor of `/templates`)
@@ -36,4 +42,5 @@ to [Semantic Versioning][semver].
 
 [changelog]: http://keepachangelog.com/en/1.0.0/
 [semver]: http://semver.org/spec/v2.0.0.html
-[homepage]: https://sensu.io/#getting-started
+[homepage]: https://sensu.io/#getting-started 
+[2316]: https://github.com/sensu/sensu-go/issues/2316 

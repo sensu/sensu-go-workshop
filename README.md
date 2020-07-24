@@ -1,5 +1,13 @@
 # Sensu Go Workshop
 
+- [Overview](#overview)
+  - [What is Sensu?](#what-is-sensu)
+  - [Observability Pipeline](#observability-pipeline)
+- [Workshop]
+  - [Setup](#setup)
+  - [Lesson 1: Introduction to Sensu Go](#lesson-1--introduction-to-sensu-go)
+  - [Lesson 2: Introduction to `sensu-agent`](#lesson-2--introduction-to-sensu-agent)
+
 ## Overview 
 
 This project is intended to provide a simple template for developing training 
@@ -7,139 +15,145 @@ modules for Sensu Go. The workshop outlined below is effectively module #1 – 
 it's designed to introduce new Sensu users to the basic concepts of the 
 [Observability Pipeline][0] and help them get started with Sensu Go. 
 
-This workshop is also designed to be simple enough for self-guided training, 
-while also providing a tool for trainers to host a workshop for multiple 
-attendees. See [SETUP.md][1] for more details on getting started. 
-
-## Observability Pipeline 
+### What is Sensu?
 
 ==COMING SOON==
 
-## Workshop 
+### Observability Pipeline 
 
-1. Configure `sensuctl`:
+==COMING SOON==
+
+## Workshop
+
+This workshop is designed to be simple enough for self-guided training, while 
+also providing a tool for trainers to host a workshop for multiple attendees. 
+See [SETUP.md][1] for more details on getting started. 
+
+### Setup
+
+1. Clone this repository & configure your local environment. 
 
    ```
-   $ sensuctl configure -n --url http://127.0.0.1:8080 \
-     --username sensu \
-     --password sensu \
-     --namespace default
+   $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
+   $ cd sensu-go-workshop/ 
+   ```
+   
+   Edit the contents of `.config/cluster` and `.config/profile` as needed (e.g.
+   you may wish to edit the `"api-url"` field of the `.config/cluster` file to
+   point at a remote Sensu cluster). 
+   
+2. Configure `sensuctl`. 
+
+   This workshop includes multiple configuration examples: 
+   
+   a. `.config/default/` should be used for self-guided workshops
+   b. `.config/example/` should be modifed and used in instructor-led workshops
+   
+   _NOTE: if you're participating in an instructor-led workshop, please copy 
+   the example configs (e.g. `cp -r .config/example .config/workshop`) and 
+   modify them as needed._
+
+   Run the following command with the corresponding `--config-dir` (either 
+   `.config/default/`, or `.config/workshop`) to configure the Sensu CLI: 
+   
+   ```
+   $ sensuctl configure --config-dir .config/default/ 
    ```
 
-   Alternatively, you may configure `sensuctl` using the interactive mode:
-
+   You will be prompted to provide a Sensu Backend URL, username, password, 
+   namespace, and preferred output format. The backend URL, namespace, and 
+   output format fields will be pre-populated with defaults based on the 
+   contents of `.config/default/cluster` and `.config/default/profile` (or 
+   `.config/workshop/cluster` and `.config/workshop/profile` for instructor-led
+   workshops). 
+   
    ```
-   $ sensuctl configure
-
-   ? Sensu Backend URL: (http://localhost:8080)
-   ? Username: sensu
-   ? Password: *****
-   ? Organization: default
-   ? Environment: default
-   ? Preferred output format: tabular
+   $ sensuctl configure --config-dir .config/default/
+     ? Sensu Backend URL: http://127.0.0.1:8080
+     ? Username: sensu
+     ? Password: *****
+     ? Namespace: default
+     ? Preferred output format:
+     ❯ tabular
+       yaml
+       wrapped-json
+       json
    ```
 
    _NOTE: the default username and password for this workshop environment are 
-   username: `sensu` and password: `sensu`._
-
-2. Register some Sensu Go Assets from [Bonsai][5] (i.e. the "Docker Hub" for
-   Sensu Go plugins):
-
-   ```
-   $ sensuctl asset add sensu/monitoring-plugins:2.2.0-2
-   $ sensuctl asset add sensu/sensu-influxdb-handler
-   ```
-
-   [5]: https://bonsai.sensu.io
-
-4. Configure a handler to process your monitoring data:
+   username: `sensu` and password: `sensu`. Trainees in instructor-led 
+   workshops may need to login with individual credentials provided by the 
+   instructor._
+   
+3. Create an API Key. 
 
    ```
-   $ sensuctl create -f manifests/handlers/influxdb.yaml
+   $ sensuctl api-key grant sensu
+   Created: /api/core/v2/apikeys/1390f2cf-e31b-450e-b38c-e3fc09b52d07
    ```
+   
+   _NOTE: self-guided users should create an api-key for the `sensu` user (the 
+   default user for this workshop). Trainees in instructor-led workshops may 
+   need to login with individual credentials provided by the instructor._ 
+   
 
-5. Configure a check to start collecting data:
+### Lesson 1: introduction to Sensu Go
 
-   ```
-   $ sensuctl create -f manifests/checks/example-http-service-check.yaml
-   ```
+1. Configure a handler to process observability data
 
-## Helpful tips
+   ==COMING SOON==
 
-### Local HTTP server for hosting Sensu Assets
+2. Publish an event to the pipeline 
 
-This project provides a local HTTP server for hosting Sensu Assets. This will
-allow you to test new assets by dropping them into the `./assets` directory. You
-can view your assets from your browser by visiting http://localhost:8000/assets.
-To view the HTTP server logs, simply use `docker logs` to follow the NGINX
-container logs:
+   ==COMING SOON==
 
-```
-$ docker logs -f $(docker ps --format "{{.ID}}" --filter "name=sensu-asset-server")
+3. Enrich observations with additional context, and modify pipeline behaviors
 
-172.28.0.1 - - [23/Aug/2018:22:15:30 +0000] "GET /assets/ HTTP/1.1" 200 955 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
-```
+   ==COMING SOON==
 
-An example "helloworld-0.1.0.tar.gz" asset has been provided to demonstrate this
-workflow. To register this example asset, and configure a check to use the
-example asset, run the following commands:
+4. Discovery & inventory 
 
-```shell
-$ sensuctl create -f manifests/assets/helloworld.yaml
-$ sensuctl create -f manifests/checks/helloworld.yaml
-```
+   ==COMING SOON==
 
-For reference, this is what an asset definition looks like:
+5. Create & resolve incidents  
 
-```yaml
----
-type: Asset
-api_version: core/v2
-metadata:
-  name: helloworld:0.1.0
-spec:
-  url: http://sensu-asset-server/assets/helloworld-0.1.0.tar.gz
-  sha512: 8d18d3194b94330155b004d516d4164593e40030ac80813eb3e6ba14d5f2570ed59508148890a7b0d6200148c1c0cff7cd161a26ca624aa2c8f7fc31caa3556c
-  filters:
-  - "entity.system.os == 'linux'"
-```
+   ==COMING SOON==
+   
+6. Collect & process metrics 
 
-_NOTE: the "sensu-asset-server" host name used here will be automatically
-resolved by Docker for communication between containers (specifically from the
-sensu-agent container to the NGINX container). This same container is accessible
-from your host OS at 127.0.0.1:8080, as Docker is "publishing" port 8080 of your
-local workstation to the NGINX container port 80. See Docker's ["Container
-Networking"][6] documentation for more information._
+   ==COMING SOON==
+   
+7. Pipeline filtering 
 
-[6]: https://docs.docker.com/config/containers/container-networking/
+   ==COMING SOON==
 
-### Interact with the Sensu API
+### Lesson 2: introduction to `sensu-agent`
 
-The [Sensu Go API][api], like the rest of Sensu Go, provides full support for
-role-based access controls (RBAC). This also means that an authentication token
-is required to make API calls. As of version 5.13.0, the Sensu CLI provides a
-helpful [`sensuctl env` command][7] for setting local environment variables,
-including a `SENSU_ACCESS_TOKEN` which can be used to make API calls.
+1. Install and configure your first agent 
 
-```
-$ eval $(sensuctl env)
-```
+   ==COMING SOON==
+   
+2. Publish events to the pipeline via the Agent API 
 
-Example API requests:
+   ==COMING SOON==
+   
+3. Configure your first check/monitor (automated event collection)
 
-- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/entities`
-- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/assets`
-- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/checks`
-- `GET /api/core/v2/namespaces/$SENSU_NAMESPACE/handlers`
-
-Example `POST /entities` for registering proxy entities in Sensu Go:
-
-```
-$ curl -XPOST -s -H "Authorization: $SENSU_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"id": "web-server-01", "class": "proxy", "environment": "default", "organization": "default", "extended_attributes": {"foo": "bar"}, "keepalive_timeout": 30}' http://localhost:8080/entities
-```
-
-[7]: https://docs.sensu.io/sensu-go/latest/sensuctl/reference/#environment-variables
+   ==COMING SOON==
 
 
-[0]: #observability-pipeline 
-[1]: /docs/SETUP.md
+
+
+
+[0]:  #observability-pipeline 
+[1]:  /docs/SETUP.md
+[2]:  #
+[3]:  #
+[4]:  #
+[5]:  #
+[6]:  #
+[7]:  #
+[8]:  #
+[9]:  #
+[10]: #
+[11]: #

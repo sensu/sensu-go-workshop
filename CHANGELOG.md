@@ -21,6 +21,9 @@ to [Semantic Versioning][semver].
   workaround for [sensu/sensu-go#2316][2316]
 - Outlined the observability pipeline workshop lessons 1-2 
 - Added an issue tracker document (WIP)
+- Update docker-compose.yaml template to version 3.8 
+- Use long-syntax volumes for easier readability 
+- Add comments to docker-compose.yaml
 - Next: 
   - Start developing the "Observability Pipeline" workshop
   - Add new Sensu templates (deprecate `/manifests` in favor of `/templates`)

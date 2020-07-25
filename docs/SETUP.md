@@ -3,16 +3,26 @@
 ## Workshop contents
 
 1. A Docker Compose environment file for customizing the workshop environment
-1. A `docker-compose.yaml` for provisioning a simple Sensu Go workshop 
+
+2. A `docker-compose.yaml` for provisioning a simple Sensu Go workshop 
    environment, including:
+   
    - A Sensu Go backend, API, and dashboard (`sensu-backend`)
    - A Sensu Go agent (`sensu-agent`)
    - A telemetry stack, including: 
      - TimescaleDB for storage
      - Grafana for visualization
-2. Configuration files for TimescaleDB and Grafana 
-3. Dockerfiles templates for building custom Sensu Docker images
-4. Sensu resource templates for configuring an example pipeline
+
+   Coming soon: 
+   
+   - Deployment templates for [AWS Fargate][fargate]
+   - Deployment templates for [Heroku][heroku]   
+
+3. Configuration files for TimescaleDB and Grafana 
+
+4. Dockerfiles templates for building custom Sensu Docker images
+
+5. Sensu resource templates for configuring an example pipeline
 
 ## Prerequisites
 
@@ -227,3 +237,5 @@ documentation][8].
 [7]: https://docs.sensu.io/sensu-go/latest/reference/rbac/ 
 [8]: https://docs.sensu.io/sensu-go/latest/operations/control-access/auth/ 
 
+[fargate]: https://www.docker.com/blog/from-docker-straight-to-aws/
+[heroku]: https://devcenter.heroku.com/categories/deploying-with-docker 

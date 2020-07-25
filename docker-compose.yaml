@@ -1,6 +1,11 @@
 ---
-version: "3"
+version: "3.8"
 services:
+  # Sensu Backend 
+  #
+  # Includes embedded database, API, event processor, and web UI). 
+  # 
+  # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
     image: sensu/sensu:5.21.0
     labels:
@@ -14,12 +19,19 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME}
     - SENSU_TIMESCALEDB_DSN=${SENSU_TIMESCALEDB_DSN}
     volumes:
-    - "sensu_data:/var/lib/sensu"
+    - type: volume 
+      source: sensu_data
+      target: /var/lib/sensu
     command: >-
       sensu-backend start 
       --log-level=debug
       --debug=true
 
+  # Sensu Agent 
+  #
+  # Includes monitoring agent, local API, and local StatsD socket.
+  # 
+  # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
     image: sensu/sensu:5.21.0
     labels:
@@ -37,8 +49,15 @@ services:
       --subscriptions="linux,demo"
       --labels="foo=bar,bar=baz"
 
+  # TimescaleDB  
+  #
+  # Includes TimescaleDB (Postgres database) for storage of telemetry data.
+  # 
+  # See: https://docs.timescale.com/latest/introduction
   timescaledb-server:
     image: timescale/timescaledb:latest-pg12
+    labels:
+    - io.sensu.role=tsdb
     depends_on:
     - sensu-agent # not actually true; only used for demo purposes
     ports:
@@ -47,11 +66,23 @@ services:
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     - POSTGRES_DB=${POSTGRES_DB}
     volumes: 
-    - "timescaledb_data:/var/lib/postgresql/data"
-    - "./config/timescaledb/003-sensu-metrics.sql:/docker-entrypoint-initdb.d/003-sensu-metrics.sql"
-  
+    - type: bind 
+      source: ./config/timescaledb/100-sensu-metrics.sql
+      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
+    - type: volume 
+      source: timescaledb_data
+      target: /var/lib/postgresql/data
+      
+  # Grafana 
+  #
+  # Includes Grafana dashboard and datasource configuration files for 
+  # Timescaledb. 
+  # 
+  # See: https://grafana.com/docs/grafana/latest/
   grafana-server:
     image: grafana/grafana:7.0.0
+    labels:
+    - io.sensu.role=dashboards
     depends_on:
     - timescaledb-server # not actually true; used only for demo purposes
     ports:
@@ -59,21 +90,12 @@ services:
     environment:
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-    - "grafana_data:/var/lib/grafana"
-    - "./config/grafana/provisioning/datasources/:/etc/grafana/provisioning/datasources/"
-
-  # artifactory-server:
-  #   image: docker.bintray.io/jfrog/artifactory-oss:latest
-  #   depends_on:
-  #   - sensu-backend # not actually true; only used for demo purposes
-  #   ports:
-  #   - 8888:8888
-  #   environment:
-  #   - SERVER_XML_ARTIFACTORY_PORT=${SERVER_XML_ARTIFACTORY_PORT}
-  #   - SERVER_XML_ARTIFACTORY_MAX_THREADS=${SERVER_XML_ARTIFACTORY_MAX_THREADS}
-  #   - SERVER_XML_ACCESS_MAX_THREADS=${SERVER_XML_ACCESS_MAX_THREADS}
-  #   volumes:
-  #   - "artifactory_data:/var/opt/jfrog/artifactory"    
+    - type: bind
+      source: ./config/grafana/provisioning/datasources/ 
+      target: /etc/grafana/provisioning/datasources/
+    - type: volume 
+      source: grafana_data
+      target: /var/lib/grafana
 
 volumes:
   sensu_data:
@@ -82,5 +104,5 @@ volumes:
     driver: local
   grafana_data:
     driver: local
-  # artifactory_data:
-  #   driver: local
+
+  

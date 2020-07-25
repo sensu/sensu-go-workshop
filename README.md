@@ -11,9 +11,16 @@
 ## Overview 
 
 This project is intended to provide a simple template for developing training 
-modules for Sensu Go. The workshop outlined below is effectively module #1 – 
-it's designed to introduce new Sensu users to the basic concepts of the 
-[Observability Pipeline][0] and help them get started with Sensu Go. 
+modules for Sensu Go. The workshop lessons outlined below are effectively the 
+introductory modules – they are designed to help new Sensu users learn the 
+basic concepts of an [Observability Pipeline][0] and help them get started 
+with Sensu Go. 
+
+This project has also be designed with both self-guided learning _and_ 
+instructor-led training workshops in mind. It's easy to deploy the workshop 
+environment on a laptop for personal use, or to a shared server (or cloud 
+provider) for multiple users. See [SETUP.md][1] for more information on 
+setting up the workshop environment. 
 
 ### What is Sensu?
 
@@ -25,11 +32,15 @@ it's designed to introduce new Sensu users to the basic concepts of the
 
 ## Workshop
 
+### Setup
+
 This workshop is designed to be simple enough for self-guided training, while 
 also providing a tool for trainers to host a workshop for multiple attendees. 
-See [SETUP.md][1] for more details on getting started. 
+See [SETUP.md][1] for more details on setting up the workshop environment. 
 
-### Setup
+Once you have deployed a workshop environment, you may proceed with the 
+following local workstation setup instructions which will help you install 
+the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
 1. Clone this repository & configure your local environment. 
 
@@ -38,37 +49,37 @@ See [SETUP.md][1] for more details on getting started.
    $ cd sensu-go-workshop/ 
    ```
    
-   Edit the contents of `.config/cluster` and `.config/profile` as needed (e.g.
-   you may wish to edit the `"api-url"` field of the `.config/cluster` file to
-   point at a remote Sensu cluster). 
-   
 2. Configure `sensuctl`. 
 
    This workshop includes multiple configuration examples: 
    
-   a. `.config/default/` should be used for self-guided workshops
-   b. `.config/example/` should be modifed and used in instructor-led workshops
+   a. `.sensu/default/` should be used for self-guided workshops
+   b. `.sensu/example/` should be modifed and used in instructor-led workshops
+
+   Edit the contents of `.sensu/default/cluster` and `.sensu/default/profile` 
+   as needed (e.g. you may need to edit the `"api-url"` field of the 
+   `.sensu/default/cluster` file to point at a remote Sensu cluster). 
    
    _NOTE: if you're participating in an instructor-led workshop, please copy 
-   the example configs (e.g. `cp -r .config/example .config/workshop`) and 
+   the example configs (e.g. `cp -r .sensu/example .sensu/workshop`) and 
    modify them as needed._
 
    Run the following command with the corresponding `--config-dir` (either 
-   `.config/default/`, or `.config/workshop`) to configure the Sensu CLI: 
+   `.sensu/default/`, or `.sensu/workshop`) to configure the Sensu CLI: 
    
    ```
-   $ sensuctl configure --config-dir .config/default/ 
+   $ sensuctl configure --config-dir .sensu/default/ 
    ```
 
-   You will be prompted to provide a Sensu Backend URL, username, password, 
+   Sensuctl will prompt you to provide a Sensu Backend URL, username, password,
    namespace, and preferred output format. The backend URL, namespace, and 
    output format fields will be pre-populated with defaults based on the 
-   contents of `.config/default/cluster` and `.config/default/profile` (or 
-   `.config/workshop/cluster` and `.config/workshop/profile` for instructor-led
+   contents of `.sensu/default/cluster` and `.sensu/default/profile` (or 
+   `.sensu/workshop/cluster` and `.sensu/workshop/profile` for instructor-led
    workshops). 
    
    ```
-   $ sensuctl configure --config-dir .config/default/
+   $ sensuctl configure --config-dir .sensu/default/
      ? Sensu Backend URL: http://127.0.0.1:8080
      ? Username: sensu
      ? Password: *****

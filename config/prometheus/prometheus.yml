@@ -1,0 +1,22 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 30s
+  scrape_timeout:      10s
+
+  external_labels:
+    foo:     bar
+
+scrape_configs:
+- job_name: pushgateway
+  honor_labels: true
+  metrics_path: /metrics # default
+  scheme: http # default
+  # scrape_interval: 15s # default
+  # scrape_timeout: 10s # default
+
+  static_configs:
+  - targets: 
+    - pushgateway:9091
+    labels:
+      my:   label
+      your: label

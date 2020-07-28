@@ -24,6 +24,7 @@ to [Semantic Versioning][semver].
 - Update docker-compose.yaml template to version 3.8 
 - Use long-syntax volumes for easier readability 
 - Add comments to docker-compose.yaml
+- Add Prometheus + Pushgateway to the reference architecture 
 - Next: 
   - Start developing the "Observability Pipeline" workshop
   - Add new Sensu templates (deprecate `/manifests` in favor of `/templates`)

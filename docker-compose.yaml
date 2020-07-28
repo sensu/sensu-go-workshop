@@ -49,17 +49,67 @@ services:
       --subscriptions="linux,demo"
       --labels="foo=bar,bar=baz"
 
+  # Prometheus Push Gateway
+  # 
+  # Includes the Prometheus Pushgateway for pushing metrics to the Prometheus
+  # TSDB.
+  # 
+  # See: https://github.com/prometheus/pushgateway
+  pushgateway:
+    image: prom/pushgateway:v1.2.0
+    labels:
+    - io.sensu.role=tsdb
+    depends_on:
+    - sensu-agent # not actually true; only used for demo purposes
+    ports:
+    - 9091:9091
+    entrypoint: /bin/pushgateway
+    command: >-
+      --web.listen-address=":9091"
+      --web.telemetry-path="/metrics"
+      --web.external-url="http://0.0.0.0:9091"
+      --web.route-prefix=""
+      --web.enable-lifecycle 
+      --web.enable-admin-api 
+      --persistence.file="/var/prometheus/pushgateway.store"
+      --persistence.interval=5m
+      --log.level=info
+      --log.format=json
+      
+  # Prometheus 
+  # 
+  # Includes the Prometheus database for storage of telemtry data.
+  # 
+  # See: https://prometheus.io/docs/introduction/overview/
+  prometheus:
+    image: prom/prometheus:2.20.0
+    labels:
+    - io.sensu.role=tsdb
+    depends_on:
+    - pushgateway # not actually true; only used for demo purposes
+    ports:
+    - 9090:9090
+    environment:
+    - PROMETHEUS_EXAMPLE=${PROMETHEUS_EXAMPLE}
+    volumes:
+    - type: bind
+      source: ./config/prometheus
+      target: /etc/prometheus
+    - type: volume 
+      source: prometheus_data
+      target: /prometheus
+      
   # TimescaleDB  
   #
   # Includes TimescaleDB (Postgres database) for storage of telemetry data.
   # 
   # See: https://docs.timescale.com/latest/introduction
-  timescaledb-server:
+  timescaledb:
     image: timescale/timescaledb:latest-pg12
     labels:
     - io.sensu.role=tsdb
     depends_on:
-    - sensu-agent # not actually true; only used for demo purposes
+    - pushgateway # not actually true; only used for demo purposes
     ports:
     - 5432:5432
     environment:
@@ -79,12 +129,13 @@ services:
   # Timescaledb. 
   # 
   # See: https://grafana.com/docs/grafana/latest/
-  grafana-server:
+  grafana:
     image: grafana/grafana:7.0.0
     labels:
     - io.sensu.role=dashboards
     depends_on:
-    - timescaledb-server # not actually true; used only for demo purposes
+    - timescaledb # not actually true; used only for demo purposes
+    - prometheus # not actually true; used only for demo purposes
     ports:
     - 3001:3000
     environment:
@@ -103,6 +154,8 @@ volumes:
   timescaledb_data:
     driver: local
   grafana_data:
+    driver: local
+  prometheus_data:
     driver: local
 
   

@@ -16,20 +16,6 @@ spec:
       resource_names: []
 
 ---
-type: ClusterRole
-api_version: core/v2
-metadata:
-  name: trainee
-spec:
-  rules:
-    - resources: 
-      - "*"
-      verbs:
-      - get
-      - list
-      resource_names: []
-
----
 type: ClusterRoleBinding
 api_version: core/v2 
 metadata:
@@ -43,14 +29,29 @@ spec:
     type: Group
 
 ---
-type: ClusterRoleBinding
-api_version: core/v2 
+type: Role
+api_version: core/v2
 metadata:
   name: trainee
 spec:
+  rules:
+    - resources: 
+      - "*"
+      verbs:
+      - get
+      - list
+      resource_names: []
+
+---
+type: RoleBinding
+api_version: core/v2 
+metadata:
+  name: trainee
+  namespace: default
+spec:
   role_ref:
     name: trainee
-    type: ClusterRole
+    type: Role
   subjects:
   - name: trainee
     type: Group

@@ -99,8 +99,8 @@
    Once `docker-compose` is done standing up our systems we should be able to
    login to the Sensu Go dashboard! If you have deployed the workshop 
    environment on your local machine, visit http://localhost:3000/, otherwise 
-   use the corresponding IP address for your Docker host in place of 
-   "localhost".
+   use the corresponding IP address or hostname for your Docker host in place 
+   of "localhost".
 
    _NOTE: you may login to the dashboard using the username and password
    provided in the `.env` file._
@@ -121,13 +121,14 @@
 4. [OPTIONAL] Create RBAC resources
 
    ```
-   $ sensuctl create -r -f users/
+   $ sensuctl create -r -f templates/rbac/
    ```
    
    _NOTE: this step is not required for self-guided trainees. Instructors may 
-   wish to copy the `example.yaml` template for as many trainees as they wish 
-   to create sandboxed training environments for (i.e. dedicated Sensu Go 
-   Namespaces); see [Adding Sensu RBAC resources][rbac] for more information._
+   wish to copy the `users/user.yaml.example` template for as many trainees as 
+   they wish to create sandboxed training environments for (i.e. dedicated 
+   Sensu Go Namespaces); see [Adding Sensu RBAC resources][rbac] for more 
+   information._
 
 [rbac]: #adding-sensu-rbac-resources
 
@@ -152,7 +153,7 @@ documentation][8].
    the name `lizy` with the desired username. Then run the following command: 
    
    ```
-   $ sensuctl create -r -f users/
+   $ sensuctl create -r -f templates/rbac/
    ```
 
 ### Scale one of the workshop services 

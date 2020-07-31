@@ -17,7 +17,7 @@ to [Semantic Versioning][semver].
   installing the `sensuctl` CLI)
 - Documented `--config-dir` oriented trainee setup; added default/example 
   `sensuctl` configs
-- Added `sensuctl` wrapper script (needs documents); which can be used as a 
+- Added `sensuctl` wrapper script (needs documentation); which can be used as a 
   workaround for [sensu/sensu-go#2316][2316]
 - Outlined the observability pipeline workshop lessons 1-2 
 - Added an issue tracker document (WIP)
@@ -25,6 +25,7 @@ to [Semantic Versioning][semver].
 - Use long-syntax volumes for easier readability 
 - Add comments to docker-compose.yaml
 - Add Prometheus + Pushgateway to the reference architecture 
+- Add RBAC templates & user RBAC/namespace generator script
 - Next: 
   - Start developing the "Observability Pipeline" workshop
   - Add new Sensu templates (deprecate `/manifests` in favor of `/templates`)

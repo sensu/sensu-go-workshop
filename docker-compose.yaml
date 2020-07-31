@@ -75,22 +75,20 @@ services:
       --persistence.interval=5m
       --log.level=info
       --log.format=json
-      
+
   # Prometheus 
   # 
   # Includes the Prometheus database for storage of telemtry data.
   # 
   # See: https://prometheus.io/docs/introduction/overview/
   prometheus:
-    image: prom/prometheus:2.20.0
+    image: prom/prometheus:v2.20.0
     labels:
     - io.sensu.role=tsdb
     depends_on:
     - pushgateway # not actually true; only used for demo purposes
     ports:
     - 9090:9090
-    environment:
-    - PROMETHEUS_EXAMPLE=${PROMETHEUS_EXAMPLE}
     volumes:
     - type: bind
       source: ./config/prometheus
@@ -157,5 +155,3 @@ volumes:
     driver: local
   prometheus_data:
     driver: local
-
-  

@@ -2,16 +2,16 @@
 type: Namespace
 api_version: core/v2 
 metadata: 
-  name: lizy
+  name: ${USERNAME}
 spec:
-  name: lizy
+  name: ${USERNAME}
 
 ---
 type: Role
 api_version: core/v2
 metadata:
-  name: trainee:lizy
-  namespace: lizy
+  name: trainee:${USERNAME}
+  namespace: ${USERNAME}
 spec:
   rules:
     - resources:
@@ -24,25 +24,25 @@ spec:
 type: RoleBinding
 api_version: core/v2 
 metadata:
-  name: trainee:lizy
-  namespace: lizy
+  name: trainee:${USERNAME}
+  namespace: ${USERNAME}
 spec:
   role_ref:
-    name: trainee:lizy
+    name: trainee:${USERNAME}
     type: Role
   subjects:
-  - name: trainee:lizy
+  - name: trainee:${USERNAME}
     type: Group
       
 ---
 type: User 
 api_version: core/v2 
 metadata:
-  name: lizy
+  name: ${USERNAME}
 spec:
   disabled: false
-  username: lizy
-  password_hash: $2a$10$lztzWd1gfyXjATMYF46C3eZViZq2uhBGWXLQaZDLm4d5CC.Fz/QzW
+  username: ${USERNAME}
+  password_hash: ${PASSWORD_HASH}
   groups: 
   - trainee
-  - trainee:lizy
+  - trainee:${USERNAME}

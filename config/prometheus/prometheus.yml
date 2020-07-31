@@ -18,5 +18,4 @@ scrape_configs:
   - targets: 
     - pushgateway:9091
     labels:
-      my:   label
-      your: label
+      source: pushgateway

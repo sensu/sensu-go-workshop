@@ -5,8 +5,8 @@
   - [Observability Pipeline](#observability-pipeline)
 - [Workshop](#workshop)
   - [Setup](#setup)
-  - [Lesson 1: Introduction to Sensu Go](#lesson-1--introduction-to-sensu-go)
-  - [Lesson 2: Introduction to `sensu-agent`](#lesson-2--introduction-to-sensu-agent)
+  - [Lesson 1: Introduction to Sensu Go](#lesson-1-introduction-to-sensu-go)
+  - [Lesson 2: Introduction to `sensu-agent`](#lesson-2-introduction-to-sensu-agent)
 
 ## Overview 
 

@@ -23,8 +23,12 @@ lessons contained in this workshop:
    - https://trello.com/c/tUtPwOHq  
    - https://github.com/sensu/sensu-go/issues/3599  
    
+3. **Support for pre-seeding pipeline resources?!**  
 
-3. **Check interval should be optional for checks set to `publish: false`**  
+   - For convenience only... it would be nice to pre-seed a fresh install with
+     Sensu resources (e.g. assets, checks, filters, mutators, handlers, etc)
+
+4. **Check interval should be optional for checks set to `publish: false`**  
 
    - This basically just leaves the door open for new users to get confused; 
      why is an interval needed when `check.publish: false`? 

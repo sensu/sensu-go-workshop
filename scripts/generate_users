@@ -1,9 +1,10 @@
-#!/usr/bin/env sh
-#
+#!/bin/sh
 
 USERS_JSON=${1:-"users/users.json"} 
-USER_TEMPLATE=${2:-"users/user.yaml.example"}
-OUTPUT_DIRECTORY=${3:-$PWD/templates/rbac}
+USER_TEMPLATE=${2:-"users/user.yaml.template"}
+OUTPUT_DIRECTORY=${3:-"templates/rbac"}
+COMPOSE_FILE=${4:-docker-compose.yaml}
+OUTPUT_FORMAT=yaml
 
 check_deps() {
   for DEP in jq base64 envsubst
@@ -41,11 +42,15 @@ validate_io() {
 
 create_users() {
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64'); do
-    USERNAME=$(echo ${USER} | base64 --decode | jq -r .username)
-    PASSWORD=$(echo ${USER} | base64 --decode | jq -r .password)
-    export $(echo ${USER} | base64 --decode | jq -r '@sh "PASSWORD_HASH=\(.password_hash)"')
-    echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.yaml"
-    envsubst < ${USER_TEMPLATE} > ${OUTPUT_DIRECTORY}/${USERNAME}.yaml
+    export USERNAME=$(echo ${USER} | base64 -d | jq -r .username)
+    export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
+    export $(echo ${USER} | base64 -d | jq -r '@sh "PASSWORD_HASH=\(.password_hash)"')
+    echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
+    envsubst < ${USER_TEMPLATE} > ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}
+    # cat ${USER_TEMPLATE} | envsubst | tee ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}
+    docker-compose \
+      -f ${COMPOSE_FILE} run --no-deps -d --rm \
+      -e SENSU_NAMESPACE=${USERNAME} sensu-agent
   done
 }
 

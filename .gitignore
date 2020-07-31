@@ -1,7 +1,6 @@
 .vagrant
 .envrc
-assets/*.tar.gz
-manifests/assets/local-*.yaml
+.sensu
+*.tar.gz
 license.json
-ldap/*.crt
-ldap/*.key
+templates/rbac/

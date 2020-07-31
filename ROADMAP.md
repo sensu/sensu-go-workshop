@@ -26,3 +26,7 @@ The following are planned improvements to the workshop:
      pipeline resources in the new namespace
    - Include instructions for instructor-led workshops, for reseting the 
      workshop environment and having trainees restore their configs
+
+1. Investigate `volumes.:volume.external`
+
+   - See: https://docs.docker.com/compose/compose-file/#external

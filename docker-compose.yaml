@@ -1,5 +1,5 @@
 ---
-version: "3.8"
+version: "3.3"
 services:
   # Sensu Backend 
   #
@@ -144,6 +144,43 @@ services:
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
 
+  # Init
+  # 
+  # Generate workshop configuration files (e.g. user templates)! 
+  init-workshop:
+    container_name: init-workshop
+    build:
+      context: docker/init-workshop/
+      dockerfile: Dockerfile
+    image: init-workshop:latest
+    labels:
+    - io.sensu.role=init-workshop
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    - type: bind
+      source: ./.env
+      target: /var/lib/sensu/workshop/.env
+    - type: bind
+      source: ./${COMPOSE_FILE}
+      target: /var/lib/sensu/workshop/docker-compose.yaml
+    - type: bind
+      source: ./docker
+      target: /var/lib/sensu/workshop/docker
+    - type: bind 
+      source: ./scripts
+      target: /usr/local/bin
+    - type: bind
+      source: ./users
+      target: /var/lib/sensu/workshop/users
+    - type: bind
+      source: ./templates
+      target: /var/lib/sensu/workshop/templates
+      consistency: consistent # required for MacOS
+    command: |-
+      generate_users
+      
 volumes:
   sensu_data:
     driver: local

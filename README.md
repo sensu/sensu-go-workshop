@@ -42,14 +42,14 @@ Once you have deployed a workshop environment, you may proceed with the
 following local workstation setup instructions which will help you install 
 the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
-1. Clone this repository & configure your local environment. 
+1. Clone this repository & configure your local environment.  
 
    ```
    $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
    ```
    
-2. Configure `sensuctl`. 
+2. Configure `sensuctl`.  
 
    This workshop includes multiple configuration examples: 
    
@@ -98,16 +98,27 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    
 3. Create an API Key. 
 
+   To create an API Key, use the `sensuctl api-key grant` command: 
+   
    ```
    $ sensuctl api-key grant sensu
-   Created: /api/core/v2/apikeys/1390f2cf-e31b-450e-b38c-e3fc09b52d07
+   Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+   
+   For our purposes, we want to capture this API key (the 
+   `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) as an environment
+   variable. You can either copy the output from the `sensuctl api-key grant`
+   command manually, or run the following command: 
+   
+   ```
+   $ SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    ```
    
    _NOTE: self-guided users should create an api-key for the `sensu` user (the 
-   default user for this workshop). Trainees in instructor-led workshops may 
-   need to login with individual credentials provided by the instructor._ 
+   default user for this workshop). Trainees in instructor-led workshops should
+   create an api-key for their own user (e.g. `sensuctl api-key grant 
+   me@mycompany.com`._ 
    
-
 ### Lesson 1: introduction to Sensu Go
 
 1. Configure a handler to process observability data

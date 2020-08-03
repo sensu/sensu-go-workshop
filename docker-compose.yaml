@@ -175,11 +175,21 @@ services:
       source: ./users
       target: /var/lib/sensu/workshop/users
     - type: bind
-      source: ./templates
-      target: /var/lib/sensu/workshop/templates
+      source: ./config/sensu
+      target: /var/lib/sensu/workshop/config/sensu
       consistency: consistent # recommended for MacOS
     command: |-
       generate_users
+  
+  workstation:
+    container_name: workstation
+    image: sensu/sensu:${SENSU_CLI_VERSION}
+    working_dir: /root
+    volumes:
+    - type: bind
+      source: ./
+      target: /root/workshop 
+      consistency: consistent # recommended for MacOS
       
 volumes:
   sensu_data:

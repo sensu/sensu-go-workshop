@@ -163,7 +163,13 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
    ==COMING SOON==
 
+4. Output Metric Extraction 
 
+   ==COMING SOON==
+
+5. Agent StatsD Socket 
+
+   ==COMING SOON==
 
 
 

@@ -3,4 +3,4 @@
 .sensu
 *.tar.gz
 license.json
-templates/rbac/
+config/sensu/rbac/

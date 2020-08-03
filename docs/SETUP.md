@@ -1,5 +1,11 @@
 # Sensu Go Workshop 
 
+- [Workshop contents](#workshop-contents)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [Customization](#customization)
+- [Maintenance & Troubleshooting](#maintenance-troubleshooting)
+
 ## Workshop contents
 
 1. A Docker Compose environment file for customizing the workshop environment
@@ -16,7 +22,9 @@
    Coming soon: 
    
    - Deployment templates for [AWS Fargate][fargate]
-   - Deployment templates for [Heroku][heroku]   
+   - Deployment templates for [Heroku][heroku]
+   - Alternate reference architectures (e.g. Elasticsearch or Splunk for 
+     metric storage instead of Timescale)   
 
 3. Configuration files for TimescaleDB and Grafana 
 
@@ -40,46 +48,36 @@
 
 ## Setup
 
-1. Review and optionally edit the Docker Compose environment file. 
-
-   Please note the following configuration parameters: 
-   
-   - `COMPOSE_PROJECT_NAME`  
-     The Docker resource prefix for all resources managed by Docker Compose.
-     
-   - `SENSU_BACKEND_CLUSTER_ADMIN_USERNAME`  
-     The Sensu Go cluster admin username. _NOTE: if you're a long-time Sensu Go
-     user you may recall that the default cluster admin username was `admin`; 
-     since version 5.16.0 the default cluster admin user has been removed and 
-     must now be provided via a new [`sensu-backend init` command][4]._
-     
-   - `SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD`  
-     The Sensu Go cluster admin password. _NOTE: if you're a long-time Sensu Go
-     user you may recall that the default cluster admin password was 
-     `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has 
-     been removed and must now be provided via the [`sensu-backend init` 
-     command][4]._
-     
-   - `SENSU_TIMESCALEDB_DSN`  
-     The TimescaleDB Postgres database Data Source Name (DSN). 
-     
-   - `POSTGRES_PASSWORD`  
-     The TimescaleDB Postgres database password (for the default `postgres` 
-     user). 
-   
-   - `POSTGRES_DB`  
-     The TimescaleDB Postgres database to connect to. If omitted, the default 
-     database will be `postgres`. If provided and no such database exists, it 
-     will be created. 
-
-1. Clone this repository
+1. **Clone this repository.**
 
    ```
    $ git clone git@github.com:calebhailey/sensu-go-workshop.git
    $ cd sensu-go-workshop/
+   $ export $(cat .env | grep =)
    ```
      
-2. Bootstrap our Sensu Go environment!
+2. **Customize the Docker Compose environment file (`.env`), as needed.**
+
+   > _NOTE: complete this step **BEFORE** you run any `docker-compose` 
+     commands._
+
+   See [Customization](#customization) for more information.    
+   
+3. **[OPTIONAL] Add user accounts for workshop trainees.** 
+
+   > _NOTE: **self-guided trainees should skip this step**._ 
+   
+   Instructors who are setting up a shared workshop environment for multiple 
+   trainees should edit the `users/users.json` file, adding as many rows as 
+   needed (one per trainee). If you modify this file before you complete the 
+   next step, the 
+   
+   may wish to copy the `users/user.yaml.example` template for as many trainees as 
+   they wish to create sandboxed training environments for (i.e. dedicated 
+   Sensu Go Namespaces); see [Adding Sensu RBAC resources][rbac] for more 
+   information._
+
+4. **Bootstrap our Sensu Go environment!**
 
    ```
    $ sudo docker-compose -f docker-compose.yaml up -d
@@ -104,33 +102,118 @@
 
    _NOTE: you may login to the dashboard using the username and password
    provided in the `.env` file._
-
-3. Install and configure a local `sensuctl` (the new Sensu Go CLI)
-
-   Mac users:
-
-   ```
-   $ curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.15.0/sensu-go_5.15.0_darwin_amd64.tar.gz
-   $ sudo tar -xzf sensu-go_5.15.0_darwin_amd64.tar.gz -C /usr/local/bin/
-   ```
-
-   Linux and Windows users can find [installation instructions][5] in the Sensu
-   [user documentation][6]. The complete list of Sensu downloads is available at
-   https://sensu.io/downloads
-
-4. [OPTIONAL] Create RBAC resources
-
-   ```
-   $ sensuctl create -r -f templates/rbac/
-   ```
    
-   _NOTE: this step is not required for self-guided trainees. Instructors may 
-   wish to copy the `users/user.yaml.example` template for as many trainees as 
-   they wish to create sandboxed training environments for (i.e. dedicated 
-   Sensu Go Namespaces); see [Adding Sensu RBAC resources][rbac] for more 
-   information._
+   > _NOTE: self-guided trainees can return to the workshop and begin their 
+     first lessons._
 
-[rbac]: #adding-sensu-rbac-resources
+5. **[OPTIONAL] Create RBAC resources**
+
+   > _NOTE: **self-guided trainees should skip this step**._ 
+
+   ```
+   $ sudo docker-compose run workstation ./workshop/scripts/create_user_accounts \
+     ./workshop/config/sensu/rbac \
+     http://sensu-backend:8080
+   Successfully created the following workshop user accounts:
+   
+      Name    
+    ───────── 
+     default  
+     example  
+     lizy    
+   ```
+
+## Customization 
+
+Please note the following configuration parameters: 
+   
+- `COMPOSE_PROJECT_NAME`  
+  The Docker resource prefix for all resources managed by Docker Compose.
+
+- `COMPOSE_FILE`
+  The Docker Compose template to use; defaults to `docker-compose.yaml`. 
+     
+- `SENSU_BACKEND_VERSION`
+   
+  The Sensu backend version to use. This should be kept in sync with 
+  `SENSU_AGENT_VERSION` and `SENSU_CLI_VERSION`. 
+     
+- `SENSU_BACKEND_CLUSTER_ADMIN_USERNAME`  
+  The Sensu Go cluster admin username. _NOTE: if you're a long-time Sensu Go
+  user you may recall that the default cluster admin username was `admin`; 
+  since version 5.16.0 the default cluster admin user has been removed and 
+  must now be provided via a new [`sensu-backend init` command][4]._
+     
+- `SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD`  
+  The Sensu Go cluster admin password. _NOTE: if you're a long-time Sensu Go
+  user you may recall that the default cluster admin password was 
+  `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has 
+  been removed and must now be provided via the [`sensu-backend init` 
+  command][4]._
+     
+- `SENSU_TIMESCALEDB_DSN`  
+  The TimescaleDB Postgres database Data Source Name (DSN). 
+     
+- `SENSU_CLI_VERSION`
+  The Sensu CLI (`sensuctl`) version to use. This should be kept in sync 
+  with `SENSU_BACKEND_VERSION` and `SENSU_AGENT_VERSION`. 
+
+- `SENSU_CONFIG_DIR`
+  The `sensuctl` configuration directory to use. This environment variable
+  is not yet supported by `sensuctl`, but may be in a future release. In the
+  interim, setting this variable is useful in the context of custom 
+  `sensuctl` wrapper scripts (see `/scripts/sensuctl`) or for passing on the
+  command line (e.g. `sensuctl --config-dir $SENSU_CONFIG_DIR`). 
+     
+- `SENSU_AGENT_VERSION`
+  The Sensu Agent version to use. This should be kept in sync with 
+  `SENSU_BACKEND_VERSION` and `SENSU_CLI_VERSION`. 
+
+- `SENSU_BACKEND_URL`
+  The Sensu Backend DNS used by Sensu Agents running in the Docker Compose 
+  environment (default: `ws://sensu-backend:8081`). This should not need to 
+  be changed unless you're modifying the Docker Compose template. 
+
+- `SENSU_NAMESPACE`
+  The Sensu namespace used by Sensu Agents running in the Docker Compose 
+  environment (default: `default`). This variable can be overriden when 
+  spawning additional agents; e.g.: 
+     
+  ```
+  $ sudo docker-compose run -e "SENSU_NAMESPACE=us-west-1" sensu-agent
+  ```
+
+- `SENSU_SUBSCRIPTIONS`
+  The default subscriptions used by Sensu Agents running in the Docker Compose 
+  environment (default: `linux,workshop,devel`). 
+     
+- `PROM_PROMETHEUS_VERSION`
+   
+  The Prometheus Docker image version to use in the workshop environment 
+  (default: `v2.20.0`). 
+   
+- `PROM_PUSHGATEWAY_VERSION`
+   
+  The Prometheus Pushgateway Docker image version to use in the workshop 
+  environment (default: `v1.2.0`). 
+   
+- `TIMESCALEDB_VERSION`
+   
+  The TimescaleDB Docker image version to use in the workshop environment 
+  (default: `1.7.2-pg12`). 
+
+- `POSTGRES_PASSWORD`  
+  The TimescaleDB Postgres database password (for the default `postgres` 
+  user). 
+   
+- `POSTGRES_DB`  
+  The TimescaleDB Postgres database to connect to. If omitted, the default 
+  database will be `postgres`. If provided and no such database exists, it 
+  will be created. 
+     
+- `GRAFANA_VERSION`
+   
+  The Grafana Docker image version to use in the workshop (default: `7.0.0`).
 
 ## Maintenance & Troubleshooting 
 
@@ -147,14 +230,6 @@ In organizations where an SSO provider is available, we recommend configuring
 Sensu for single sign-on (supports LDAP, Active Directory, OAuth, and OIDC). To
 learn more about SSO for Sensu Go, please visit the [authentication provider 
 documentation][8]. 
-
-1. **Create local user accounts w/ dedicated namespaces.**  
-   To create local user accounts, copy the example.yaml template and replace 
-   the name `lizy` with the desired username. Then run the following command: 
-   
-   ```
-   $ sensuctl create -r -f templates/rbac/
-   ```
 
 ### Scale one of the workshop services 
 

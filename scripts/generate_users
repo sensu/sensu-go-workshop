@@ -2,7 +2,7 @@
 
 USERS_JSON=${1:-"users/users.json"} 
 USER_TEMPLATE=${2:-"users/user.yaml.template"}
-OUTPUT_DIRECTORY=${3:-"templates/rbac"}
+OUTPUT_DIRECTORY=${3:-"config/sensu/rbac"}
 COMPOSE_FILE=${4:-docker-compose.yaml}
 OUTPUT_FORMAT=yaml
 

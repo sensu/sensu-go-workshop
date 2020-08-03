@@ -177,7 +177,7 @@ services:
     - type: bind
       source: ./templates
       target: /var/lib/sensu/workshop/templates
-      consistency: consistent # required for MacOS
+      consistency: consistent # recommended for MacOS
     command: |-
       generate_users
       

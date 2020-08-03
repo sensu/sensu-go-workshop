@@ -128,23 +128,27 @@
 Please note the following configuration parameters: 
    
 - `COMPOSE_PROJECT_NAME`  
+  
   The Docker resource prefix for all resources managed by Docker Compose.
 
-- `COMPOSE_FILE`
+- `COMPOSE_FILE`  
+
   The Docker Compose template to use; defaults to `docker-compose.yaml`. 
      
-- `SENSU_BACKEND_VERSION`
+- `SENSU_BACKEND_VERSION`  
    
   The Sensu backend version to use. This should be kept in sync with 
   `SENSU_AGENT_VERSION` and `SENSU_CLI_VERSION`. 
      
 - `SENSU_BACKEND_CLUSTER_ADMIN_USERNAME`  
+  
   The Sensu Go cluster admin username. _NOTE: if you're a long-time Sensu Go
   user you may recall that the default cluster admin username was `admin`; 
   since version 5.16.0 the default cluster admin user has been removed and 
   must now be provided via a new [`sensu-backend init` command][4]._
      
 - `SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD`  
+  
   The Sensu Go cluster admin password. _NOTE: if you're a long-time Sensu Go
   user you may recall that the default cluster admin password was 
   `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has 
@@ -152,29 +156,35 @@ Please note the following configuration parameters:
   command][4]._
      
 - `SENSU_TIMESCALEDB_DSN`  
+  
   The TimescaleDB Postgres database Data Source Name (DSN). 
      
-- `SENSU_CLI_VERSION`
+- `SENSU_CLI_VERSION`  
+  
   The Sensu CLI (`sensuctl`) version to use. This should be kept in sync 
   with `SENSU_BACKEND_VERSION` and `SENSU_AGENT_VERSION`. 
 
-- `SENSU_CONFIG_DIR`
+- `SENSU_CONFIG_DIR`  
+  
   The `sensuctl` configuration directory to use. This environment variable
   is not yet supported by `sensuctl`, but may be in a future release. In the
   interim, setting this variable is useful in the context of custom 
   `sensuctl` wrapper scripts (see `/scripts/sensuctl`) or for passing on the
   command line (e.g. `sensuctl --config-dir $SENSU_CONFIG_DIR`). 
      
-- `SENSU_AGENT_VERSION`
+- `SENSU_AGENT_VERSION`  
+  
   The Sensu Agent version to use. This should be kept in sync with 
   `SENSU_BACKEND_VERSION` and `SENSU_CLI_VERSION`. 
 
-- `SENSU_BACKEND_URL`
+- `SENSU_BACKEND_URL`  
+  
   The Sensu Backend DNS used by Sensu Agents running in the Docker Compose 
   environment (default: `ws://sensu-backend:8081`). This should not need to 
   be changed unless you're modifying the Docker Compose template. 
 
-- `SENSU_NAMESPACE`
+- `SENSU_NAMESPACE`  
+  
   The Sensu namespace used by Sensu Agents running in the Docker Compose 
   environment (default: `default`). This variable can be overriden when 
   spawning additional agents; e.g.: 
@@ -183,11 +193,11 @@ Please note the following configuration parameters:
   $ sudo docker-compose run -e "SENSU_NAMESPACE=us-west-1" sensu-agent
   ```
 
-- `SENSU_SUBSCRIPTIONS`
+- `SENSU_SUBSCRIPTIONS`  
   The default subscriptions used by Sensu Agents running in the Docker Compose 
   environment (default: `linux,workshop,devel`). 
      
-- `PROM_PROMETHEUS_VERSION`
+- `PROM_PROMETHEUS_VERSION`  
    
   The Prometheus Docker image version to use in the workshop environment 
   (default: `v2.20.0`). 
@@ -197,21 +207,23 @@ Please note the following configuration parameters:
   The Prometheus Pushgateway Docker image version to use in the workshop 
   environment (default: `v1.2.0`). 
    
-- `TIMESCALEDB_VERSION`
-   
+- `TIMESCALEDB_VERSION`  
+  
   The TimescaleDB Docker image version to use in the workshop environment 
   (default: `1.7.2-pg12`). 
 
 - `POSTGRES_PASSWORD`  
+  
   The TimescaleDB Postgres database password (for the default `postgres` 
   user). 
    
 - `POSTGRES_DB`  
+  
   The TimescaleDB Postgres database to connect to. If omitted, the default 
   database will be `postgres`. If provided and no such database exists, it 
   will be created. 
      
-- `GRAFANA_VERSION`
+- `GRAFANA_VERSION`  
    
   The Grafana Docker image version to use in the workshop (default: `7.0.0`).
 

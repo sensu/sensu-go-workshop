@@ -1,4 +1,5 @@
-.vagrant
+.ash_history
+.config
 .envrc
 .sensu
 *.tar.gz

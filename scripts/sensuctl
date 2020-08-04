@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/usr/local/bin/sensuctl ${@} --config-dir ${SENSU_CONFIG_DIR} 

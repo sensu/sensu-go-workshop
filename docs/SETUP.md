@@ -111,9 +111,7 @@
    > _NOTE: **self-guided trainees should skip this step**._ 
 
    ```
-   $ sudo docker-compose run workstation ./workshop/scripts/create_user_accounts \
-     ./workshop/config/sensu/rbac \
-     http://sensu-backend:8080
+   $ sudo docker-compose run --rm configurator create_user_accounts 
    Successfully created the following workshop user accounts:
    
       Name    
@@ -190,7 +188,7 @@ Please note the following configuration parameters:
   spawning additional agents; e.g.: 
      
   ```
-  $ sudo docker-compose run -e "SENSU_NAMESPACE=us-west-1" sensu-agent
+  $ sudo docker-compose run --rm -e "SENSU_NAMESPACE=us-west-1" sensu-agent
   ```
 
 - `SENSU_SUBSCRIPTIONS`  

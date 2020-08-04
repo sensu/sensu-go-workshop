@@ -47,39 +47,33 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    ```
    $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
+   $ export $(cat .env | grep -v "#" | grep =)
    ```
    
-2. Configure `sensuctl`.  
+2. Install and configure a local `sensuctl` (the new Sensu Go CLI)
 
-   This workshop includes multiple configuration examples: 
-   
-   a. `.sensu/default/` should be used for self-guided workshops  
-   b. `.sensu/example/` should be modifed and used in instructor-led workshops  
+   Mac users:
 
-   Edit the contents of `.sensu/default/cluster` and `.sensu/default/profile` 
-   as needed (e.g. you may need to edit the `"api-url"` field of the 
-   `.sensu/default/cluster` file to point at a remote Sensu cluster). 
-   
-   _NOTE: if you're participating in an instructor-led workshop, please copy 
-   the example configs (e.g. `cp -r .sensu/example .sensu/workshop`) and 
-   modify them as needed._
+   ```
+   $ curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz
+   $ sudo tar -xzf sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz -C /usr/local/bin/
+   ```
 
-   Run the following command with the corresponding `--config-dir` (either 
-   `.sensu/default/`, or `.sensu/workshop`) to configure the Sensu CLI: 
+   > NOTE: Linux and Windows users can find [installation instructions][5] in the 
+     Sensu [user documentation][6]. The complete list of Sensu downloads is 
+     available at https://sensu.io/downloads
+
+   Configure the Sensu CLI to connect to your backend:
    
    ```
-   $ sensuctl configure --config-dir .sensu/default/ 
+   $ sensuctl configure
    ```
 
    Sensuctl will prompt you to provide a Sensu Backend URL, username, password,
-   namespace, and preferred output format. The backend URL, namespace, and 
-   output format fields will be pre-populated with defaults based on the 
-   contents of `.sensu/default/cluster` and `.sensu/default/profile` (or 
-   `.sensu/workshop/cluster` and `.sensu/workshop/profile` for instructor-led
-   workshops). 
+   namespace, and preferred output format. 
    
    ```
-   $ sensuctl configure --config-dir .sensu/default/
+   $ sensuctl configure
      ? Sensu Backend URL: http://127.0.0.1:8080
      ? Username: sensu
      ? Password: *****
@@ -116,8 +110,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    
    _NOTE: self-guided users should create an api-key for the `sensu` user (the 
    default user for this workshop). Trainees in instructor-led workshops should
-   create an api-key for their own user (e.g. `sensuctl api-key grant 
-   me@mycompany.com`._ 
+   create an api-key for their own user, using the username provided by the 
+   instructor (e.g. `sensuctl api-key grant <username>`)._ 
    
 ### Lesson 1: introduction to Sensu Go
 

@@ -50,7 +50,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ export $(cat .env | grep -v "#" | grep =)
    ```
    
-2. Install and configure a local `sensuctl` (the new Sensu Go CLI)
+2. Install and configure a local `sensuctl` (the Sensu Go CLI).
 
    Mac users:
 
@@ -102,10 +102,16 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    For our purposes, we want to capture this API key (the 
    `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) as an environment
    variable. You can either copy the output from the `sensuctl api-key grant`
-   command manually, or run the following command: 
+   command manually, like this: 
    
    ```
-   $ SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
+   $ export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+   
+   Or run the following command: 
+   
+   ```
+   $ export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    ```
    
    _NOTE: self-guided users should create an api-key for the `sensu` user (the 

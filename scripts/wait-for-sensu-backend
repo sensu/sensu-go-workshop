@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+SENSU_API_URL=${SENSU_API_URL:-"http://127.0.0.1:8080"}
+INTERVAL=2
+RETRIES=5
+ATTEMPT=0
+SUCCESS=0
+
+while [ ${ATTEMPT} -lt ${RETRIES} ]; do
+  curl ${SENSU_API_URL}/version > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    SUCCESS=$(expr ${SUCCESS} + 1)
+    break
+  fi
+  echo "Unable to connect to ${SENSU_API_URL}, retrying in ${INTERVAL} seconds..."
+  sleep ${INTERVAL}
+  ATTEMPT=$(expr ${ATTEMPT} + 1)
+done
+
+if [ $SUCCESS -eq 0 ]; then
+  echo "Failed to connect to ${SENSU_API_URL} after ${RETRIES} attempts; giving up."
+  exit 2
+fi
+
+if [ $ATTEMPT -gt 0 -a $SUCCESS -gt 0 ]; then
+  # only display success message if we don't connect on the first try
+  echo "Successfully connected to ${SENSU_API_URL}"  
+fi 
+
+exec $@
+exit 0

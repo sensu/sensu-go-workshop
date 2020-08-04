@@ -18,7 +18,7 @@ The following are planned improvements to the workshop:
    - Sensu cluster w/ standalone/external etcd
    - Self-signed certificates (documentation and scripts)
 
-1. Add a lesson on backup & restore
+1. Add a lesson on backup & restore. 
 
    - Document recommended `sensuctl dump` command(s) for backing up pipeline
      resources (i.e. assets, checks, filters, mutators, handlers, etc)
@@ -27,6 +27,13 @@ The following are planned improvements to the workshop:
    - Include instructions for instructor-led workshops, for reseting the 
      workshop environment and having trainees restore their configs
 
-1. Investigate `volumes.:volume.external`
+1. Investigate `volumes.:volume.external` to create a seamless transition
+   from the landing page "quick start" to the workshop. 
 
-   - See: https://docs.docker.com/compose/compose-file/#external
+   - See: https://docs.docker.com/compose/compose-file/#external 
+   
+1. Deprecate the Vagrant-based Sensu Go Sandbox in favor of the Sensu Go 
+   Workshop. 
+   
+   - See: https://docs.sensu.io/sensu-go/latest/learn/learn-sensu-sandbox/ 
+   - See: https://github.com/sensu/sandbox 

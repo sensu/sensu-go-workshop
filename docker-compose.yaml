@@ -186,6 +186,9 @@ services:
       source: ./config/sensu
       target: /var/lib/sensu/workshop/config/sensu
       consistency: consistent
+    - type: volume
+      source: sensuctl_data
+      target: /root/.config
     command: |-
       generate_users
   
@@ -205,8 +208,13 @@ services:
     image: workshop:latest
     labels:
     - io.sensu.role=sensuctl
+    environment:
+    - SENSU_API_URL=${SENSU_API_URL}
     working_dir: /root
     volumes:
+    - type: bind 
+      source: ./scripts
+      target: /usr/local/bin/scripts
     - type: volume
       source: sensuctl_data
       target: /root/.config
@@ -215,10 +223,11 @@ services:
       source: ./
       target: /root/workshop
       consistency: consistent 
-    entrypoint: /usr/local/bin/sensuctl
+    # entrypoint: wait-for sensu-backend:8080 -t 15 -- sensuctl
+    entrypoint: wait-for-sensu-backend sensuctl
     command: >-
       configure -n 
-      --url http://sensu-backend:8080
+      --url ${SENSU_API_URL}
       --username sensu
       --password sensu
       --namespace default

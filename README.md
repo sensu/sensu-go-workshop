@@ -59,8 +59,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ sudo tar -xzf sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz -C /usr/local/bin/
    ```
 
-   > NOTE: Linux and Windows users can find [installation instructions][5] in the 
-     Sensu [user documentation][6]. The complete list of Sensu downloads is 
+   > NOTE: Linux and Windows users can find [installation instructions][2] in the 
+     Sensu [user documentation][3]. The complete list of Sensu downloads is 
      available at https://sensu.io/downloads
 
    Configure the Sensu CLI to connect to your backend:
@@ -169,8 +169,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
 [0]:  #observability-pipeline 
 [1]:  /docs/SETUP.md
-[2]:  #
-[3]:  #
+[2]:  https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
+[3]:  https://docs.sensu.io/sensu-go/latest/
 [4]:  #
 [5]:  #
 [6]:  #

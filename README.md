@@ -84,11 +84,11 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
        wrapped-json
        json
    ```
-
-   _NOTE: the default username and password for this workshop environment are 
-   username: `sensu` and password: `sensu`. Trainees in instructor-led 
-   workshops may need to login with individual credentials provided by the 
-   instructor._
+   
+   > _NOTE: self-guided trainees who are running the workshop on their local 
+     workstation should use the default backend URL (`http://127.0.0.1:8080`), 
+     username (`sensu`), and password (`sensu`). Trainees in instructor-led 
+     workshops should use the URL and credentials provided by the instructor._
    
 3. Create an API Key. 
 

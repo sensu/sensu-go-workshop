@@ -194,6 +194,7 @@ Please note the following configuration parameters:
   ```
 
 - `SENSU_SUBSCRIPTIONS`  
+  
   The default subscriptions used by Sensu Agents running in the Docker Compose 
   environment (default: `linux,workshop,devel`). 
      

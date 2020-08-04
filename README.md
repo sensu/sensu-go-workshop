@@ -53,8 +53,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
    This workshop includes multiple configuration examples: 
    
-   a. `.sensu/default/` should be used for self-guided workshops
-   b. `.sensu/example/` should be modifed and used in instructor-led workshops
+   a. `.sensu/default/` should be used for self-guided workshops  
+   b. `.sensu/example/` should be modifed and used in instructor-led workshops  
 
    Edit the contents of `.sensu/default/cluster` and `.sensu/default/profile` 
    as needed (e.g. you may need to edit the `"api-url"` field of the 

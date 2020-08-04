@@ -49,7 +49,7 @@ create_users() {
       echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
       cat ${USER_TEMPLATE} | envsubst | tee ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}
     else
-      echo "Skipping user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
+      echo "Skipping user template for \"${USERNAME}\" (an RBAC template at \"${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}\" already exists)"
     fi
   done
 }

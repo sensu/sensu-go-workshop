@@ -25,23 +25,9 @@ validate_io() {
 }
 
 validate_api_url() {
-  apk add curl > /dev/null 2>&1
   curl -XGET ${SENSU_API_URL}/version > /dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo "No Sensu Backend found at ${SENSU_API_URL}"
-    exit 2
-  fi
-}
-
-sensuctl_configure() {
-  /usr/local/bin/sensuctl configure -n \
-    --url ${SENSU_API_URL} \
-    --username ${SENSU_USERNAME} \
-    --password ${SENSU_PASSWORD} \
-    --namespace ${SENSU_NAMESPACE} \
-    --format json
-  if [ $? -ne 0 ]; then 
-    echo "Unable to configure sensuctl"
     exit 2
   fi
 }
@@ -61,5 +47,5 @@ create_user_accounts() {
 check_deps
 validate_io
 validate_api_url
-sensuctl_configure
+# sensuctl_configure
 create_user_accounts

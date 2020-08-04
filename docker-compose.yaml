@@ -210,6 +210,9 @@ services:
     - io.sensu.role=sensuctl
     environment:
     - SENSU_API_URL=${SENSU_API_URL}
+    - SENSU_USERNAME=${SENSU_USERNAME}
+    - SENSU_PASSWORD=${SENSU_PASSWORD}
+    - SENSU_NAMESPACE=${SENSU_NAMESPACE}
     working_dir: /root
     volumes:
     - type: bind 
@@ -228,9 +231,9 @@ services:
     command: >-
       configure -n 
       --url ${SENSU_API_URL}
-      --username sensu
-      --password sensu
-      --namespace default
+      --username ${SENSU_USERNAME}
+      --password ${SENSU_PASSWORD}
+      --namespace ${SENSU_NAMESPACE}
       --format tabular
       
 volumes:

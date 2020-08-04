@@ -70,13 +70,8 @@
    Instructors who are setting up a shared workshop environment for multiple 
    trainees should edit the `users/users.json` file, adding as many rows as 
    needed (one per trainee). If you modify this file before you complete the 
-   next step, the 
+   next step, RBAC profiles for each user will be automatically generated. 
    
-   may wish to copy the `users/user.yaml.example` template for as many trainees as 
-   they wish to create sandboxed training environments for (i.e. dedicated 
-   Sensu Go Namespaces); see [Adding Sensu RBAC resources][rbac] for more 
-   information._
-
 4. **Bootstrap our Sensu Go environment!**
 
    ```

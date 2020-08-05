@@ -198,7 +198,7 @@ services:
       source: sensuctl_data
       target: /root/.config
     command: |-
-      generate_users
+      generate_user_rbac
   
   # Workstation
   # 

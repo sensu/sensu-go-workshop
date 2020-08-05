@@ -235,7 +235,6 @@ services:
       source: ./
       target: /root/workshop
       consistency: consistent 
-    # entrypoint: wait-for sensu-backend:8080 -t 15 -- sensuctl
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
       configure -n 

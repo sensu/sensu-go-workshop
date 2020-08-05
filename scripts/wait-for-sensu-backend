@@ -7,7 +7,7 @@ ATTEMPT=0
 SUCCESS=0
 
 while [ ${ATTEMPT} -lt ${RETRIES} ]; do
-  curl ${SENSU_API_URL}/version > /dev/null 2>&1
+  curl ${SENSU_API_URL}/health > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     SUCCESS=$(expr ${SUCCESS} + 1)
     break

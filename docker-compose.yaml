@@ -16,14 +16,14 @@ services:
     - 8080:8080
     - 8081:8081
     healthcheck:
-      test: wget -q http://127.0.0.1:8080/version
-      interval: 60s
-      timeout: 10s
-      retries: 3
+      test: wget -q http://127.0.0.1:8080/health -O-
+      interval: 10s
+      timeout: 5s
+      retries: 6
     environment:
-    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME}
-    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME}
-    - SENSU_TIMESCALEDB_DSN=${SENSU_TIMESCALEDB_DSN}
+    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_TIMESCALEDB_DSN
     volumes:
     - type: volume 
       source: sensu_data
@@ -92,8 +92,8 @@ services:
     ports:
     - 5432:5432
     environment:
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    - POSTGRES_DB=${POSTGRES_DB}
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
     volumes: 
     - type: bind 
       source: ./config/timescaledb/100-sensu-metrics.sql
@@ -136,9 +136,9 @@ services:
     labels:
     - io.sensu.role=sensu-agent
     environment:
-    - SENSU_BACKEND_URL=${SENSU_BACKEND_URL}
-    - SENSU_NAMESPACE=${SENSU_NAMESPACE}
-    - SENSU_SUBSCRIPTIONS=${SENSU_SUBSCRIPTIONS}
+    - SENSU_BACKEND_URL
+    - SENSU_NAMESPACE
+    - SENSU_SUBSCRIPTIONS
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
@@ -218,10 +218,10 @@ services:
     labels:
     - io.sensu.role=sensuctl
     environment:
-    - SENSU_API_URL=${SENSU_API_URL}
-    - SENSU_USERNAME=${SENSU_USERNAME}
-    - SENSU_PASSWORD=${SENSU_PASSWORD}
-    - SENSU_NAMESPACE=${SENSU_NAMESPACE}
+    - SENSU_API_URL
+    - SENSU_USERNAME
+    - SENSU_PASSWORD
+    - SENSU_NAMESPACE
     working_dir: /root
     volumes:
     - type: bind 

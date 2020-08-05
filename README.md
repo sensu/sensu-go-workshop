@@ -114,10 +114,10 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    ```
    
-   _NOTE: self-guided users should create an api-key for the `sensu` user (the 
-   default user for this workshop). Trainees in instructor-led workshops should
-   create an api-key for their own user, using the username provided by the 
-   instructor (e.g. `sensuctl api-key grant <username>`)._ 
+   > _NOTE: self-guided trainees should grant an api-key for the `sensu` user,
+     as shown above. Trainees in instructor-led workshops should create an 
+     api-key for their own user, using the username provided by the instructor 
+     (e.g. `sensuctl api-key grant <username>`)._ 
    
 ### Lesson 1: introduction to Sensu Go
 

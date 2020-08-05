@@ -1,7 +1,10 @@
-# Fetch latest Sensu image (for build only)
-FROM sensu/sensu:latest AS sensu
+# Use multi-stage Dockerfile to fetch desired sensuctl version
+ARG SENSU_CLI_VERSION
+FROM sensu/sensu:${SENSU_CLI_VERSION} AS sensu
+ARG SENSU_CLI_VERSION
+RUN sensuctl version
 
-# Build configurator image
+# Build the workshop workstation image
 FROM alpine:latest 
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 ENV PATH=$PATH:/usr/local/bin/scripts

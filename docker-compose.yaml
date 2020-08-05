@@ -151,7 +151,14 @@ services:
 
   # Configurator
   # 
-  # Configuration automation for instructor-led workshops (e.g. user profiles).
+  # Configuration automation for instructor-led workshops (e.g. user profile 
+  # generation) using a super light-weight "configuration management" stack:
+  #
+  # - curl
+  # - jq
+  # - envsubst (part of the gettext package)
+  # - sensuctl
+  # - docker & docker-compose
   # 
   # See: ./scripts/
   configurator:
@@ -159,8 +166,9 @@ services:
     build:
       context: docker/workshop/
       dockerfile: Dockerfile
-      args: []
-    image: workshop:latest
+      args: 
+      - SENSU_CLI_VERSION
+    image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=configurator
     volumes:
@@ -204,8 +212,9 @@ services:
     build:
       context: docker/workshop/
       dockerfile: Dockerfile
-      args: []
-    image: workshop:latest
+      args:
+      - SENSU_CLI_VERSION
+    image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
     environment:

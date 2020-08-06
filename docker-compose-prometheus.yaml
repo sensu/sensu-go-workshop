@@ -79,29 +79,6 @@ services:
       source: prometheus_data
       target: /prometheus
       
-  # TimescaleDB  
-  #
-  # Includes TimescaleDB (Postgres database) for storage of telemetry data.
-  # 
-  # See: https://docs.timescale.com/latest/introduction
-  timescaledb:
-    container_name: timescaledb
-    image: timescale/timescaledb:${TIMESCALEDB_VERSION}
-    labels:
-    - io.sensu.role=tsdb
-    ports:
-    - 5432:5432
-    environment:
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB
-    volumes: 
-    - type: bind 
-      source: ./config/timescaledb/100-sensu-metrics.sql
-      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
-    - type: volume 
-      source: timescaledb_data
-      target: /var/lib/postgresql/data
-      
   # Grafana 
   #
   # Includes Grafana dashboard and datasource configuration files for 
@@ -119,8 +96,8 @@ services:
     - POSTGRES_PASSWORD
     volumes:
     - type: bind
-      source: ./config/grafana/provisioning/datasources/ 
-      target: /etc/grafana/provisioning/datasources/
+      source: ./config/grafana/provisioning/datasources/prometheus.yaml 
+      target: /etc/grafana/provisioning/datasources/prometheus.yaml
     - type: volume 
       source: grafana_data
       target: /var/lib/grafana
@@ -245,13 +222,11 @@ services:
       --format tabular
       
 volumes:
+  sensuctl_data:
+    driver: local
   sensu_data:
-    driver: local
-  timescaledb_data:
-    driver: local
-  grafana_data:
     driver: local
   prometheus_data:
     driver: local
-  sensuctl_data:
+  grafana_data:
     driver: local

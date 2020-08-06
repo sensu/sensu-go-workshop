@@ -1,0 +1,209 @@
+---
+version: "3.3"
+services:
+  # Sensu Backend 
+  #
+  # Includes embedded database, API, event processor, and web UI). 
+  # 
+  # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
+  sensu-backend:
+    container_name: sensu-backend
+    image: sensu/sensu:${SENSU_BACKEND_VERSION}
+    labels:
+    - io.sensu.role=sensu-backend
+    ports:
+    - 3000:3000
+    - 8080:8080
+    - 8081:8081
+    healthcheck:
+      test: wget -q http://127.0.0.1:8080/health -O-
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    environment:
+    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_TIMESCALEDB_DSN
+    volumes:
+    - type: volume 
+      source: sensu_data
+      target: /var/lib/sensu
+    command: >-
+      sensu-backend start 
+      --log-level=debug
+      --debug=true
+      
+  # TimescaleDB  
+  #
+  # Includes TimescaleDB (Postgres database) for storage of telemetry data.
+  # 
+  # See: https://docs.timescale.com/latest/introduction
+  timescaledb:
+    container_name: timescaledb
+    image: timescale/timescaledb:${TIMESCALEDB_VERSION}
+    labels:
+    - io.sensu.role=tsdb
+    ports:
+    - 5432:5432
+    environment:
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
+    volumes: 
+    - type: bind 
+      source: ./config/timescaledb/100-sensu-metrics.sql
+      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
+    - type: volume 
+      source: timescaledb_data
+      target: /var/lib/postgresql/data
+      
+  # Grafana 
+  #
+  # Includes Grafana dashboard and datasource configuration files for 
+  # Timescaledb. 
+  # 
+  # See: https://grafana.com/docs/grafana/latest/
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:${GRAFANA_VERSION}
+    labels:
+    - io.sensu.role=dashboards
+    ports:
+    - 3001:3000
+    environment:
+    - POSTGRES_PASSWORD
+    volumes:
+    - type: bind
+      source: ./config/grafana/provisioning/datasources/timescaledb.yaml 
+      target: /etc/grafana/provisioning/datasources/timescaledb.yaml
+    - type: volume 
+      source: grafana_data
+      target: /var/lib/grafana
+
+  # Sensu Agent 
+  #
+  # Includes monitoring agent, local API, and local StatsD socket.
+  # 
+  # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
+  sensu-agent:
+    container_name: sensu-agent
+    image: sensu/sensu:${SENSU_AGENT_VERSION}
+    labels:
+    - io.sensu.role=sensu-agent
+    environment:
+    - SENSU_BACKEND_URL
+    - SENSU_NAMESPACE
+    - SENSU_SUBSCRIPTIONS
+    - SENSU_KEEPALIVE_INTERVAL=5
+    - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
+    - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
+    command: >-
+      sensu-agent start 
+      --log-level=info
+      --deregister=true 
+      --detect-cloud-provider
+      --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+
+  # Configurator
+  # 
+  # Configuration automation for instructor-led workshops (e.g. user profile 
+  # generation) using a super light-weight "configuration management" stack:
+  #
+  # - curl
+  # - jq
+  # - envsubst (part of the gettext package)
+  # - sensuctl
+  # - docker & docker-compose
+  # 
+  # See: ./scripts/
+  configurator:
+    container_name: configurator
+    build:
+      context: docker/workshop/
+      dockerfile: Dockerfile
+      args: 
+      - SENSU_CLI_VERSION
+    image: workshop:${SENSU_CLI_VERSION}
+    labels:
+    - io.sensu.role=configurator
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    - type: bind
+      source: ./.env
+      target: /var/lib/sensu/workshop/.env
+    - type: bind
+      source: ./${COMPOSE_FILE}
+      target: /var/lib/sensu/workshop/docker-compose.yaml
+    - type: bind
+      source: ./docker
+      target: /var/lib/sensu/workshop/docker
+    - type: bind 
+      source: ./scripts
+      target: /usr/local/bin/scripts
+    - type: bind
+      source: ./users
+      target: /var/lib/sensu/workshop/users
+    - type: bind
+      source: ./config/sensu
+      target: /var/lib/sensu/workshop/config/sensu
+      consistency: consistent
+    - type: volume
+      source: sensuctl_data
+      target: /root/.config
+    command: |-
+      generate_user_rbac
+  
+  # Workstation
+  # 
+  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl 
+  # pre-installed in case the trainee workstation is missing a required 
+  # dependency. 
+  # 
+  # See: https://alpinelinux.org
+  sensuctl:
+    container_name: sensuctl
+    build:
+      context: docker/workshop/
+      dockerfile: Dockerfile
+      args:
+      - SENSU_CLI_VERSION
+    image: workshop:${SENSU_CLI_VERSION}
+    labels:
+    - io.sensu.role=sensuctl
+    environment:
+    - SENSU_API_URL
+    - SENSU_USERNAME
+    - SENSU_PASSWORD
+    - SENSU_NAMESPACE
+    working_dir: /root
+    volumes:
+    - type: bind 
+      source: ./scripts
+      target: /usr/local/bin/scripts
+    - type: volume
+      source: sensuctl_data
+      target: /root/.config
+      consistency: consistent 
+    - type: bind
+      source: ./
+      target: /root/workshop
+      consistency: consistent 
+    entrypoint: wait-for-sensu-backend sensuctl
+    command: >-
+      configure -n 
+      --url ${SENSU_API_URL}
+      --username ${SENSU_USERNAME}
+      --password ${SENSU_PASSWORD}
+      --namespace ${SENSU_NAMESPACE}
+      --format tabular
+      
+volumes:
+  sensuctl_data:
+    driver: local
+  sensu_data:
+    driver: local
+  timescaledb_data:
+    driver: local
+  grafana_data:
+    driver: local

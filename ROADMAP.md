@@ -10,7 +10,7 @@ The following are planned improvements to the workshop:
    workshops.
 
    ```
-   $ sudo docker-compose run -d --rm -e SENSU_NAMESPACE=lizy sensu-agent
+   $ sudo docker-compose run --no-deps -d --rm -e SENSU_NAMESPACE=lizy sensu-agent
    ```
 
 1. Add alternate docker-compose templates: 
@@ -33,7 +33,12 @@ The following are planned improvements to the workshop:
    - See: https://docs.docker.com/compose/compose-file/#external 
    
 1. Deprecate the Vagrant-based Sensu Go Sandbox in favor of the Sensu Go 
-   Workshop. 
+   Workshop. Or turn it into a wrapper for the workshop environment for users
+   who can't install Docker on their workstations, but _can_ run a VM? could we
+   refactor the workshop to basically just install Docker+Compose, clone the 
+   workshop, run it (`docker-compose up -d`) and make sure all the necessary 
+   ports are configured for external access (i.e. load the dashboard from  
+   the host machine at http://localhost:3000)?  
    
    - See: https://docs.sensu.io/sensu-go/latest/learn/learn-sensu-sandbox/ 
    - See: https://github.com/sensu/sandbox 

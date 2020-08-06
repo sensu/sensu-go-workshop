@@ -24,6 +24,7 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_TIMESCALEDB_DSN
+    - PAGERDUTY_TOKEN
     volumes:
     - type: volume 
       source: sensu_data

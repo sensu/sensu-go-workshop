@@ -44,13 +44,37 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
 1. Clone this repository & configure your local environment.  
 
+   Self-guided trainees may skip this step, as you should have already 
+   downloaded the workshop materials as part of the instructions in 
+   [SETUP.md][1].
+
    ```
    $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
    $ export $(cat .env | grep -v "#" | grep =)
+   $ echo $WORKSHOP_VERSION
+   0.2.0
    ```
+
+   > _NOTE: if you don't see a workshop version number printed out after the 
+   > `echo $WORKSHOP_VERSION` command, please check with your instructor._   
    
-2. Install and configure a local `sensuctl` (the Sensu Go CLI).
+2. Visit the Sensu web app!  
+
+   - **Self guided trainees**: please visit http://127.0.0.1:3000 and login 
+     with the default workshop username (`sensu`) and password (`sensu`).  
+   - **Instructor-led workshop trainees**: please use the URL, username, and 
+     password as provided your instructor.  
+     
+   You should see a login screen that looks like this: 
+   
+   ![](docs/img/login.png)
+     
+   > _TROUBLESHOOTING: no login screen? Please consult with your instructor, or
+   > double-check that you complete all of the steps in [SETUP.md][1] before 
+   > proceding._
+
+3. Install and configure a local `sensuctl` (the Sensu Go CLI).
 
    Mac users:
 
@@ -59,18 +83,13 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ sudo tar -xzf sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz -C /usr/local/bin/
    ```
 
-   > NOTE: Linux and Windows users can find [installation instructions][2] in the 
+   > _NOTE: Linux and Windows users can find [installation instructions][2] in the 
      Sensu [user documentation][3]. The complete list of Sensu downloads is 
-     available at https://sensu.io/downloads
+     available at https://sensu.io/downloads._
 
-   Configure the Sensu CLI to connect to your backend:
-   
-   ```
-   $ sensuctl configure
-   ```
-
-   Sensuctl will prompt you to provide a Sensu Backend URL, username, password,
-   namespace, and preferred output format. 
+   Configure the Sensu CLI to connect to your backend by running the `sensuctl 
+   configure` command. Sensuctl will prompt you to provide a Sensu Backend URL, 
+   username, password, namespace, and preferred output format.  
    
    ```
    $ sensuctl configure
@@ -90,9 +109,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
      username (`sensu`), and password (`sensu`). Trainees in instructor-led 
      workshops should use the URL and credentials provided by the instructor._
    
-3. Create an API Key. 
+4. Create an API Key. 
 
-   To create an API Key, use the `sensuctl api-key grant` command: 
+   To create a [Sensu API Key][4], use the `sensuctl api-key grant` command: 
    
    ```
    $ sensuctl api-key grant sensu
@@ -121,13 +140,71 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    
 ### Lesson 1: introduction to Sensu Go
 
-1. Configure a handler to process observability data
+The following guide will walk you through the basic concepts behind the 
+observability pipeline, and prepare you to start configuration your own 
+monitoring and observability workflows using Sensu. The guide starts with a 
+fresh Sensu installation, and assumes certain companion services are available 
+(e.g. a data platform such as Prometheus, TimescaleDB, Elasticsearch, or 
+Splunk; and a graphing solution such as Grafana, Kibana, or Splunk's built-in 
+dashboards). 
 
-   ==COMING SOON==
+Multiple reference architectures will be provided for use with this workshop. 
+Please consult [SETUP.md][1] for more information. 
 
-2. Publish an event to the pipeline 
+1. **Configure an handler to process observability data**
 
-   ==COMING SOON==
+   The first thing we need to do with a fresh Sensu installation is configure 
+   one or more [Sensu event handlers][5] to process observability data. 
+   Handlers are actions the Sensu backend executes on events, such as sending 
+   alerts or routing events and metrics to one or more data platforms.
+   
+   Handlers are sometimes referred to as "integrations" since they let you 
+   connect Sensu to tools like Slack, Pagerduty, ServiceNow, Jira, InfluxDB,
+   Prometheus, TimescaleDB, Elasticsearch, Splunk, and many many more. 
+   
+   To get started, let's configure the Sensu Pagerduty handler using the 
+   template provided with this workshop (see 
+   `lessons/1/pipelines/pagerduty.yaml`):
+
+   ```
+   $ sensuctl create -f lessons/1/pipelines/pagerduty.yaml
+   $ sensuctl handler list
+       Name      Type   Timeout           Filters            Mutator              Execute              Environment Variables                 Assets
+    ─────────── ────── ───────── ────────────────────────── ───────── ─────────────────────────────── ─────────────────────── ─────────────────────────────────────
+     pagerduty   pipe         0   is_incident,not_silenced             RUN:  sensu-pagerduty-handler                           sensu/sensu-pagerduty-handler:1.3.2
+   ```
+   
+   Congratulations! You just configured your first Sensu handler! 
+
+2. **Publish an event to the pipeline** 
+
+   Let's publish our first event to the pipeline using `curl` and the 
+   [Sensu Events API][6]. 
+
+   ```
+   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database."}}' \
+          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
+   HTTP/1.1 201 Created
+   Content-Type: application/json
+   Sensu-Entity-Count: 2
+   Sensu-Entity-Limit: 100
+   Sensu-Entity-Warning:
+   Date: Thu, 06 Aug 2020 22:19:57 GMT
+   Content-Length: 0
+   ```   
+   
+   Success! We should not be able to see the event in Sensu using `sensuctl` 
+   or the Sensu web UI (. 
+
+   ```
+   $ sensuctl event list
+        Entity        Check                                     Output                                   Status   Silenced             Timestamp                             UUID                  
+    ────────────── ─────────── ──────────────────────────────────────────────────────────────────────── ──────── ────────── ─────────────────────────────── ────────────────────────────────────── 
+     405628f1ce39   keepalive   Keepalive last sent from 405628f1ce39 at 2020-08-06 22:23:02 +0000 UTC        0   false      2020-08-06 15:23:02 -0700 PDT   c88b8116-7196-4052-94c7-546e7e45969a  
+     server-01      my-app      ERROR: failed to connect to database.                                         2   false      2020-08-06 15:19:57 -0700 PDT   8434c06f-ed34-4ac6-b0fb-343c1fc492a0  
+   ```   
 
 3. Enrich observations with additional context, and modify pipeline behaviors
 
@@ -177,9 +254,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 [1]:  /docs/SETUP.md
 [2]:  https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
 [3]:  https://docs.sensu.io/sensu-go/latest/
-[4]:  #
-[5]:  #
-[6]:  #
+[4]:  https://docs.sensu.io/sensu-go/latest/reference/apikeys/
+[5]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
+[6]:  https://docs.sensu.io/sensu-go/latest/api/events/
 [7]:  #
 [8]:  #
 [9]:  #

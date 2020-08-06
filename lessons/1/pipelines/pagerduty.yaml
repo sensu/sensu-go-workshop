@@ -1,0 +1,120 @@
+---
+# Description
+#   The Sensu PagerDuty Handler is a Sensu Event Handler that alerts to
+#   the PagerDuty incident reponse service.
+#
+# Instructions
+#   1. Add "pagerduty" to the "incident-management" handler set.
+#
+#      To create the "incident-management" handler set, please run:
+#
+#      $ sensuctl handler create incident-management --type set --handlers pagerduty
+#
+#      If you already have a handler set called "incident-management", please run:
+#
+#      $ sensuctl edit handler incident-management
+#
+#      NOTE: the sensuctl edit command will open your default editor; please
+#      modify the "handlers" attribute by adding "pagerduty".
+#
+#   2. Configure the following secrets using your preferred Sensu Go Secrets
+#      provider:
+#
+#      - pagerduty_token
+#
+#      NOTE: example secret resources using the "env" provider are included in
+#      this template; to add your secrets to the Sensu Backend, please modify
+#      /etc/default/sensu-backend or /etc/sysconfig/sensu-backend and restart
+#      the sensu-backend service.
+#
+#   3. More configuration options are available for this plugin; please see the
+#      plugin documentation for more details.
+#
+# Documentation
+#   - https://github.com/sensu/sensu-pagerduty-handler#sensu-pagerduty-handler
+#   - https://docs.sensu.io/sensu-go/latest/reference/secrets/
+#
+# Contributors
+#   The following individuals have contributed to this configuration template:
+#   - Todd Campbell, @nixwiz
+type: Handler
+api_version: core/v2
+metadata:
+  name: pagerduty
+spec:
+  command: sensu-pagerduty-handler
+  env_vars: null
+  filters:
+  - is_incident
+  - not_silenced
+  handlers: null
+  runtime_assets:
+  - sensu/sensu-pagerduty-handler:1.3.2
+  secrets:
+  - name: PAGERDUTY_TOKEN
+    secret: pagerduty_token
+  timeout: 0
+  type: pipe
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: pagerduty_token
+spec:
+  provider: env
+  id: PAGERDUTY_TOKEN
+---
+type: Asset
+api_version: core/v2
+metadata:
+  name: sensu-pagerduty-handler:1.3.2
+  annotations:
+    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler
+    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/sensu-pagerduty-handler
+    io.sensu.bonsai.tier: Supported
+    io.sensu.bonsai.version: 1.3.2
+    io.sensu.bonsai.namespace: sensu
+    io.sensu.bonsai.name: sensu-pagerduty-handler
+    io.sensu.bonsai.tags: handler
+spec:
+  builds:
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_windows_386.tar.gz
+      sha512: 10eb353c624fa1853a5b6175366e6ae325315208b2289b1191629004737dbacbfc576f54b95a89560a5226e24aa0438458256b04ac1ffdc9876cf0afdf6441dd
+      filters:
+        - entity.system.os == 'windows'
+        - entity.system.arch == '386'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_windows_amd64.tar.gz
+      sha512: 83b51af2254470edbeabf840ae556f113452133f4abbe41e0ce5e0ac37d00262a17646d38ddc23fa16f39706f3506ade902eb1b29429bb0898cfd8c5ce0b0e36
+      filters:
+        - entity.system.os == 'windows'
+        - entity.system.arch == 'amd64'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_darwin_386.tar.gz
+      sha512: 46826d62f586f935d6a8686da7315105a8161364cbf7665943b3fd349cbe194ab1b5c1f312616014472f2499858f8c595ac5bc56b191df4761632bfa42b1b97c
+      filters:
+        - entity.system.os == 'darwin'
+        - entity.system.arch == '386'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_darwin_amd64.tar.gz
+      sha512: 8f14359b5e9f881a495b7b2019b3ecd080421c43c07a96856ee607ab710f57397fd65fdb288cc672eac201e280fa7d87fb2a23f72089665dc0dfc25b27bc64fc
+      filters:
+        - entity.system.os == 'darwin'
+        - entity.system.arch == 'amd64'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_linux_armv7.tar.gz
+      sha512: 77d2a57ce4e806766faf766a592d5623ee31b634d5a118eaf1423a6aec14819cf569bdeb7f557c727f4c3f67a8127b771ff41a3d2e1ce17ffe9935a2bdb00a8a
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'armv7'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_linux_arm64.tar.gz
+      sha512: be5a306fcfbec1f3be9ef8f5300dfcbc59425681f4108bf844dc6e7586567e5f5b207f448f335cff0f2bc3816c845bacffa21ed5a124dfb902b7894b4df0acb9
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'arm64'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_linux_386.tar.gz
+      sha512: 4fea313808cd4e899248f07928386fc84d52cae7013b41d26d6bb9bfac8a0fb4f84cce4ffbeb38d4f8bbb8e4e4e55f72942bfb244d8f2c9f862bcdfb5775da6c
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == '386'
+    - url: https://assets.bonsai.sensu.io/e6722787284bd20f68d0375ee927aa0ec5d2e57b/sensu-pagerduty-handler_1.3.2_linux_amd64.tar.gz
+      sha512: f0236559b696270ea74ac51274269b8af28ed90901b43e2d13ebed1de34f4faf7a29f06268268a0a41a08721ce67fa0c1f245ad54e444eb06f26fbd87163b687
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'amd64'

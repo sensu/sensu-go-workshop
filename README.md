@@ -179,7 +179,7 @@ Please consult [SETUP.md][1] for more information.
 2. **Publish an event to the pipeline** 
 
    Let's publish our first event to the pipeline using `curl` and the 
-   [Sensu Events API][6]. 
+   [Sensu Events API][6].  
 
    ```
    $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
@@ -195,8 +195,8 @@ Please consult [SETUP.md][1] for more information.
    Content-Length: 0
    ```   
    
-   Success! We should not be able to see the event in Sensu using `sensuctl` 
-   or the Sensu web UI (. 
+   What happens when Sensu processes an event? We should now be able to see the
+   event in Sensu using `sensuctl` or the Sensu web app.  
 
    ```
    $ sensuctl event list
@@ -205,7 +205,45 @@ Please consult [SETUP.md][1] for more information.
      405628f1ce39   keepalive   Keepalive last sent from 405628f1ce39 at 2020-08-06 22:23:02 +0000 UTC        0   false      2020-08-06 15:23:02 -0700 PDT   c88b8116-7196-4052-94c7-546e7e45969a  
      server-01      my-app      ERROR: failed to connect to database.                                         2   false      2020-08-06 15:19:57 -0700 PDT   8434c06f-ed34-4ac6-b0fb-343c1fc492a0  
    ```   
+   
+   But did we get an alert in Pagerduty? No! Sensu processes each event using 
+   one or more event handlers, but since this event didn't reference any 
+   handlers there was no action for Sensu to take. To trigger an event handler
+   we'll need to modify our event with `"handlers": ["pagerduty"]`. Let's 
+   try it again: 
+   
+   ```
+   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
+          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
+   HTTP/1.1 201 Created
+   Content-Type: application/json
+   Sensu-Entity-Count: 2
+   Sensu-Entity-Limit: 100
+   Sensu-Entity-Warning:
+   Date: Thu, 06 Aug 2020 22:19:57 GMT
+   Content-Length: 0
+   ``` 
+   
+   Success! 
 
+3. **Publish a resolution event.**
+
+   ```
+   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
+          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
+   HTTP/1.1 201 Created
+   Content-Type: application/json
+   Sensu-Entity-Count: 2
+   Sensu-Entity-Limit: 100
+   Sensu-Entity-Warning:
+   Date: Thu, 06 Aug 2020 22:19:57 GMT
+   Content-Length: 0
+   ``` 
+   
 3. Enrich observations with additional context, and modify pipeline behaviors
 
    ==COMING SOON==

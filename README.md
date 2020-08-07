@@ -13,13 +13,13 @@
 This project is intended to provide a simple template for developing training 
 modules for Sensu Go. The workshop lessons outlined below are effectively the 
 introductory modules – they are designed to help new Sensu users learn the 
-basic concepts of an [Observability Pipeline][0] and help them get started 
+basic concepts of an [Observability Pipeline][0-0] and help them get started 
 with Sensu Go. 
 
 This project has also be designed with both self-guided learning _and_ 
 instructor-led training workshops in mind. It's easy to deploy the workshop 
 environment on a laptop for personal use, or to a shared server (or cloud 
-provider) for multiple users. See [SETUP.md][1] for more information on 
+provider) for multiple users. See [SETUP.md][0-1] for more information on 
 setting up the workshop environment. 
 
 ### What is Sensu?
@@ -36,7 +36,7 @@ setting up the workshop environment.
 
 This workshop is designed to be simple enough for self-guided training, while 
 also providing a tool for trainers to host a workshop for multiple attendees. 
-See [SETUP.md][1] for more details on setting up the workshop environment. 
+See [SETUP.md][0-1] for more details on setting up the workshop environment. 
 
 Once you have deployed a workshop environment, you may proceed with the 
 following local workstation setup instructions which will help you install 
@@ -46,7 +46,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
    Self-guided trainees may skip this step, as you should have already 
    downloaded the workshop materials as part of the instructions in 
-   [SETUP.md][1].
+   [SETUP.md][0-1].
 
    ```
    $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
@@ -71,7 +71,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    ![](docs/img/login.png)
      
    > _TROUBLESHOOTING: no login screen? Please consult with your instructor, or
-   > double-check that you complete all of the steps in [SETUP.md][1] before 
+   > double-check that you complete all of the steps in [SETUP.md][0-1] before 
    > proceding._
 
 3. Install and configure a local `sensuctl` (the Sensu Go CLI).
@@ -83,9 +83,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ sudo tar -xzf sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz -C /usr/local/bin/
    ```
 
-   > _NOTE: Linux and Windows users can find [installation instructions][2] in the 
-     Sensu [user documentation][3]. The complete list of Sensu downloads is 
-     available at https://sensu.io/downloads._
+   > _NOTE: Linux and Windows users can find [installation instructions][0-2] 
+     in the Sensu [user documentation][0-3]. The complete list of Sensu 
+     downloads is available at https://sensu.io/downloads._
 
    Configure the Sensu CLI to connect to your backend by running the `sensuctl 
    configure` command. Sensuctl will prompt you to provide a Sensu Backend URL, 
@@ -111,7 +111,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    
 4. Create an API Key. 
 
-   To create a [Sensu API Key][4], use the `sensuctl api-key grant` command: 
+   To create a [Sensu API Key][0-4], use the `sensuctl api-key grant` command: 
    
    ```
    $ sensuctl api-key grant sensu
@@ -149,12 +149,12 @@ Splunk; and a graphing solution such as Grafana, Kibana, or Splunk's built-in
 dashboards). 
 
 Multiple reference architectures will be provided for use with this workshop. 
-Please consult [SETUP.md][1] for more information. 
+Please consult [SETUP.md][0-1] for more information. 
 
 1. **Configure an handler to process observability data**
 
    The first thing we need to do with a fresh Sensu installation is configure 
-   one or more [Sensu event handlers][5] to process observability data. 
+   one or more [Sensu event handlers][1-1] to process observability data. 
    Handlers are actions the Sensu backend executes on events, such as sending 
    alerts or routing events and metrics to one or more data platforms.
    
@@ -179,7 +179,7 @@ Please consult [SETUP.md][1] for more information.
 2. **Publish an event to the pipeline** 
 
    Let's publish our first event to the pipeline using `curl` and the 
-   [Sensu Events API][6].  
+   [Sensu Events API][1-2].  
 
    ```
    $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
@@ -230,6 +230,18 @@ Please consult [SETUP.md][1] for more information.
 
 3. **Publish a resolution event.**
 
+   All Sensu events are required to indicate an event "status", which is used
+   to indicate event severity. Status `0` indicates a "Healthy" or "OK" event, 
+   status `1` indicates a "Warning" severity event, and status `2` indicates a
+   "Critical" severity event; all other status codes (up to `255`) are treated
+   as "Unknown" severity.  
+   
+   If you inspect the event we sent in our previous step, we created a critical
+   severity event (i.e. `"status": 2`). Now let's modify our event payload to 
+   indicate that our service has recovered by setting `"status": 0` and 
+   updating the `output` field with an appropriate message (e.g. `"output": 
+   "200 OK"`).  
+
    ```
    $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
           -H "Content-Type: application/json" \
@@ -243,6 +255,9 @@ Please consult [SETUP.md][1] for more information.
    Date: Thu, 06 Aug 2020 22:19:57 GMT
    Content-Length: 0
    ``` 
+   
+   What happened? Did you notice that the event is now "green" in the Sensu web
+   app, and our Pagerduty incident should have been automatically resolved.  
    
 3. Enrich observations with additional context, and modify pipeline behaviors
 
@@ -288,15 +303,12 @@ Please consult [SETUP.md][1] for more information.
 
 
 
-[0]:  #observability-pipeline 
-[1]:  /docs/SETUP.md
-[2]:  https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
-[3]:  https://docs.sensu.io/sensu-go/latest/
-[4]:  https://docs.sensu.io/sensu-go/latest/reference/apikeys/
-[5]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
-[6]:  https://docs.sensu.io/sensu-go/latest/api/events/
-[7]:  #
-[8]:  #
-[9]:  #
-[10]: #
-[11]: #
+[0-0]:  #observability-pipeline 
+[0-1]:  /docs/SETUP.md
+[0-2]:  https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
+[0-3]:  https://docs.sensu.io/sensu-go/latest/
+[0-4]:  https://docs.sensu.io/sensu-go/latest/reference/apikeys/
+
+[1-1]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
+[1-2]:  https://docs.sensu.io/sensu-go/latest/api/events/
+

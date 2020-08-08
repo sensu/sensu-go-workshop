@@ -192,7 +192,7 @@ Please consult [SETUP.md][0-1] for more information.
    > output that starts with `HTTP/1.1 201 Created` or `HTTP/1.1 200 OK`. If 
    > you do not see this output, or if you received an error message, please 
    > ensure that you completed all of the steps under [Setup](#setup) (above),
-   > and/or ask your instructor for help. 
+   > and/or ask your instructor for help._
    
    What happens when Sensu processes an event? We should now be able to see the
    event in Sensu using `sensuctl` or the Sensu web app.  

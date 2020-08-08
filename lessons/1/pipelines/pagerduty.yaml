@@ -44,6 +44,7 @@ metadata:
 spec:
   command: >-
     sensu-pagerduty-handler
+    --summary-template "{{.Entity.Name}}/{{.Check.Name}}: {{.Check.Output}}"
     --status-map "{\"info\":[0],\"warning\": [1],\"critical\": [2],\"error\": [3,127]}"
   env_vars: null
   filters:

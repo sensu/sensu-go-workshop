@@ -274,7 +274,7 @@ Please consult [SETUP.md][0-1] for more information.
    > _NOTE: to find the Sensu entity list, run the `sensuctl entity list` 
    > command, or select the "Entities" view in the sidebar of the Sensu web 
    > app. Self-guided trainees should find this view at: 
-   > http://127.0.0.1:3000/c/~/n/default/entities 
+   > http://127.0.0.1:3000/c/~/n/default/entities._ 
    
    Let's publish another event with a different entity name and see what 
    happens:

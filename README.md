@@ -261,11 +261,33 @@ Please consult [SETUP.md][0-1] for more information.
    
 3. Enrich observations with additional context, and modify pipeline behaviors
 
-   ==COMING SOON==
+   In Sensu, every event must be associated with an [Entity][1-3]. An Entity 
+   represents **anything** that needs to be monitored, such as a physical or 
+   virtual "server", cloud compute instance, container (or "pod" of 
+   containers), application, function, IoT device, or network switch (or pretty
+   much anything else you can imagine). 
+   
+   If you look at your Sensu entity list you'll note that you already have at 
+   least one entity (including one named "server-01"). Sensu automatically 
+   created this entity when we published our first event data to the pipeline.
 
-4. Discovery & inventory 
-
-   ==COMING SOON==
+   > _NOTE: to find the Sensu entity list, run the `sensuctl entity list` 
+   > command, or select the "Entities" view in the sidebar of the Sensu web 
+   > app. Self-guided trainees should find this view at: 
+   > http://127.0.0.1:3000/c/~/n/default/entities 
+   
+   Let's publish another event with a different entity name and see what 
+   happens:
+   
+   ```
+   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-02"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
+          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
+   ```
+   
+   When Sensu processes an event that references a new entity name, it will 
+   automatically create an entity resource in the API. 
 
 5. Create & resolve incidents  
 
@@ -311,4 +333,4 @@ Please consult [SETUP.md][0-1] for more information.
 
 [1-1]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
 [1-2]:  https://docs.sensu.io/sensu-go/latest/api/events/
-
+[1-3]:  https://docs.sensu.io/sensu-go/latest/reference/entities/

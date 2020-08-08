@@ -182,9 +182,9 @@ Please consult [SETUP.md][0-1] for more information.
    [Sensu Events API][1-2].  
 
    ```
-   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database."}}' \
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database."}}' \
           http://127.0.0.1:8080/api/core/v2/namespaces/default/events
    HTTP/1.1 201 Created
    Content-Type: application/json
@@ -213,9 +213,9 @@ Please consult [SETUP.md][0-1] for more information.
    try it again: 
    
    ```
-   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
           http://127.0.0.1:8080/api/core/v2/namespaces/default/events
    HTTP/1.1 201 Created
    Content-Type: application/json
@@ -243,9 +243,9 @@ Please consult [SETUP.md][0-1] for more information.
    "200 OK"`).  
 
    ```
-   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
           http://127.0.0.1:8080/api/core/v2/namespaces/default/events
    HTTP/1.1 201 Created
    Content-Type: application/json
@@ -259,7 +259,7 @@ Please consult [SETUP.md][0-1] for more information.
    What happened? Did you notice that the event is now "green" in the Sensu web
    app, and our Pagerduty incident should have been automatically resolved.  
    
-3. Enrich observations with additional context, and modify pipeline behaviors
+3. Enrich observations with additional context.
 
    In Sensu, every event must be associated with an [Entity][1-3]. An Entity 
    represents **anything** that needs to be monitored, such as a physical or 

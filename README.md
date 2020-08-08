@@ -284,7 +284,7 @@ Please consult [SETUP.md][0-1] for more information.
    you can add labels to the `"check"` data as well:
    
    ```
-   curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
           "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"

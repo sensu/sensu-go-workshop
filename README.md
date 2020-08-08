@@ -344,11 +344,11 @@ Please consult [SETUP.md][0-1] for more information.
 
    > **PROTIP:** almost every resource in Sensu offers support for resource 
    > metadata, including a `name`, `labels`, and `annotations`. Labels and 
-   > annotations are identical in format (`"key": "value"` pairs; all values 
-   > must be strings), but they serve different purposes. Labels are used as 
-   > selectors (i.e. for "filtering" resources), whereas annotations are not.
-   > Annotations are great for storing additional data for processing in the
-   > pipeline, or in third-party systems. 
+   > annotations are identical in format (i.e. `"key": "value"` pairs; all 
+   > values must be strings), but they serve different purposes. Labels are 
+   > used as selectors (e.g. for "filtering" resources), whereas annotations 
+   > are not. Annotations are great for storing additional data for processing 
+   > in the pipeline, or in third-party systems. 
    
 6. Event filtering.  
 

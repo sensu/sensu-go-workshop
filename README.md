@@ -79,13 +79,13 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    Mac users:
 
    ```
-   $ curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz
-   $ sudo tar -xzf sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz -C /usr/local/bin/
+   $ curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz"
+   $ sudo tar -xzf "sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
    ```
 
    > _NOTE: Linux and Windows users can find [installation instructions][0-2] 
-     in the Sensu [user documentation][0-3]. The complete list of Sensu 
-     downloads is available at https://sensu.io/downloads._
+   > in the Sensu [user documentation][0-3]. The complete list of Sensu 
+   > downloads is available at https://sensu.io/downloads._
 
    Configure the Sensu CLI to connect to your backend by running the `sensuctl 
    configure` command. Sensuctl will prompt you to provide a Sensu Backend URL, 
@@ -105,9 +105,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    ```
    
    > _NOTE: self-guided trainees who are running the workshop on their local 
-     workstation should use the default backend URL (`http://127.0.0.1:8080`), 
-     username (`sensu`), and password (`sensu`). Trainees in instructor-led 
-     workshops should use the URL and credentials provided by the instructor._
+   > workstation should use the default backend URL (`http://127.0.0.1:8080`), 
+   > username (`sensu`), and password (`sensu`). Trainees in instructor-led 
+   > workshops should use the URL and credentials provided by the instructor._
    
 4. Create an API Key. 
 
@@ -134,9 +134,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    ```
    
    > _NOTE: self-guided trainees should grant an api-key for the `sensu` user,
-     as shown above. Trainees in instructor-led workshops should create an 
-     api-key for their own user, using the username provided by the instructor 
-     (e.g. `sensuctl api-key grant <username>`)._ 
+   > as shown above. Trainees in instructor-led workshops should create an 
+   > api-key for their own user, using the username provided by the instructor 
+   > (e.g. `sensuctl api-key grant <username>`)._ 
    
 ### Lesson 1: introduction to Sensu Go
 
@@ -184,16 +184,15 @@ Please consult [SETUP.md][0-1] for more information.
    ```
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database."}}' \
-          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
-   HTTP/1.1 201 Created
-   Content-Type: application/json
-   Sensu-Entity-Count: 2
-   Sensu-Entity-Limit: 100
-   Sensu-Entity-Warning:
-   Date: Thu, 06 Aug 2020 22:19:57 GMT
-   Content-Length: 0
-   ```   
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   ```  
+   
+   > _NOTE: This command and all subsequent `curl` commands should generate 
+   > output that starts with `HTTP/1.1 201 Created` or `HTTP/1.1 200 OK`. If 
+   > you do not see this output, or if you received an error message, please 
+   > ensure that you completed all of the steps under [Setup](#setup) (above),
+   > and/or ask your instructor for help. 
    
    What happens when Sensu processes an event? We should now be able to see the
    event in Sensu using `sensuctl` or the Sensu web app.  
@@ -215,15 +214,8 @@ Please consult [SETUP.md][0-1] for more information.
    ```
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":2,"interval":5,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
-          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
-   HTTP/1.1 201 Created
-   Content-Type: application/json
-   Sensu-Entity-Count: 2
-   Sensu-Entity-Limit: 100
-   Sensu-Entity-Warning:
-   Date: Thu, 06 Aug 2020 22:19:57 GMT
-   Content-Length: 0
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
    ``` 
    
    Success! 
@@ -245,21 +237,14 @@ Please consult [SETUP.md][0-1] for more information.
    ```
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
-          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
-   HTTP/1.1 201 Created
-   Content-Type: application/json
-   Sensu-Entity-Count: 2
-   Sensu-Entity-Limit: 100
-   Sensu-Entity-Warning:
-   Date: Thu, 06 Aug 2020 22:19:57 GMT
-   Content-Length: 0
-   ``` 
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   ```
    
    What happened? Did you notice that the event is now "green" in the Sensu web
    app, and our Pagerduty incident should have been automatically resolved.  
    
-3. Enrich observations with additional context.
+4. Enrich observations with additional context.
 
    In Sensu, every event must be associated with an [Entity][1-3]. An Entity 
    represents **anything** that needs to be monitored, such as a physical or 
@@ -271,33 +256,101 @@ Please consult [SETUP.md][0-1] for more information.
    least one entity (including one named "server-01"). Sensu automatically 
    created this entity when we published our first event data to the pipeline.
 
-   > _NOTE: to find the Sensu entity list, run the `sensuctl entity list` 
-   > command, or select the "Entities" view in the sidebar of the Sensu web 
-   > app. Self-guided trainees should find this view at: 
-   > http://127.0.0.1:3000/c/~/n/default/entities._ 
+   > _NOTE: to find the Sensu entity list, run the `sensuctl entity list` or
+   > `sensuctl entity info server-01` command(s), or select the "Entities" view 
+   > in the sidebar of the Sensu web app. Self-guided trainees should find this 
+   > view at: http://127.0.0.1:3000/c/~/n/default/entities._ 
+
+   > **PROTIP:** the default output format of the `sensuctl` CLI is a "tabular"
+   > style output, intended for display in your terminal. For machine-parsable 
+   > output, try using the `--output` flag. The available output formats are 
+   > `tabular` (default), `yaml`, `json`, and `wrapped-json`. Give it a try 
+   > with the entity list or entity info commands. 
    
    Let's publish another event with a different entity name and see what 
    happens:
    
    ```
-   $ curl -i -XPOST -H "Authorization: Key $SENSU_API_KEY" \
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-02"},"entity_class":"proxy"},"check":{"metadata":{"name":"my-app"},"status":0,"interval":5,"output":"200 OK","handlers":["pagerduty"]}}' \
-          http://127.0.0.1:8080/api/core/v2/namespaces/default/events
+          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app"},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
    ```
    
    When Sensu processes an event that references a new entity name, it will 
-   automatically create an entity resource in the API. 
-
-5. Create & resolve incidents  
-
-   ==COMING SOON==
+   automatically create an entity resource in the API.  
    
-6. Collect & process metrics 
-
-   ==COMING SOON==
+   Try experimenting with adding metadata to your checks as well. For example, 
+   you can add labels to the `"check"` data as well:
    
-7. Pipeline filtering 
+   ```
+   curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   ```
+
+4. Provide context about the systems you're monitoring using "discovery" events.
+
+   As we learned in step 3, every observation (i.e. every event) in Sensu must 
+   be associated with an [Entity][1-3], and if no such entity exists in Sensu 
+   when an event is processed, Sensu will automatically an entity for you. When
+   an event is processed for an entity that is already registered, Sensu will 
+   overwrite the event `"entity"` information with the information from the 
+   [Sensu Entities API][1-4]. 
+
+   The [Sensu Entities API][1-4] is effectively a discovery API – you can use 
+   it to register entities and provide context about them; e.g. what cloud 
+   provider does a compute instance running in, or for IoT devices – what 
+   make/model are they and where are they located? Sensu provides it's own 
+   built-in discovery solution (i.e. the Sensu Agent, which we'll explore in 
+   Lesson 2), so the Entities API is primarily useful for extending Sensu's own
+   capabilities – and it's _very easy_ to use. 
+
+   Let's try providing some context about our "server-01" entity by adding some
+   label data:
+
+   ```
+   $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d "{
+          \"metadata\": {
+            \"name\": \"server-01\",
+            \"namespace\": \"${SENSU_NAMESPACE}\",
+            \"labels\": {
+              \"app\": \"workshop\",
+              \"environment\": \"development\"
+            }
+          },
+          \"entity_class\": \"proxy\"                    
+        }" \
+     "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/entities/server-01"
+   ```
+   
+   Alternatively, please modify the file at `lessons/1/entities/server-01.json`
+   and run the following command: 
+
+   ```
+   $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d @lessons/1/entities/server-01.json \
+     "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/entities/server-01"
+   ```
+
+   If you consult the Sensu Entity list again (via the web app or `sensuctl`),
+   you should see that "server-01" now has some additional metadata associated 
+   with it, and this metadata will now be attached to _every_ event we process 
+   for this entity. 
+
+   > **PROTIP:** almost every resource in Sensu offers support for resource 
+   > metadata, including a `name`, `labels`, and `annotations`. Labels and 
+   > annotations are identical in format (`"key": "value"` pairs; all values 
+   > must be strings), but they serve different purposes. Labels are used as 
+   > selectors (i.e. for "filtering" resources), whereas annotations are not.
+   > Annotations are great for storing additional data for processing in the
+   > pipeline, or in third-party systems. 
+   
+6. Event filtering.  
 
    ==COMING SOON==
 
@@ -334,3 +387,6 @@ Please consult [SETUP.md][0-1] for more information.
 [1-1]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
 [1-2]:  https://docs.sensu.io/sensu-go/latest/api/events/
 [1-3]:  https://docs.sensu.io/sensu-go/latest/reference/entities/
+[1-4]:  https://https://docs.sensu.io/sensu-go/latest/api/entities/
+
+[x-x]: #

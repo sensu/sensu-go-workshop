@@ -6,6 +6,11 @@
 - [Workshop](#workshop)
   - [Setup](#setup)
   - [Lesson 1: Introduction to Sensu Go](#lesson-1-introduction-to-sensu-go)
+    - Configure a handler to process observability data
+    - Publish your first event to the Sensu observability pipeline 
+    - Publish resolution events 
+    - Introduction to entities 
+    - Enriching observations with additional context 
   - [Lesson 2: Introduction to `sensu-agent`](#lesson-2-introduction-to-sensu-agent)
 
 ## Overview 
@@ -244,7 +249,7 @@ Please consult [SETUP.md][0-1] for more information.
    What happened? Did you notice that the event is now "green" in the Sensu web
    app, and our Pagerduty incident should have been automatically resolved.  
    
-4. Enrich observations with additional context.
+4. **Introduction to entities.**
 
    In Sensu, every event must be associated with an [Entity][1-3]. An Entity 
    represents **anything** that needs to be monitored, such as a physical or 
@@ -265,7 +270,11 @@ Please consult [SETUP.md][0-1] for more information.
    > style output, intended for display in your terminal. For machine-parsable 
    > output, try using the `--output` flag. The available output formats are 
    > `tabular` (default), `yaml`, `json`, and `wrapped-json`. Give it a try 
-   > with the entity list or entity info commands. 
+   > with the entity list or entity info commands; for example: 
+   > 
+   > ```
+   > $ sensuctl entity list --format json
+   > ```
    
    Let's publish another event with a different entity name and see what 
    happens:
@@ -277,18 +286,9 @@ Please consult [SETUP.md][0-1] for more information.
           "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
    ```
    
-   When Sensu processes an event that references a new entity name, it will 
-   automatically create an entity resource in the API.  
-   
-   Try experimenting with adding metadata to your checks as well. For example, 
-   you can add labels to the `"check"` data as well:
-   
-   ```
-   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
-          -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
-          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
-   ```
+   Do you see a new entity in Sensu? When Sensu processes an event that 
+   references a new entity name, it will automatically create an entity 
+   resource in the API.  
 
 4. Provide context about the systems you're monitoring using "discovery" events.
 
@@ -349,10 +349,20 @@ Please consult [SETUP.md][0-1] for more information.
    > used as selectors (e.g. for "filtering" resources), whereas annotations 
    > are not. Annotations are great for storing additional data for processing 
    > in the pipeline, or in third-party systems. 
+
+   Try experimenting with adding metadata to your checks as well. For example, 
+   you can add labels to the `"check"` data as well:
+   
+   ```
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   ```
    
 6. Event filtering.  
 
-   ==COMING SOON==
+   
 
 ### Lesson 2: introduction to `sensu-agent`
 

@@ -197,7 +197,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```  
    
    > _NOTE: This command and all subsequent `curl` commands should generate 
@@ -227,7 +227,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ``` 
    
    Success! 
@@ -250,7 +250,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
    
    What happened? Did you notice that the event is now "green" in the Sensu web
@@ -290,7 +290,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app"},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
    
    Do you see a new entity in Sensu? When Sensu processes an event that 
@@ -331,7 +331,7 @@ Please consult [SETUP.md][0-1] for more information.
           },
           \"entity_class\": \"proxy\"                    
         }" \
-     "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/entities/server-01"
+     "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/entities/server-01"
    ```
    
    Alternatively, please modify the file at `lessons/1/entities/server-01.json`
@@ -341,7 +341,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
      -d @lessons/1/entities/server-01.json \
-     "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/entities/server-01"
+     "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/entities/server-01"
    ```
 
    If you consult the Sensu Entity list again (via the web app or `sensuctl`),
@@ -356,7 +356,7 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
    > **PROTIP:** almost every resource in Sensu offers support for resource 
@@ -417,11 +417,11 @@ Please consult [SETUP.md][0-1] for more information.
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
-          "${SENSU_API_URL}/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+          "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
    > **PROTIP:** Sensu filters are Javascript expressions, executed in a 

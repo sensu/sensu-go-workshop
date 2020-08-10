@@ -67,6 +67,9 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ echo $SENSU_USERNAME
    sensu
    ```
+   
+   If you see a username output after the `echo $SENSU_USERNAME` command, 
+   you're ready to go to the next step! 
 
    > _NOTE: self-guided users should see the username `sensu`. Instructor-led 
    > workshop users should see the username assigned to them by the instructor. 
@@ -78,11 +81,14 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    - **Self guided users**: please visit http://127.0.0.1:3000 and login with 
      the default workshop username (`sensu`) and password (`sensu`).  
    - **Instructor-led workshop users**: please use the URL, username, and 
-     password as provided your instructor.  
+     password as provided by your instructor.  
      
    You should see a login screen that looks like this: 
    
    ![](docs/img/login.png)
+   
+   If you can reach the Sensu web app and login, you're ready to go to the next
+   step! 
      
    > _TROUBLESHOOTING: no login screen? Please consult with your instructor, or
    > double-check that you complete all of the steps in [SETUP.md][0-1] before 
@@ -117,11 +123,24 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
        wrapped-json
        json
    ```
-   
+
    > _NOTE: self-guided trainees who are running the workshop on their local 
    > workstation should use the default backend URL (`http://127.0.0.1:8080`), 
    > username (`sensu`), and password (`sensu`). Trainees in instructor-led 
    > workshops should use the URL and credentials provided by the instructor._
+   
+   Now let's run a `sensuctl` command to verify that we are successfully 
+   connected to the cluster: 
+   
+   ```shell
+   === Etcd Cluster ID: xxxxxxxxxxxxxxxx
+            ID           Name     Error   Healthy  
+    ────────────────── ───────── ─────── ───────── 
+     xxxxxxxxxxxxxxxx   default           true   
+   ```
+   
+   If you see output indicating that the cluster is healthy, you're ready to 
+   move on to the next step! 
    
 4. **Create an API Key.**  
 
@@ -131,8 +150,13 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ sensuctl api-key grant sensu
    Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
-   
-   For our purposes, we want to capture this API key (the 
+  
+   > _NOTE: self-guided trainees should grant an api-key for the `sensu` user,
+   > as shown above. Trainees in instructor-led workshops should create an 
+   > api-key for their own user, using the username provided by the instructor 
+   > (e.g. `sensuctl api-key grant <username>`)._ 
+      
+   For the purposes of this workshop, we want to capture this API key (the 
    `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) as an environment
    variable. You can either copy the output from the `sensuctl api-key grant`
    command manually, like this: 
@@ -147,11 +171,19 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    ```
    
-   > _NOTE: self-guided trainees should grant an api-key for the `sensu` user,
-   > as shown above. Trainees in instructor-led workshops should create an 
-   > api-key for their own user, using the username provided by the instructor 
-   > (e.g. `sensuctl api-key grant <username>`)._ 
+   Alternatively, you can also update the `.envrc` file and rerun the `source 
+   .envrc` command from step 1, above. 
    
+   Verify that you have successfully set an environment variable with your API
+   key: 
+   
+   ```shell
+   $ echo $SENSU_API_KEY
+   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+   
+   If you see your API key, you're ready to move on to the next step! 
+      
 ### Lesson 1: introduction to Sensu Go
 
 The following guide will walk you through the basic concepts behind the 

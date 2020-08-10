@@ -431,35 +431,62 @@ building blocks of the Sensu observability pipeline. In lesson 2, we'll
 introduce the Sensu Agent – a simple yet powerful event producer that works in
 concert with the Sensu backend to form a comprehensive observability solution.
 
-1. Install and configure your first agent 
+1. **Install and configure your first agent.**  
+
+   So far, we have practiced generating observability events by manually 
+   interacting with the Sensu Events API. In practice, these events will be
+   generated automatically.  
+
+   The [Sensu Agent][2-1] is provided as companion for the Sensu platform as 
+   a monitoring and observability data collection service. Let's start our 
+   first agent: 
 
    ```
-   $ sudo docker-compose run --no-deps -d --rm \
+   $ sudo docker-compose run --no-deps --rm -d \
+     -e SENSU_API_URL=${SENSU_API_URL} \
      -e SENSU_NAMESPACE=${SENSU_NAMESPACE} \
      -e SENSU_LABELS='{"app": "workshop", "environment": "production"}' \
      sensu-agent
-   ```   
-
-   ```
-   $ sudo docker run -d --rm --network sensu -p :3030 \
-     sensu/sensu:${SENSU_AGENT_VERSION} sensu-agent start \
-     --backend-url ws://sensu-backend:8081 --deregister \
-     --keepalive-interval=5 --keepalive-warning-timeout=10 --subscriptions workshop,linux
    ```
 
-   ```
-   C:\> docker.exe run -d --rm --network sensu -p :3030 `
-        sensu/sensu:5.21.1 sensu-agent start `
-        --backend-url ws://sensu-backend:8081 --deregister `
-        --keepalive-interval=5 --keepalive-warning-timeout=10 --subscriptions workshop,linux
-   ```
+   If you look at your Sensu entity list you should see a new entity appear 
+   within a few seconds! 
    
 2. Publish events to the pipeline via the Agent API 
+
+   In lesson 1, we published events to the Sensu Backend Events API using 
+   `curl` and an API token for authentication. The Sensu Agent also provides an 
+   Events API (see [Agent API][2-2]), but it offers some key advantages over 
+   the backend API. Let's take a look. 
+
+   First of all, let's get shell access to our container running the Sensu 
+   Agent. 
+
+   ```
+   $ sudo docker-compose exec sensu-agent /bin/ash
+   ```
+
+   > _NOTE: Sensu Agent binaries are available for Windows, Linux, MacOS, BSD, 
+   > and some Unix platforms – and there are 32-bit, 64-bit, and ARM versions 
+   > available for platforms that support them! Sensu Agents can be installed 
+   > on "bare metal" hosts, virtual machines, containers, and even some 
+   > embedded systems. In the case of our workshop, our first agent is running 
+   > in a container – so we're using `docker exec` (or `docker-compose exec`)
+   > to get shell access and manually interact with the agent._
+
+   Now let's install `curl` (this is an Alpine Linux container, so the `apk add
+   curl` command should do the trick), and try publishing an event to the Agent 
+   Events API. Notice that this event doesn't need an Entity reference – the 
+   Sensu Agent will automatically associate the event with its own Entity! We 
+   also don't have to authenticate to the Agent API (by default, but this can 
+   be disabled as needed), so it's even easier than before: 
 
    ```
    $ curl -i -X POST -d '{"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
      "http://127.0.0.1:3031/events"
    ```
+
+   Do you see the new event in Sensu's event list? 
    
 3. Configure your first check/monitor (automated event collection)
 
@@ -474,17 +501,19 @@ concert with the Sensu backend to form a comprehensive observability solution.
    ==COMING SOON==
 
 
-
-[0-0]:  #observability-pipeline 
-[0-1]:  /docs/SETUP.md
-[0-2]:  https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
-[0-3]:  https://docs.sensu.io/sensu-go/latest/
-[0-4]:  https://docs.sensu.io/sensu-go/latest/reference/apikeys/
-
-[1-1]:  https://docs.sensu.io/sensu-go/latest/reference/handlers/
-[1-2]:  https://docs.sensu.io/sensu-go/latest/api/events/
-[1-3]:  https://docs.sensu.io/sensu-go/latest/reference/entities/
-[1-4]:  https://https://docs.sensu.io/sensu-go/latest/api/entities/
-[1-5]:  https://docs.sensu.io/sensu-go/latest/reference/filters/ 
-
 [x-x]: #
+
+[0-0]: #observability-pipeline 
+[0-1]: /docs/SETUP.md
+[0-2]: https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
+[0-3]: https://docs.sensu.io/sensu-go/latest/
+[0-4]: https://docs.sensu.io/sensu-go/latest/reference/apikeys/
+
+[1-1]: https://docs.sensu.io/sensu-go/latest/reference/handlers/
+[1-2]: https://docs.sensu.io/sensu-go/latest/api/events/
+[1-3]: https://docs.sensu.io/sensu-go/latest/reference/entities/
+[1-4]: https://https://docs.sensu.io/sensu-go/latest/api/entities/
+[1-5]: https://docs.sensu.io/sensu-go/latest/reference/filters/ 
+
+[2-1]: https://docs.sensu.io/sensu-go/latest/reference/agent/ 
+

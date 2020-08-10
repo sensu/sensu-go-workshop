@@ -33,7 +33,31 @@ services:
       sensu-backend start 
       --log-level=debug
       --debug=true
-      
+
+  # Sensu Agent 
+  #
+  # Includes monitoring agent, local API, and local StatsD socket.
+  # 
+  # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
+  sensu-agent:
+    container_name: sensu-agent
+    image: sensu/sensu:${SENSU_AGENT_VERSION}
+    labels:
+    - io.sensu.role=sensu-agent
+    environment:
+    - SENSU_BACKEND_URL
+    - SENSU_NAMESPACE
+    - SENSU_SUBSCRIPTIONS
+    - SENSU_KEEPALIVE_INTERVAL=5
+    - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
+    - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
+    command: >-
+      sensu-agent start 
+      --log-level=info
+      --deregister=true 
+      --detect-cloud-provider
+      --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+
   # TimescaleDB  
   #
   # Includes TimescaleDB (Postgres database) for storage of telemetry data.
@@ -79,30 +103,6 @@ services:
     - type: volume 
       source: grafana_data
       target: /var/lib/grafana
-
-  # Sensu Agent 
-  #
-  # Includes monitoring agent, local API, and local StatsD socket.
-  # 
-  # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
-  sensu-agent:
-    container_name: sensu-agent
-    image: sensu/sensu:${SENSU_AGENT_VERSION}
-    labels:
-    - io.sensu.role=sensu-agent
-    environment:
-    - SENSU_BACKEND_URL
-    - SENSU_NAMESPACE
-    - SENSU_SUBSCRIPTIONS
-    - SENSU_KEEPALIVE_INTERVAL=5
-    - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
-    - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
-    command: >-
-      sensu-agent start 
-      --log-level=info
-      --deregister=true 
-      --detect-cloud-provider
-      --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
 
   # Configurator
   # 

@@ -60,22 +60,24 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    downloaded the workshop materials as part of the instructions in 
    [SETUP.md][0-1].
 
-   ```
+   ```shell
    $ git clone git@github.com:sensu/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
    $ source .envrc
-   $ echo $WORKSHOP_VERSION
-   0.2.0
+   $ echo $SENSU_USERNAME
+   sensu
    ```
 
-   > _NOTE: if you don't see a workshop version number printed out after the 
-   > `echo $WORKSHOP_VERSION` command, please check with your instructor._   
+   > _NOTE: self-guided users should see the username `sensu`. Instructor-led 
+   > workshop users should see the username assigned to them by the instructor. 
+   > If you don't see a username printed out after the `echo $SENSU_USERNAME` 
+   > command, please check with your instructor._   
    
 2. **Visit the Sensu web app!**  
 
-   - **Self guided trainees**: please visit http://127.0.0.1:3000 and login 
-     with the default workshop username (`sensu`) and password (`sensu`).  
-   - **Instructor-led workshop trainees**: please use the URL, username, and 
+   - **Self guided users**: please visit http://127.0.0.1:3000 and login with 
+     the default workshop username (`sensu`) and password (`sensu`).  
+   - **Instructor-led workshop users**: please use the URL, username, and 
      password as provided your instructor.  
      
    You should see a login screen that looks like this: 
@@ -90,7 +92,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
    Mac users:
 
-   ```
+   ```shell
    $ curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz"
    $ sudo tar -xzf "sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
    ```
@@ -103,7 +105,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    configure` command. Sensuctl will prompt you to provide a Sensu Backend URL, 
    username, password, namespace, and preferred output format.  
    
-   ```
+   ```shell
    $ sensuctl configure
      ? Sensu Backend URL: http://127.0.0.1:8080
      ? Username: sensu
@@ -125,7 +127,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
    To create a [Sensu API Key][0-4], use the `sensuctl api-key grant` command: 
    
-   ```
+   ```shell
    $ sensuctl api-key grant sensu
    Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
@@ -135,13 +137,13 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    variable. You can either copy the output from the `sensuctl api-key grant`
    command manually, like this: 
    
-   ```
+   ```shell
    $ export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
    
    Or run the following command: 
    
-   ```
+   ```shell
    $ export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    ```
    
@@ -178,7 +180,7 @@ Please consult [SETUP.md][0-1] for more information.
    template provided with this workshop (see 
    `lessons/1/pipelines/pagerduty.yaml` for more information):
 
-   ```
+   ```shell
    $ sensuctl create -f lessons/1/pipelines/pagerduty.yaml
    $ sensuctl handler list
        Name      Type   Timeout           Filters            Mutator              Execute              Environment Variables                 Assets
@@ -193,7 +195,7 @@ Please consult [SETUP.md][0-1] for more information.
    Let's publish our first event to the pipeline using `curl` and the 
    [Sensu Events API][1-2].  
 
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
@@ -209,7 +211,7 @@ Please consult [SETUP.md][0-1] for more information.
    What happens when Sensu processes an event? We should now be able to see the
    event in Sensu using `sensuctl` or the Sensu web app.  
 
-   ```
+   ```shell
    $ sensuctl event list
         Entity        Check                                     Output                                   Status   Silenced             Timestamp                             UUID                  
     ────────────── ─────────── ──────────────────────────────────────────────────────────────────────── ──────── ────────── ─────────────────────────────── ────────────────────────────────────── 
@@ -223,7 +225,7 @@ Please consult [SETUP.md][0-1] for more information.
    we'll need to modify our event with `"handlers": ["pagerduty"]`. Let's 
    try it again: 
    
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
@@ -246,7 +248,7 @@ Please consult [SETUP.md][0-1] for more information.
    updating the `output` field with an appropriate message (e.g. `"output": 
    "200 OK"`).  
 
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
@@ -279,14 +281,14 @@ Please consult [SETUP.md][0-1] for more information.
    > `tabular` (default), `yaml`, `json`, and `wrapped-json`. Give it a try 
    > with the entity list or entity info commands; for example: 
    > 
-   > ```
+   > ```shell
    > $ sensuctl entity list --format json
    > ```
    
    Let's publish another event with a different entity name and see what 
    happens:
    
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app"},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
@@ -317,7 +319,7 @@ Please consult [SETUP.md][0-1] for more information.
    Let's try providing some context about our "server-01" entity by adding some
    label data via the Entities API:
 
-   ```
+   ```shell
    $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
      -d "{
@@ -337,7 +339,7 @@ Please consult [SETUP.md][0-1] for more information.
    Alternatively, please modify the file at `lessons/1/entities/server-01.json`
    and run the following command: 
 
-   ```
+   ```shell
    $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
      -d @lessons/1/entities/server-01.json \
@@ -352,7 +354,7 @@ Please consult [SETUP.md][0-1] for more information.
    Try experimenting with adding metadata to your checks as well. For example, 
    you can add labels to the `"check"` data as well:
    
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
@@ -390,14 +392,14 @@ Please consult [SETUP.md][0-1] for more information.
    `"environment": "production"` label (which we added to "server-01" in step 4
    above). 
 
-   ```
+   ```shell
    $ sensuctl create -f lessons/1/shared/production-only.yaml
    ```
 
    Now let's modify our Pagerduty handler to apply this filter by modifying the
    contents of `lessons/1/pipelines/pagerduty.yaml` as follows: 
 
-   ```
+   ```yaml
    filters:
    - is_incident
    - not_silenced 
@@ -406,14 +408,14 @@ Please consult [SETUP.md][0-1] for more information.
 
    Now let's update Sensu with the revised Pagerduty configuration: 
 
-   ```
+   ```shell
    $ sensuctl create -f lessons/1/pagerduty.yaml
    ```
    
    Now let's create two new "critical" severity events – one for each of 
    "server-01" and "server-02". 
 
-   ```
+   ```shell
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
           -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
@@ -448,7 +450,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    a monitoring and observability data collection service. Let's start our 
    first agent: 
 
-   ```
+   ```shell
    $ sudo docker-compose run --no-deps --rm -d \
      -e SENSU_API_URL=${SENSU_API_URL} \
      -e SENSU_NAMESPACE=${SENSU_NAMESPACE} \
@@ -469,7 +471,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    First of all, let's get shell access to our container running the Sensu 
    Agent. 
 
-   ```
+   ```shell
    $ sudo docker-compose exec sensu-agent /bin/ash
    ```
 
@@ -488,7 +490,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    also don't have to authenticate to the Agent API (by default, but this can 
    be disabled as needed), so it's even easier than before: 
 
-   ```
+   ```shell
    $ curl -i -X POST -d '{"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
      "http://127.0.0.1:3031/events"
    ```
@@ -521,7 +523,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    Let's configure our first check using the template provided in 
    `lessons/2/checks/ntp.yaml`: 
 
-   ```
+   ```shell
    $ sensuctl create -f lessons/2/checks/ntp.yaml
    ```
 

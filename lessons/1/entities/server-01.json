@@ -4,7 +4,7 @@
     "namespace": "default",
     "labels": {
       "app": "workshop",
-      "environment": "development"
+      "environment": "production"
     }
   },
   "entity_class": "proxy"

@@ -1,0 +1,9 @@
+---
+type: EventFilter
+api_version: core/v2
+metadata:
+  name: production-only
+spec:
+  action: allow
+  expressions:
+  - event.entity.labels["environment"] == "production"

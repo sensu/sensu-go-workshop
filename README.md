@@ -47,7 +47,7 @@ Once you have deployed a workshop environment, you may proceed with the
 following local workstation setup instructions which will help you install 
 the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
-1. Clone this repository & configure your local environment.  
+1. **Clone this repository & configure your local environment.**  
 
    Self-guided trainees may skip this step, as you should have already 
    downloaded the workshop materials as part of the instructions in 
@@ -64,7 +64,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    > _NOTE: if you don't see a workshop version number printed out after the 
    > `echo $WORKSHOP_VERSION` command, please check with your instructor._   
    
-2. Visit the Sensu web app!  
+2. **Visit the Sensu web app!**  
 
    - **Self guided trainees**: please visit http://127.0.0.1:3000 and login 
      with the default workshop username (`sensu`) and password (`sensu`).  
@@ -79,7 +79,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    > double-check that you complete all of the steps in [SETUP.md][0-1] before 
    > proceding._
 
-3. Install and configure a local `sensuctl` (the Sensu Go CLI).
+3. **Install and configure a local `sensuctl` (the Sensu Go CLI).**  
 
    Mac users:
 
@@ -114,7 +114,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    > username (`sensu`), and password (`sensu`). Trainees in instructor-led 
    > workshops should use the URL and credentials provided by the instructor._
    
-4. Create an API Key. 
+4. **Create an API Key.**  
 
    To create a [Sensu API Key][0-4], use the `sensuctl api-key grant` command: 
    
@@ -156,7 +156,7 @@ dashboards).
 Multiple reference architectures will be provided for use with this workshop. 
 Please consult [SETUP.md][0-1] for more information. 
 
-1. **Configure an handler to process observability data**
+1. **Configure an handler to process observability data.**
 
    The first thing we need to do with a fresh Sensu installation is configure 
    one or more [Sensu event handlers][1-1] to process observability data. 
@@ -181,7 +181,7 @@ Please consult [SETUP.md][0-1] for more information.
    
    Congratulations! You just configured your first Sensu handler! 
 
-2. **Publish an event to the pipeline** 
+2. **Publish an event to the pipeline.** 
 
    Let's publish our first event to the pipeline using `curl` and the 
    [Sensu Events API][1-2].  
@@ -290,7 +290,7 @@ Please consult [SETUP.md][0-1] for more information.
    references a new entity name, it will automatically create an entity 
    resource in the API.  
 
-4. Provide context about the systems you're monitoring using "discovery" events.
+4. **Enrich observations with additional context.**  
 
    As we learned in step 3, every observation (i.e. every event) in Sensu must 
    be associated with an [Entity][1-3], and if no such entity exists in Sensu 
@@ -308,7 +308,7 @@ Please consult [SETUP.md][0-1] for more information.
    capabilities – and it's _very easy_ to use. 
 
    Let's try providing some context about our "server-01" entity by adding some
-   label data:
+   label data via the Entities API:
 
    ```
    $ curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -319,7 +319,7 @@ Please consult [SETUP.md][0-1] for more information.
             \"namespace\": \"${SENSU_NAMESPACE}\",
             \"labels\": {
               \"app\": \"workshop\",
-              \"environment\": \"development\"
+              \"environment\": \"production\"
             }
           },
           \"entity_class\": \"proxy\"                    
@@ -342,6 +342,16 @@ Please consult [SETUP.md][0-1] for more information.
    with it, and this metadata will now be attached to _every_ event we process 
    for this entity. 
 
+   Try experimenting with adding metadata to your checks as well. For example, 
+   you can add labels to the `"check"` data as well:
+   
+   ```
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"interval":30,"status":0,"output":"200 OK","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   ```
+
    > **PROTIP:** almost every resource in Sensu offers support for resource 
    > metadata, including a `name`, `labels`, and `annotations`. Labels and 
    > annotations are identical in format (i.e. `"key": "value"` pairs; all 
@@ -350,25 +360,80 @@ Please consult [SETUP.md][0-1] for more information.
    > are not. Annotations are great for storing additional data for processing 
    > in the pipeline, or in third-party systems. 
 
-   Try experimenting with adding metadata to your checks as well. For example, 
-   you can add labels to the `"check"` data as well:
+6. **Event filtering.**  
+
+   By default, Sensu will process every event that is published to the pipeline 
+   using one or more event handlers. But not every event should result in an 
+   action (e.g. Pagerduty alert or Slack notification)! To help with this, 
+   Sensu provides powerful [Event Filters][x-x] that analyze events in 
+   real-time and decide whether they should be processed (handled) or not.
+
+   Sensu Event filters can be inclusive (only matching events are processed) or
+   exclusive (matching events are not processed). Sensu can evaluate events 
+   based on the contents of the event payload alone, or it can compare the 
+   event contents with other state information (e.g. don't process events from
+   an application if the database it depends on is experiencing an outage). 
+   Sensu Event filters can even consult third-party services as part of the 
+   analysis.
+
+   Let's create a filter to prevent processing any event that's not part of the
+   "production" environment. If you look at the provided example event filter 
+   at `lessons/1/production-only.yaml`, you'll see that we're configuring an 
+   _inclusive_ filter for events associated with entities that have the 
+   `"environment": "production"` label (which we added to "server-01" in step 4
+   above). 
+
+   ```
+   $ sensuctl create -f lessons/1/shared/production-only.yaml
+   ```
+
+   Now let's modify our Pagerduty handler to apply this filter by modifying the
+   contents of `lessons/1/pipelines/pagerduty.yaml` as follows: 
+
+   ```
+   filters:
+   - is_incident
+   - not_silenced 
+   - production-only
+   ```
+
+   Now let's update Sensu with the revised Pagerduty configuration: 
+
+   ```
+   $ sensuctl create -f lessons/1/pagerduty.yaml
+   ```
    
+   Now let's create two new "critical" severity events – one for each of 
+   "server-01" and "server-02". 
+
    ```
    $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
           -H "Content-Type: application/json" \
-          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app","labels":{"app":"workshop"}},"status":0,"interval":30,"output":"200 OK","handlers":["pagerduty"]}}' \
+          -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
+          "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
+   $ curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{"entity":{"metadata":{"name":"server-02"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
           "http://127.0.0.1:8080/api/core/v2/namespaces/${SENSU_NAMESPACE}/events"
    ```
-   
-6. Event filtering.  
 
-   
+   > **PROTIP:** Sensu filters are Javascript expressions, executed in a 
+   > sandboxed Javascript runtime environment. These expressions can be as 
+   > simple as basic comparison operations (e.g. "less than" `<` or "greater 
+   > than" `>`, "equal to" `==` or "not equal" `!=`), or as complex as a small
+   > Javascript program. You can even import Javascript libraries into the 
+   > sandbox environment! 
 
 ### Lesson 2: introduction to `sensu-agent`
 
+In lesson 1, we introduced some high-level concepts and APIs that are the 
+building blocks of the Sensu observability pipeline. In lesson 2, we'll 
+introduce the Sensu Agent – a simple yet powerful event producer that works in
+concert with the Sensu backend.
+
 1. Install and configure your first agent 
 
-   ==COMING SOON==
+   
    
 2. Publish events to the pipeline via the Agent API 
 
@@ -398,5 +463,6 @@ Please consult [SETUP.md][0-1] for more information.
 [1-2]:  https://docs.sensu.io/sensu-go/latest/api/events/
 [1-3]:  https://docs.sensu.io/sensu-go/latest/reference/entities/
 [1-4]:  https://https://docs.sensu.io/sensu-go/latest/api/entities/
+[1-5]:  https://docs.sensu.io/sensu-go/latest/reference/filters/ 
 
 [x-x]: #

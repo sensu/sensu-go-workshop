@@ -75,7 +75,7 @@
 4. **Bootstrap our Sensu Go environment!**
 
    ```
-   $ sudo docker-compose -f docker-compose.yaml up -d
+   $ sudo docker-compose up -d
    Creating network "workshop_default" with the default driver
    Creating volume "workshop_sensu_data" with local driver
    Creating volume "workshop_timescaledb_data" with local driver
@@ -126,7 +126,7 @@ Please note the following configuration parameters:
 
 - `COMPOSE_FILE`  
 
-  The Docker Compose template to use; defaults to `docker-compose.yaml`. 
+  The Docker Compose template to use; defaults to `docker-compose-default.yaml`. 
      
 - `SENSU_BACKEND_VERSION`  
    

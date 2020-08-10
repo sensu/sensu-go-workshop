@@ -47,5 +47,4 @@ create_user_accounts() {
 check_deps
 validate_io
 validate_api_url
-# sensuctl_configure
 create_user_accounts

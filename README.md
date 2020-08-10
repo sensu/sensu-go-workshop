@@ -194,10 +194,10 @@ Please consult [SETUP.md][0-1] for more information.
    ```  
    
    > _NOTE: This command and all subsequent `curl` commands should generate 
-   > output that starts with `HTTP/1.1 201 Created` or `HTTP/1.1 200 OK`. If 
-   > you do not see this output, or if you received an error message, please 
-   > ensure that you completed all of the steps under [Setup](#setup) (above),
-   > and/or ask your instructor for help._
+   > output that starts with `HTTP/1.1 200 OK`, `HTTP/1.1 201 Created`, or 
+   > `HTTP/1.1 202 Accepted`. If you do not see this output, or if you 
+   > received an error message, please ensure that you completed all of the 
+   > steps under [Setup](#setup) (above), and/or ask your instructor for help._
    
    What happens when Sensu processes an event? We should now be able to see the
    event in Sensu using `sensuctl` or the Sensu web app.  
@@ -429,15 +429,37 @@ Please consult [SETUP.md][0-1] for more information.
 In lesson 1, we introduced some high-level concepts and APIs that are the 
 building blocks of the Sensu observability pipeline. In lesson 2, we'll 
 introduce the Sensu Agent – a simple yet powerful event producer that works in
-concert with the Sensu backend.
+concert with the Sensu backend to form a comprehensive observability solution.
 
 1. Install and configure your first agent 
 
-   
+   ```
+   $ sudo docker-compose run --no-deps -d --rm \
+     -e SENSU_NAMESPACE=${SENSU_NAMESPACE} \
+     -e SENSU_LABELS='{"app": "workshop", "environment": "production"}' \
+     sensu-agent
+   ```   
+
+   ```
+   $ sudo docker run -d --rm --network sensu -p :3030 \
+     sensu/sensu:${SENSU_AGENT_VERSION} sensu-agent start \
+     --backend-url ws://sensu-backend:8081 --deregister \
+     --keepalive-interval=5 --keepalive-warning-timeout=10 --subscriptions workshop,linux
+   ```
+
+   ```
+   C:\> docker.exe run -d --rm --network sensu -p :3030 `
+        sensu/sensu:5.21.1 sensu-agent start `
+        --backend-url ws://sensu-backend:8081 --deregister `
+        --keepalive-interval=5 --keepalive-warning-timeout=10 --subscriptions workshop,linux
+   ```
    
 2. Publish events to the pipeline via the Agent API 
 
-   ==COMING SOON==
+   ```
+   $ curl -i -X POST -d '{"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["pagerduty"]}}' \
+     "http://127.0.0.1:3031/events"
+   ```
    
 3. Configure your first check/monitor (automated event collection)
 

@@ -40,7 +40,7 @@ services:
   # 
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
-    container_name: sensu-agent
+    # container_name: sensu-agent
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     labels:
     - io.sensu.role=sensu-agent
@@ -65,7 +65,7 @@ services:
   # 
   # See: https://github.com/prometheus/pushgateway
   pushgateway:
-    container_name: pushgateway
+    # container_name: pushgateway
     image: prom/pushgateway:${PROM_PUSHGATEWAY_VERSION}
     labels:
     - io.sensu.role=tsdb
@@ -90,7 +90,7 @@ services:
   # 
   # See: https://prometheus.io/docs/introduction/overview/
   prometheus:
-    container_name: prometheus
+    # container_name: prometheus
     image: prom/prometheus:${PROM_PROMETHEUS_VERSION}
     labels:
     - io.sensu.role=tsdb
@@ -111,7 +111,7 @@ services:
   # 
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
-    container_name: grafana
+    # container_name: grafana
     image: grafana/grafana:${GRAFANA_VERSION}
     labels:
     - io.sensu.role=dashboards
@@ -140,7 +140,7 @@ services:
   # 
   # See: ./scripts/
   configurator:
-    container_name: configurator
+    # container_name: configurator
     build:
       context: docker/workshop/
       dockerfile: Dockerfile
@@ -186,7 +186,7 @@ services:
   # 
   # See: https://alpinelinux.org
   sensuctl:
-    container_name: sensuctl
+    # container_name: sensuctl
     build:
       context: docker/workshop/
       dockerfile: Dockerfile

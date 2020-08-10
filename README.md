@@ -12,6 +12,10 @@
     - Introduction to entities 
     - Enriching observations with additional context 
   - [Lesson 2: Introduction to `sensu-agent`](#lesson-2-introduction-to-sensu-agent)
+    - Deploy your first Sensu Agent 
+- [Next Steps](#next-steps)
+  - [Join the Sensu Community](#join-the-sensu-community)
+  - [Contribute Sensu Community Projects on GitHub](#contribute-to-sensu-community-projects-on-github)
 
 ## Overview 
 
@@ -169,7 +173,7 @@ Please consult [SETUP.md][0-1] for more information.
    
    To get started, let's configure the Sensu Pagerduty handler using the 
    template provided with this workshop (see 
-   `lessons/1/pipelines/pagerduty.yaml`):
+   `lessons/1/pipelines/pagerduty.yaml` for more information):
 
    ```
    $ sensuctl create -f lessons/1/pipelines/pagerduty.yaml
@@ -431,7 +435,7 @@ building blocks of the Sensu observability pipeline. In lesson 2, we'll
 introduce the Sensu Agent – a simple yet powerful event producer that works in
 concert with the Sensu backend to form a comprehensive observability solution.
 
-1. **Install and configure your first agent.**  
+1. **Deploy your first agent.**  
 
    So far, we have practiced generating observability events by manually 
    interacting with the Sensu Events API. In practice, these events will be
@@ -452,7 +456,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    If you look at your Sensu entity list you should see a new entity appear 
    within a few seconds! 
    
-2. Publish events to the pipeline via the Agent API 
+2. **Publish observability events to the Agent API.**  
 
    In lesson 1, we published events to the Sensu Backend Events API using 
    `curl` and an API token for authentication. The Sensu Agent also provides an 
@@ -486,20 +490,74 @@ concert with the Sensu backend to form a comprehensive observability solution.
      "http://127.0.0.1:3031/events"
    ```
 
-   Do you see the new event in Sensu's event list? 
+   Do you see the new event in Sensu's event list? Great! This local API can be
+   used to collect observability data from applications and services running on
+   the local system (or in the same Kubernetes Pod, etc). 
+
+   Now let's look at how to configure our first monitor to automate collection 
+   of observability data. 
    
 3. Configure your first check/monitor (automated event collection)
 
-   ==COMING SOON==
+   The core building block for automated collection of monitoring and 
+   observability data in Sensu is the [Check][2-3]. Sensu Checks can be used
+   to monitor server/host resources, services, and application health as well
+   as collect and analyze metrics. 
+
+   Sensu Checks (or "service checks" if you prefer), are commands executed by
+   Sensu Agents that produce monitoring and observability data. Sensu Agents 
+   capture the output of service check commands, wrap them in an event payload 
+   (i.e. a [Sensu Event][2-4]) and send them to the Sensu API for processing.
+   
+   Check commands can be any executable program or script, written in any 
+   programming language in the world. Check commands should indicate event 
+   severity via their exit status codes (`0` = "OK", `1` = "WARNING", and `2` =
+   "CRITICAL"; all other status codes indicate "UNKNOWN" severity), and provide
+   additional context via [STDOUT and STDERR][2-5]. 
+
+   Let's configure our first check using the template provided in 
+   `lessons/2/checks/ntp.yaml`: 
+
+   ```
+   $ sensuctl create -f lessons/2/checks/ntp.yaml
+   ```
+
+   Congrats! You've successfully configured your first Sensu Check! In less 
+   than a minute, you should see the first check result (event) in the Sensu 
+   event list. It might even indicate that your system clock is out of sync! 
+   Check out the [Sensu Checks reference documentation][2-3] to learn more 
+   about Checks and how else you can use them. 
 
 4. Output Metric Extraction 
 
    ==COMING SOON==
 
-5. Agent StatsD Socket 
+## Next Steps
 
-   ==COMING SOON==
+I hope you enjoyed this workshop and found it helpful for learning more about 
+Sensu Go! At this point we have covered Sensu's most common concepts, which 
+should give you a much better sense for how Sensu works – but we've only really 
+just scratched the surface. If you're interest in learning more, pleaes 
+consider the following resources: 
 
+### Join the Sensu Community 
+
+The primary home of the Sensu Community is the [Sensu Community Forums][2-6]. 
+Sign up to get notified about upcoming events (e.g. webinars and virtual 
+meetups), and new releases. 
+
+https://discourse.sensu.io/signup 
+
+### Contribute to Sensu Community Projects on GitHub 
+
+The [Sensu Community GitHub org][Z-2] is home to a number of open source 
+projects that will help you get the most out of Sensu, including: 
+
+- [sensu-community/monitoring-checks (Sensu templates)][Z-3]
+- [sensu-community/monitoring-pipelines (Sensu templates)][Z-4]
+- [sensu-community/sensu-plugin-sdk][Z-5]
+- [sensu-community/check-plugin-template][Z-6]
+- Last but not least: [sensu/sensu-go][Z-7] (_the_ Sensu Go OSS project)
 
 [x-x]: #
 
@@ -516,4 +574,15 @@ concert with the Sensu backend to form a comprehensive observability solution.
 [1-5]: https://docs.sensu.io/sensu-go/latest/reference/filters/ 
 
 [2-1]: https://docs.sensu.io/sensu-go/latest/reference/agent/ 
+[2-2]: https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api 
+[2-3]: https://docs.sensu.io/sensu-go/latest/reference/checks/
+[2-4]: https://docs.sensu.io/sensu-go/latest/reference/events/
+[2-5]: https://en.wikipedia.org/wiki/Standard_streams 
 
+[Z-1]: https://discourse.sensu.io 
+[Z-2]: https://github.com/sensu-community/
+[Z-3]: https://github.com/sensu-community/monitoring-checks 
+[Z-4]: https://github.com/sensu-community/monitoring-pipelines
+[Z-5]: https://github.com/sensu-community/sensu-plugin-sdk
+[Z-6]: https://github.com/sensu-community/check-plugin-template
+[Z-7]: https://github.com/sensu/sensu-go

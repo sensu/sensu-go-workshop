@@ -51,7 +51,7 @@
 1. **Clone this repository.**
 
    ```
-   $ git clone git@github.com:calebhailey/sensu-go-workshop.git
+   $ git clone git@github.com:sensu/sensu-go-workshop.git
    $ cd sensu-go-workshop/
    $ export $(cat .env | grep =)
    ```

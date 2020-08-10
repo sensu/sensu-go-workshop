@@ -61,7 +61,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    [SETUP.md][0-1].
 
    ```
-   $ git clone git@github.com:calebhailey/sensu-go-workshop.git 
+   $ git clone git@github.com:sensu/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
    $ export $(cat .env | grep -v "#" | grep =)
    $ echo $WORKSHOP_VERSION

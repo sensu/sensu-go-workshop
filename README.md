@@ -87,8 +87,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    
    ![](docs/img/login.png)
    
-   If you can reach the Sensu web app and login, you're ready to go to the next
-   step! 
+   > **NEXT:** If you can reach the Sensu web app and login with a username 
+   > and password, you're ready to go to the next step! 
      
    > _TROUBLESHOOTING: no login screen? Please consult with your instructor, or
    > double-check that you complete all of the steps in [SETUP.md][0-1] before 
@@ -139,8 +139,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
      xxxxxxxxxxxxxxxx   default           true   
    ```
    
-   If you see output indicating that the cluster is healthy, you're ready to 
-   move on to the next step! 
+   > **NEXT:** If you see output indicating that the cluster is healthy, you're 
+   > ready to move on to the next step! 
    
 4. **Create an API Key.**  
 
@@ -182,7 +182,8 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
    
-   If you see your API key, you're ready to move on to the next step! 
+   > **NEXT:** If you see your API key, you're ready to move on to the next 
+   > step! 
       
 ### Lesson 1: introduction to Sensu Go
 

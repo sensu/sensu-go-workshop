@@ -2,6 +2,12 @@
 
 The following are planned improvements to the workshop: 
 
+1. Add instructions for changing your password. 
+
+   ```
+   $ sensuctl user change-password --interactive
+   ```
+
 1. Investigate the Docker Compose `DOCKER_CONVERT_WINDOWS_PATHS` environment
    variable to see if this helps improve "cross-platform" support for the 
    workshop. 

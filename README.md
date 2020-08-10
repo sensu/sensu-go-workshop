@@ -13,6 +13,9 @@
     - Enriching observations with additional context 
   - [Lesson 2: Introduction to `sensu-agent`](#lesson-2-introduction-to-sensu-agent)
     - Deploy your first Sensu Agent 
+    - Publish observability events to the Agent API
+    - Configure your first Sensu check
+    - Check Output Metric Extraction
 - [Next Steps](#next-steps)
   - [Join the Sensu Community](#join-the-sensu-community)
   - [Contribute Sensu Community Projects on GitHub](#contribute-to-sensu-community-projects-on-github)
@@ -497,7 +500,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    Now let's look at how to configure our first monitor to automate collection 
    of observability data. 
    
-3. Configure your first check/monitor (automated event collection)
+3. **Configure your first Sensu check.**
 
    The core building block for automated collection of monitoring and 
    observability data in Sensu is the [Check][2-3]. Sensu Checks can be used
@@ -528,7 +531,7 @@ concert with the Sensu backend to form a comprehensive observability solution.
    Check out the [Sensu Checks reference documentation][2-3] to learn more 
    about Checks and how else you can use them. 
 
-4. Output Metric Extraction 
+4. **Check Output Metric Extraction.**
 
    ==COMING SOON==
 
@@ -542,7 +545,7 @@ consider the following resources:
 
 ### Join the Sensu Community 
 
-The primary home of the Sensu Community is the [Sensu Community Forums][2-6]. 
+The primary home of the Sensu Community is the [Sensu Community Forums][Z-6]. 
 Sign up to get notified about upcoming events (e.g. webinars and virtual 
 meetups), and new releases. 
 

@@ -1,0 +1,152 @@
+---
+type: CheckConfig
+api_version: core/v2
+metadata:
+  name: ntp
+spec:
+  check_hooks: null
+  command: >-
+    check_ntp_time 
+    -H time.nist.gov 
+    --warn 0.5 
+    --critical 1.0
+  runtime_assets:
+  - sensu/monitoring-plugins:2.6.0
+  publish: true
+  subscriptions:
+  - linux
+  interval: 30
+  timeout: 10
+  output_metric_format: nagios_perfdata
+  output_metric_handlers: []
+---
+type: Asset
+api_version: core/v2
+metadata:
+  annotations:
+    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/monitoring-plugins
+    io.sensu.bonsai.name: monitoring-plugins
+    io.sensu.bonsai.namespace: sensu
+    io.sensu.bonsai.tags: dns, http, ntp, ping, procs, smtp, snmp, ssh, swap, tcp, time, users
+    io.sensu.bonsai.tier: Community
+    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/monitoring-plugins
+    io.sensu.bonsai.version: 2.6.0
+  created_by: sensu
+  labels:
+    sensu.io/managed_by: sensuctl
+  name: sensu/monitoring-plugins:2.6.0
+spec:
+  builds:
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'xcp-ng'
+    - entity.system.platform_version.split('.')[0] == '8'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 7c16b80a419b7b6f11f17eab8ab2ff223e96dcffd090c9b21ec50f3f15cd25809611086afc536dca330924945a88a8f7d8615aa35c3b456a690b064802e4ddb7
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-centos7_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'ubuntu'
+    - entity.system.platform_version.split('.')[0] == '20'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 8baa53285f4dc9eff139898f6c1ddae0cd98d13ea8cbe39955cdf02e2e3dadd0a8bfddf07252358f66d5febb2dcac443e04565cf1b0c7fb695e9afaf70f3e58a
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-ubuntu2004_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'ubuntu'
+    - entity.system.platform_version.split('.')[0] == '18'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: f230812cf4271b87e1f33a2698f723dc5d9b7e41a7c4115222add80350c9eeec8fb6a47ab077dc4802fe546c06d0e26a1e2b730b4f985f86909671ae7ed495ee
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-ubuntu1804_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'ubuntu'
+    - entity.system.platform_version.split('.')[0] == '16'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: b584960e383083f985757687ae7f27f08bc7c397a084dd3d5872988a44e27c7c6df7ae17e4a71f2821b6e44602304ac94301d3a24c875b549fc70bda4520224c
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-ubuntu1604_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'ubuntu'
+    - entity.system.platform_version.split('.')[0] == '14'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: c85d5f1bd345f47200e2a19764f40d6632ddf8fad53ca8ea1e006025fb31ddba43424c692a550f8f46bc3c118cec67bf3f5cc1480fa47c6c90104136fd9d08e2
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-ubuntu1404_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'debian'
+    - entity.system.platform_version.split('.')[0] == '10'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 25c884a1f905ed1a5828410d3c9c5ecc0b6a65358cf61cc7a28403240e7152603d069446f74cc0de84db9e097d71f59e50be09001019a2856531e235c70236ba
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-debian10_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'debian'
+    - entity.system.platform_version.split('.')[0] == '9'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 972b037fd38c2a33a165caefc746490a2d3af46800b4f49ad00032b29effa153fb5e06f69be52cf5f79c00f684831405757e46b9738ae2cf1fa622f39daeb5c7
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-debian9_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'debian'
+    - entity.system.platform_version.split('.')[0] == '8'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: fc669d1d5ecd7550fcb1c22481231e7a80e51af04102ac8b370fb6971d59ddf214b0152483a21378ae04152932d5cff6f6c0fe3189509c98ad123d5d7971b45c
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-debian8_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'rhel'
+    - entity.system.platform_version.split('.')[0] == '8'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: f7ba840e094a8273a1a20cfd3d4e50eb3a5db9e5a6fe711d13992a202ad8e72a8938afaf99962954ec7feb6fd1c87753f32de5329a570bc80415823f4bc45bd0
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-centos8_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'rhel'
+    - entity.system.platform_version.split('.')[0] == '7'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 7c16b80a419b7b6f11f17eab8ab2ff223e96dcffd090c9b21ec50f3f15cd25809611086afc536dca330924945a88a8f7d8615aa35c3b456a690b064802e4ddb7
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-centos7_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform_family == 'rhel'
+    - entity.system.platform_version.split('.')[0] == '6'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: dbb9a3727bbdfb93bc8682bea1c554c9085a38736417bc29c6ed8d058100673d066342ec55c1756cbe732d45f915799c45329abea4bfc44e3cf87708f25c1917
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-centos6_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'amazon'
+    - entity.system.platform_version == '2'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: b9e3d2742e9e50b11090d62a7e8c0729eb08ec6da15840fe71945be1ea455870e94c7b758e7671d08464ab3519f614285a379f16084d2f382405d50f8a159b39
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-amazon2_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'amazon'
+    - entity.system.platform_version.split('.')[0].indexOf('201') !== -1
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 714c18a8a8a48db47cb5d4f13aa7c65ee1e8a222a2fb027929acd6de810527ae8d7521cd7b9ba532bba02fe21e21b45b342f76586f19d4a7bc70c1c629133bb2
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-amazon1_2.6.0_linux_amd64.tar.gz
+  - filters:
+    - entity.system.os == 'linux'
+    - entity.system.platform == 'alpine'
+    - entity.system.arch == 'amd64'
+    headers: null
+    sha512: 7dbc094875e420694764a08f50258a5176ae7ca0c3a2046dd4c777b7edbe4054567859bb2a5121b5cd21db2af449c40fa835946e880fac85567cf0b5adedd4b8
+    url: https://assets.bonsai.sensu.io/1730d4a16e1072e4adcb549249ef388126ba0faf/monitoring-plugins-alpine_2.6.0_linux_amd64.tar.gz
+  filters: null
+  headers: null

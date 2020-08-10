@@ -18,7 +18,7 @@
    - A telemetry stack, including: 
      - TimescaleDB for storage
      - Grafana for visualization
-
+   
    Coming soon: 
    
    - Deployment templates for [AWS Fargate][fargate]
@@ -53,14 +53,14 @@
    ```
    $ git clone git@github.com:sensu/sensu-go-workshop.git
    $ cd sensu-go-workshop/
-   $ export $(cat .env | grep =)
+   $ source .envrc
    ```
-     
+   
 2. **Customize the Docker Compose environment file (`.env`), as needed.**
-
+   
    > _NOTE: complete this step **BEFORE** you run any `docker-compose` 
-     commands._
-
+   > commands._
+   
    See [Customization](#customization) for more information.    
    
 3. **[OPTIONAL] Add user accounts for workshop trainees.** 
@@ -99,12 +99,12 @@
    provided in the `.env` file._
    
    > _NOTE: self-guided trainees can return to the workshop and begin their 
-     first lessons._
+   > first lessons._
 
 5. **[OPTIONAL] Create RBAC resources**
-
+   
    > _NOTE: **self-guided trainees should skip this step**._ 
-
+   
    ```
    $ sudo docker-compose run --rm configurator create_user_accounts 
    Successfully created the following workshop user accounts:

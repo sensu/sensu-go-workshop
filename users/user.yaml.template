@@ -33,7 +33,39 @@ spec:
   subjects:
   - name: trainee:${USERNAME}
     type: Group
-      
+
+---
+type: ClusterRole
+api_version: core/v2
+metadata:
+  name: trainee:${USERNAME}
+spec:
+  rules:
+  - resources:
+    - apikeys
+    verbs:
+    - get 
+    - create
+  - resources:
+    - apikeys
+    verbs:
+    - list
+    resource_names: # pending support for "named API keys"
+    - ${USERNAME}
+
+---
+type: ClusterRoleBinding
+api_version: core/v2 
+metadata:
+  name: trainee:${USERNAME}
+spec:
+  role_ref:
+    name: trainee:${USERNAME}
+    type: ClusterRole
+  subjects:
+  - name: trainee:${USERNAME}
+    type: Group
+
 ---
 type: User 
 api_version: core/v2 

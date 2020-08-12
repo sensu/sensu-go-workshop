@@ -4,8 +4,53 @@ The following are planned improvements to the workshop:
 
 1. Add instructions for changing your password. 
 
-   ```
+   ```shell
    $ sensuctl user change-password --interactive
+   ```
+
+1. Add instructions for backing up workshop data and migrating to a local 
+   environment.
+   
+   Create a backup folder. 
+
+   ```shell
+   $ mkdir backup
+   ```
+   
+   Backup pipeline resources only (stripping namespaces for portability/reuse)... 
+   
+   ```shell
+   $ sensuctl dump assets,checks,hooks,filters,mutators,handlers,silenced,secrets/v1.Secret \
+     --format yaml | grep -v "^\s*namespace:" > backup/pipelines.yaml
+   ```
+   
+   Make a namespaced backup of the entire cluster (sans entities, events, apikeys)...
+   
+   ```shell 
+   $ sensuctl dump all \
+     --omit entities,events,apikeys \
+     --format yaml > backup/config.yaml
+   ```
+   
+   Backup RBAC resources only... 
+   
+   ```shell
+   $ sensuctl dump apikeys,users,roles,rolebindings,clusterroles,clusterrolebindings
+     --format yaml > backup/system-rbac.yaml
+   ```
+   
+   Optionally backup entity resources? 
+     
+   ```shell
+   $ sensuctl dump entities \
+     --format yaml | grep -v "^\s*namespace:" > backup/inventory.yaml
+   ```
+   
+   Restore everything, or a subset of things: 
+   
+   ```shell
+   $ sensuctl create -r -f backup/
+   $ sensuctl create -f backup/pipelines.yaml
    ```
 
 1. Investigate the Docker Compose `DOCKER_CONVERT_WINDOWS_PATHS` environment
@@ -15,7 +60,7 @@ The following are planned improvements to the workshop:
 1. Automate provisioning of one agent per namespace in instructor-led 
    workshops.
 
-   ```
+   ```shell
    $ sudo docker-compose run --no-deps -d --rm -e SENSU_NAMESPACE=lizy sensu-agent
    ```
 

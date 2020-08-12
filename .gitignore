@@ -3,4 +3,5 @@
 .sensu
 *.tar.gz
 license.json
+backup/
 config/sensu/rbac/

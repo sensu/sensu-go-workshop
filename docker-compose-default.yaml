@@ -179,16 +179,19 @@ services:
     - SENSU_NAMESPACE
     working_dir: /root
     volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
     - type: bind 
       source: ./scripts
       target: /usr/local/bin/scripts
-    - type: volume
-      source: sensuctl_data
-      target: /root/.config
-      consistency: consistent 
     - type: bind
       source: ./
       target: /root/workshop
+      consistency: consistent 
+    - type: volume
+      source: sensuctl_data
+      target: /root/.config
       consistency: consistent 
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-

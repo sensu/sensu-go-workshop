@@ -1,10 +1,30 @@
-#!/bin/sh
+#!/bin/sh 
+# 
+# Generate Sensu user RBAC profiles, including (by default) a dedicated 
+# Namespace will full CRUD access (via a Role + RoleBinding), limited 
+# ClusterRoleBinding (with access to create but not list or read API keys), 
+# and read-only access to the default namespace (to view the instructors 
+# environment). To customize these defaults, modify user.yaml.template 
+# or provide a custom user template. 
+# 
+# The script accepts four positional arguments: 
+# 1. A "users.json" file containing a list of usernames and password_hash values
+# 2. A user RBAC profile template in YAML or JSON format
+# 3. An output directory where the user RBAC profiles will be generated 
+# 4. The output format, which should match template used in argument #2
+# 
+# The default arguments are documented below. Execute the script with 
+# explicit arguments as follows: 
+# 
+# $ generate_user_rbac users/users.json users/user.yaml.template config/sensu/rbac yaml
+# 
+# NOTE: no flags are supported, so the arguments must be provided in the 
+# correct order. 
 
 USERS_JSON=${1:-"users/users.json"} 
 USER_TEMPLATE=${2:-"users/user.yaml.template"}
 OUTPUT_DIRECTORY=${3:-"config/sensu/rbac"}
-COMPOSE_FILE=${4:-docker-compose.yaml}
-OUTPUT_FORMAT=yaml
+OUTPUT_FORMAT=${4:-"yaml"}
 
 check_deps() {
   for DEP in jq base64 envsubst

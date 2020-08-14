@@ -66,6 +66,9 @@ create_users() {
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
     export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
     export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
+    if [ ${PASSWORD_HASH} == "null" ]; then
+      PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD})
+    fi
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
       echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
       cat ${USER_TEMPLATE} | envsubst | tee ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} > /dev/null 2>&1

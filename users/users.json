@@ -1,4 +1,4 @@
 [
-  {"username": "lizy","password_hash": "$2a$10$lztzWd1gfyXjATMYF46C3eZViZq2uhBGWXLQaZDLm4d5CC.Fz/QzW"},
-  {"username": "example","password_hash": "$2a$10$lztzWd1gfyXjATMYF46C3eZViZq2uhBGWXLQaZDLm4d5CC.Fz/QzW"}
+  {"username": "example","password": "workshop"},
+  {"username": "lizy@sensu.io","password": "workshop"}
 ]

@@ -44,6 +44,11 @@ services:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     labels:
     - io.sensu.role=sensu-agent
+    healthcheck:
+      test: wget -q http://127.0.0.1:3031/healthz -O-
+      interval: 10s
+      timeout: 5s
+      retries: 6
     environment:
     - SENSU_BACKEND_URL
     - SENSU_NAMESPACE

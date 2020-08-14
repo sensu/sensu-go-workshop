@@ -16,7 +16,7 @@ services:
     - 8080:8080
     - 8081:8081
     healthcheck:
-      test: wget -q http://127.0.0.1:8080/health -O-
+      test: wget -q -O- http://127.0.0.1:8080/health
       interval: 10s
       timeout: 5s
       retries: 6
@@ -45,7 +45,7 @@ services:
     labels:
     - io.sensu.role=sensu-agent
     healthcheck:
-      test: wget -q http://127.0.0.1:3031/healthz -O-
+      test: wget -q -O- http://127.0.0.1:3031/healthz
       interval: 10s
       timeout: 5s
       retries: 6
@@ -75,6 +75,11 @@ services:
     - io.sensu.role=tsdb
     ports:
     - 5432:5432
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 6
     environment:
     - POSTGRES_PASSWORD
     - POSTGRES_DB
@@ -99,6 +104,11 @@ services:
     - io.sensu.role=dashboards
     ports:
     - 3001:3000
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3000/api/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
     environment:
     - POSTGRES_PASSWORD
     volumes:

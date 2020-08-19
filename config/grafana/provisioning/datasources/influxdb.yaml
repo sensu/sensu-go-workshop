@@ -1,0 +1,11 @@
+---
+apiVersion: 1
+datasources:
+- name: InfluxDB
+  type: influxdb
+  access: proxy
+  orgId: 1
+  database: sensu
+  user: admin
+  password: password
+  url: http://influxdb:8086

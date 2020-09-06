@@ -1,7 +1,41 @@
 ---
 version: "3.3"
 services:
-  # Sensu Backend 
+  # Etcd
+  #
+  # Standalone etcd server.  
+  # 
+  # See: https://etcd.io/docs/v3.4.0/op-guide/container/#running-a-single-node-etcd-1
+  etcd:
+    image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
+    labels:
+    - io.sensu.role=sensu-backend-etcd
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:2379/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    ports:
+    - 2379:2379
+    - 2380:2380
+    environment:
+    - ETCD_HOST
+    volumes:
+    - type: volume 
+      source: etcd_data
+      target: /var/lib/etcd
+    command: >-
+      /usr/local/bin/etcd 
+      --data-dir=/var/lib/etcd
+      --name etcd-1 
+      --initial-cluster-state "new"
+      --initial-advertise-peer-urls "http://${ETCD_HOST}:2380" 
+      --listen-peer-urls "http://0.0.0.0:2380" 
+      --advertise-client-urls "http://${ETCD_HOST}:2379" 
+      --listen-client-urls "http://0.0.0.0:2379" 
+      --initial-cluster "etcd-1=http://${ETCD_HOST}:2380"
+
+  # Sensu Backend Cluster
   #
   # Includes embedded database, API, event processor, and web UI). 
   # 
@@ -9,22 +43,21 @@ services:
   sensu-backend:
     # container_name: sensu-backend
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
+    depends_on: 
+    - etcd
     labels:
     - io.sensu.role=sensu-backend
-    ports:
-    - 3000:3000
-    - 8080:8080
-    - 8081:8081
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8080/health
       interval: 10s
       timeout: 5s
       retries: 6
     environment:
-    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
-    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_TIMESCALEDB_DSN
     - PAGERDUTY_TOKEN
+    - SENSU_NO_EMBED_ETCD=true
+    - SENSU_ETCD_CLIENT_URLS=http://workshop_etcd_1:2379
+    - ETCD_CLIENT_URLS=${SENSU_ETCD_CLIENT_URLS}
     volumes:
     - type: volume 
       source: sensu_data
@@ -33,6 +66,8 @@ services:
       sensu-backend start 
       --log-level=debug
       --debug=true
+      --no-embed-etcd
+      --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
 
   # Sensu Agent 
   #
@@ -42,6 +77,8 @@ services:
   sensu-agent:
     # container_name: sensu-agent
     image: sensu/sensu:${SENSU_AGENT_VERSION}
+    depends_on:
+    - sensu-backend
     labels:
     - io.sensu.role=sensu-agent
     healthcheck:
@@ -62,6 +99,44 @@ services:
       --deregister=true 
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+
+  # Sensu Backend Load Balancer
+  # 
+  # Nginx load balancer
+  # 
+  # See: https://nginx.com 
+  sensu-lb:
+    container_name: sensu-backend
+    image: nginx:${NGINX_VERSION}
+    depends_on:
+    - sensu-backend
+    labels:
+    - io.sensu.role=sensu-lb
+    ports:
+    - 3000:3000
+    - 8080:8080
+    - 8081:8081
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    volumes:
+    - type: bind
+      source: ./config/nginx/nginx.lb.conf
+      target: /etc/nginx/nginx.conf
+    - type: bind 
+      source: ./config/nginx/upstream_app.conf
+      target: /etc/nginx/upstream_etcd.conf
+    - type: bind 
+      source: ./config/nginx/upstream_app.conf
+      target: /etc/nginx/upstream_app.conf
+    - type: bind 
+      source: ./config/nginx/upstream_api.conf
+      target: /etc/nginx/upstream_api.conf
+    - type: bind 
+      source: ./config/nginx/upstream_websockets.conf
+      target: /etc/nginx/upstream_websockets.conf
 
   # TimescaleDB  
   #
@@ -140,12 +215,13 @@ services:
       - SENSU_CLI_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
-    - sensu-backend
+    - etcd
     labels:
     - io.sensu.role=configurator
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_ETCD_CLIENT_URLS
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -223,6 +299,8 @@ services:
       --format tabular
       
 volumes:
+  etcd_data:
+    driver: local
   sensuctl_data:
     driver: local
   sensu_data:

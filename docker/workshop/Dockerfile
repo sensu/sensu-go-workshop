@@ -7,6 +7,7 @@ RUN sensuctl version
 # Build the workshop workstation image
 FROM alpine:latest 
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
+COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/
 ENV PATH=$PATH:/usr/local/bin/scripts
 RUN apk add curl jq gettext docker-cli docker-compose
 

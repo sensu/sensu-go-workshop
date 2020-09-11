@@ -25,6 +25,22 @@ USERS_JSON=${1:-"users/users.json"}
 USER_TEMPLATE=${2:-"users/user.yaml.template"}
 OUTPUT_DIRECTORY=${3:-"config/sensu/rbac"}
 OUTPUT_FORMAT=${4:-"yaml"}
+SENSU_ETCD_CLIENT_URLS=${SENSU_ETCD_CLIENT_URLS}
+SENSU_INIT_TEMP_FILE="/root/.config/init"
+
+sensu_backend_init() {
+  if [ ! -f ${SENSU_INIT_TEMP_FILE} ]; then
+    if [ ! -z ${SENSU_ETCD_CLIENT_URLS} ]; then
+      sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
+      if [ $? -eq 0 ]; then
+        touch ${SENSU_INIT_TEMP_FILE}
+        exit 0
+      fi
+      exit 1
+    fi
+  fi
+  exit 0
+}
 
 check_deps() {
   for DEP in jq base64 envsubst
@@ -82,3 +98,4 @@ check_deps
 validate_io
 validate_json
 create_users
+sensu_backend_init

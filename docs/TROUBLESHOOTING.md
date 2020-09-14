@@ -1,6 +1,7 @@
 # Troubleshooting 
 
 - [1. Using the `sensuctl` container as a workstation sandbox][1-0]
+- [2. Copy files into running containers][2-0]
 
 ## 1. Using the `sensuctl` container as a workstation sandbox
 
@@ -16,9 +17,26 @@ sensuctl version 5.21.0+ee, enterprise edition, build 081a854d483d7881bbcf4cb60c
 ~ #
 ```
 
-[1-0]: #1-using-the-sensuctl-container-as-a-workstation-sandbox
+## 2. Copy files into running containers 
 
-[2]: #
+In some cases it may be useful for troubleshooting and/or one-off customization
+of the workshop environment to copy files into a running container. In a Docker
+environment this can be accomplished via the `docker cp` command, which is very
+similar to how you might use `scp` in a traditional virtualization environment.
+
+```
+$ sudo docker cp example.json workshop_sensu-backend_1:/tmp/example.json
+```
+
+The `docker cp` utility can also be used to _extract_ files from a running 
+container. 
+
+```
+$ sudo docker cp workshop_sensu-backend_1:/tmp/example.json example.json
+```
+
+[1-0]: #1-using-the-sensuctl-container-as-a-workstation-sandbox
+[2-0]: #2-copy-files-into-running-containers
 [3]: #
 [4]: #
 [5]: #

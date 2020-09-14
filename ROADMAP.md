@@ -8,6 +8,12 @@ The following are planned improvements to the workshop:
    $ sensuctl user change-password --interactive
    ```
 
+1. Include StatsD examples... with tags! 
+
+   ```
+   $ echo 'my_app_requests:3|g|#region:us-west-1,foo:bar' | nc -w1 -u 127.0.0.1 8125
+   ```
+
 1. Add instructions for backing up workshop data and migrating to a local 
    environment.
    

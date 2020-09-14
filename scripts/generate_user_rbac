@@ -78,16 +78,27 @@ validate_io() {
 
 create_users() {
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64'); do
+    export RETRIES=0
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
-    export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
-    export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
-    if [ ${PASSWORD_HASH} == "null" ]; then
-      export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD})
-    fi
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
-      echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
-      cat ${USER_TEMPLATE} | envsubst | tee ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} > /dev/null 2>&1
+      export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
+      export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
+      if [ ${PASSWORD_HASH} == "null" ]; then
+        export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)
+      fi
+      while [ -z ${PASSWORD_HASH} ] && [ ${RETRIES} -lt 10 ]; do
+        echo "Attempt ${RETRIES}"
+        export RETRIES=$(expr ${RETRIES} + 1)
+        sleep 2
+        export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)
+      done
+      if [ -z ${PASSWORD_HASH} ]; then
+        echo "Failed to generate password hash for user ${USERNAME}; skipping..."
+      else
+        echo "Generating user template: ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}"
+        cat ${USER_TEMPLATE} | envsubst | tee ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} > /dev/null 2>&1
+      fi
     else
       echo "Skipping user template for \"${USERNAME}\" (an RBAC template at \"${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}\" already exists)"
     fi

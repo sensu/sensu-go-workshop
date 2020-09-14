@@ -23,7 +23,6 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - SENSU_TIMESCALEDB_DSN
     - PAGERDUTY_TOKEN
     volumes:
     - type: volume 
@@ -44,6 +43,14 @@ services:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     labels:
     - io.sensu.role=sensu-agent
+    ports:
+    - ${SENSU_API_PORT}/tcp
+    - ${SENSU_STATSD_METRICS_PORT}/udp
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3031/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
     environment:
     - SENSU_BACKEND_URL
     - SENSU_NAMESPACE
@@ -51,12 +58,17 @@ services:
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
+    - SENSU_API_HOST
+    - SENSU_API_PORT
+    - SENSU_STATSD_METRICS_HOST
+    - SENSU_STATSD_METRICS_PORT
     command: >-
       sensu-agent start 
       --log-level=info
       --deregister=true 
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+      --statsd-event-handlers prometheus
 
   # Prometheus Push Gateway
   # 
@@ -119,6 +131,9 @@ services:
     - 3001:3000
     environment:
     - POSTGRES_PASSWORD
+    - GF_AUTH_BASIC_ENABLED
+    - GF_SECURITY_ADMIN_USER
+    - GF_SECURITY_ADMIN_PASSWORD
     volumes:
     - type: bind
       source: ./config/grafana/provisioning/datasources/prometheus.yaml 

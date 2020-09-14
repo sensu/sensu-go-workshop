@@ -41,7 +41,6 @@ services:
   # 
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
-    # container_name: sensu-backend
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
     depends_on: 
     - etcd
@@ -55,9 +54,8 @@ services:
     environment:
     - SENSU_TIMESCALEDB_DSN
     - PAGERDUTY_TOKEN
+    - SENSU_ETCD_CLIENT_URLS
     - SENSU_NO_EMBED_ETCD=true
-    - SENSU_ETCD_CLIENT_URLS=http://workshop_etcd_1:2379
-    - ETCD_CLIENT_URLS=${SENSU_ETCD_CLIENT_URLS}
     volumes:
     - type: volume 
       source: sensu_data
@@ -68,6 +66,8 @@ services:
       --debug=true
       --no-embed-etcd
       --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
+      --statsd-event-handlers timescaledb
+
 
   # Sensu Agent 
   #
@@ -81,6 +81,9 @@ services:
     - sensu-backend
     labels:
     - io.sensu.role=sensu-agent
+    ports:
+    - ${SENSU_API_PORT}/tcp
+    - ${SENSU_STATSD_METRICS_PORT}/udp
     healthcheck:
       test: wget -q -O- http://127.0.0.1:3031/healthz
       interval: 10s
@@ -93,6 +96,10 @@ services:
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
+    - SENSU_API_HOST
+    - SENSU_API_PORT
+    - SENSU_STATSD_METRICS_HOST
+    - SENSU_STATSD_METRICS_PORT
     command: >-
       sensu-agent start 
       --log-level=info
@@ -186,6 +193,9 @@ services:
       retries: 6
     environment:
     - POSTGRES_PASSWORD
+    - GF_AUTH_BASIC_ENABLED
+    - GF_SECURITY_ADMIN_USER
+    - GF_SECURITY_ADMIN_PASSWORD
     volumes:
     - type: bind
       source: ./config/grafana/provisioning/datasources/timescaledb.yaml 

@@ -76,9 +76,24 @@ validate_io() {
   fi
 }
 
+# Temporary workaround for https://github.com/sensu/sensu-go/issues/4003
+wait_for_sensuctl() {
+  RETRIES=0
+  sleep 2
+  export SENSUCTL_READY=$(sensuctl user hash-password password 2> /dev/null)
+  while [ -z ${SENSUCTL_READY} ] && [ ${RETRIES} -lt 5 ]; do 
+    export RETRIES=$(expr ${RETRIES} + 1)
+    echo "Waiting for sensuctl configuration to initialize (attempt ${RETRIES})..."
+    sleep 2
+    export SENSUCTL_READY=$(sensuctl user hash-password password 2> /dev/null)
+  done
+  if [ -z ${SENSUCTL_READY} ]; then
+    exit 2
+  fi
+}
+
 create_users() {
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64'); do
-    export RETRIES=0
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
@@ -87,12 +102,6 @@ create_users() {
       if [ ${PASSWORD_HASH} == "null" ]; then
         export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)
       fi
-      while [ -z ${PASSWORD_HASH} ] && [ ${RETRIES} -lt 10 ]; do
-        echo "Attempt ${RETRIES}"
-        export RETRIES=$(expr ${RETRIES} + 1)
-        sleep 2
-        export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)
-      done
       if [ -z ${PASSWORD_HASH} ]; then
         echo "Failed to generate password hash for user ${USERNAME}; skipping..."
       else
@@ -108,5 +117,6 @@ create_users() {
 check_deps
 validate_io
 validate_json
+wait_for_sensuctl
 create_users
 sensu_backend_init

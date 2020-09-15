@@ -1,8 +1,8 @@
 # Sensu Go Workshop 
 
 - [Setup](#setup)
-  - [Self-guided workshop quick start](#self-guided-workshop-quick-start)
-  - [Instructor-led workshop quick start](#instructor-led-workshop-quick-start)
+  - [Self-guided workshop setup](#self-guided-workshop-setup)
+  - [Instructor-led workshop setup](#instructor-led-workshop-setup)
 - [References](#references)
   - [Workshop contents](#workshop-contents)
   - [Prerequisites](#prerequisites)

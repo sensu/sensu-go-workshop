@@ -101,25 +101,25 @@
 
 3. **Configure workshop user accounts.** 
 
-  This workshop contains various templates and scripts for configuring workshop 
-  trainee user accounts (dedicated namespaces and RBAC profiles for each 
-  trainee). To automatically generate these profiles, edit the `users/users.json` 
-  file **BEFORE** you run any `docker-compose` commands. Two example users 
-  are pre-configured, as follows: 
+   This workshop contains various templates and scripts for configuring 
+   workshop trainee user accounts (dedicated namespaces and RBAC profiles for 
+   each trainee). To automatically generate these profiles, edit the 
+   `users/users.json` file **BEFORE** you run any `docker-compose` commands. 
+   Two example users are pre-configured, as follows: 
 
-  ```json
-  [
-    {"username": "example","password": "workshop"},
-    {"username": "lizy@sensu.io","password": "workshop"}
-  ]
-  ``` 
+   ```json
+   [
+     {"username": "example","password": "workshop"},
+     {"username": "lizy@sensu.io","password": "workshop"}
+   ]
+   ``` 
 
-  Modify this file so that there is one row per user. The `users.json` file 
-  supports defining `username` and `password` values (in plain text), or a
-  `password_hash` (bcrypt-encrypted password hashes). If a `password_hash` 
-  _and_ `password` value are provided for the same user, the `password` will 
-  be ignored. The Sensu CLI provides a built-in utility for generating valid 
-  `password_hash` values, via [the `sensuctl user password-hash` command][9].
+   Modify this file so that there is one row per user. The `users.json` file 
+   supports defining `username` and `password` values (in plain text), or a
+   `password_hash` (bcrypt-encrypted password hashes). If a `password_hash` 
+   _and_ `password` value are provided for the same user, the `password` will 
+   be ignored. The Sensu CLI provides a built-in utility for generating valid 
+   `password_hash` values, via [the `sensuctl user password-hash` command][9].
 
 4. **Docker Compose initialization.** 
 

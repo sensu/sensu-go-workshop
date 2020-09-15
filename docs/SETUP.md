@@ -1,12 +1,203 @@
 # Sensu Go Workshop 
 
-- [Workshop contents](#workshop-contents)
-- [Prerequisites](#prerequisites)
 - [Setup](#setup)
-- [Customization](#customization)
-- [Maintenance & Troubleshooting](#maintenance-troubleshooting)
+  - [Self-guided workshop quick start](#self-guided-workshop-quick-start)
+  - [Instructor-led workshop quick start](#instructor-led-workshop-quick-start)
+- [References](#references)
+  - [Workshop contents](#workshop-contents)
+  - [Prerequisites](#prerequisites)
+  - [Customization](#customization)
+  - [Maintenance & Troubleshooting](#maintenance-troubleshooting)
 
-## Workshop contents
+## Setup
+
+### Self-guided workshop setup
+
+1. **Clone this repository.**
+
+   ```
+   $ git clone git@github.com:sensu/sensu-go-workshop.git
+   $ cd sensu-go-workshop/
+   ```
+2. **Docker Compose initialization.** 
+
+   ```
+   $ sudo docker-compose up -d
+   Creating network "workshop_default" with the default driver
+   Creating volume "workshop_sensuctl_data" with local driver
+   Creating volume "workshop_sensu_data" with local driver
+   Creating volume "workshop_timescaledb_data" with local driver
+   Creating volume "workshop_grafana_data" with local driver
+   Creating workshop_grafana_1       ... done
+   Creating workshop_sensu-agent_1   ... done
+   Creating workshop_timescaledb_1   ... done
+   Creating workshop_sensuctl_1      ... done
+   Creating workshop_sensu-backend_1 ... done
+   Creating workshop_configurator_1  ... done
+   ```   
+
+   > _NOTE: the first time you run the `docker-compose up` command you will 
+   > likely see output related to the pulling and building of the workshop 
+   > container images, this process shouldn't take more than 2-3 minutes, 
+   > depending on your system._
+
+   > **PROTIP:** To prefetch and/or prebuild the workshop container images 
+   > (e.g. for offline use), please run the following commands: 
+   > ```
+   > $ sudo docker-compose pull && sudo docker-compose build
+   > ```
+
+3. **Verify your workshop installation.**
+
+   ```
+   $ sudo docker-compose ps 
+             Name                        Command                  State                             Ports                       
+   -----------------------------------------------------------------------------------------------------------------------------
+   workshop_configurator_1    generate_user_rbac               Exit 0
+   workshop_grafana_1         /run.sh                          Up (healthy)   0.0.0.0:3001->3000/tcp
+   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)   0.0.0.0:32830->3031/tcp, 0.0.0.0:32821->8125/udp
+   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)   0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp
+   workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
+   workshop_timescaledb_1     docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp
+  ```
+
+  > **NEXT:** if all of the containers show a `Up (healthy)` or `Exit 0` state,
+  > then you're ready to start the workshop! 
+ 
+  > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if 
+  > any containers have the status `Up` or `Up (health: starting)`, please wait 
+  > a few seconds and re-run the `sudo docker-compose ps` command. Otherise, if 
+  > any containers have reached the `Exit 1` or `Exit 2` state, it's possible 
+  > that these were the result of an intermittent failure (e.g. if the 
+  > sensu-backend container was slow to start) and re-running the `sudo 
+  > docker-compose up -d` command will resolve the issue._  
+
+### Instructor-led workshop setup
+
+1. **Clone this repository.**
+
+   ```
+   $ git clone git@github.com:sensu/sensu-go-workshop.git
+   $ cd sensu-go-workshop/
+   ```
+2. **Customize the Docker Compose environment file (`.env`), as needed.**
+
+   All of the workshop configuration variables have been consolidated into a 
+   single configuration file for your convenience. These configuration 
+   variables make it easy to use a specific version of Sensu Go (see: 
+   `SENSU_BACKEND_VERSION`, `SENSU_AGENT_VERSION`, and `SENSU_CLI_VERSION`), or
+   change default passwords, and more. 
+   
+   Please review [Customization](#customization) for more information.
+   
+   > **PROTIP:** if you are preparing a workshop environment for an 
+   > instructor-led workshop, we recommend changing the Sensu admin username 
+   > (`SENSU_CLUSTER_ADMIN_USERNAME`) and admin password 
+   > (`SENSU_CLUSTER_ADMIN_PASSWORD`). This will help workshop trainees from 
+   > inadvertently access the admin account. 
+
+   > _NOTE: complete this step **BEFORE** you run any `docker-compose` 
+   > commands._
+
+3. **Configure workshop user accounts.** 
+
+  This workshop contains various templates and scripts for configuring workshop 
+  trainee user accounts (dedicated namespaces and RBAC profiles for each 
+  trainee). To automatically generate these profiles, edit the `users/users.json` 
+  file **BEFORE** you run any `docker-compose` commands. Two example users 
+  are pre-configured, as follows: 
+
+  ```json
+  [
+    {"username": "example","password": "workshop"},
+    {"username": "lizy@sensu.io","password": "workshop"}
+  ]
+  ``` 
+
+  Modify this file so that there is one row per user. The `users.json` file 
+  supports defining `username` and `password` values (in plain text), or a
+  `password_hash` (bcrypt-encrypted password hashes). If a `password_hash` 
+  _and_ `password` value are provided for the same user, the `password` will 
+  be ignored. The Sensu CLI provides a built-in utility for generating valid 
+  `password_hash` values, via [the `sensuctl user password-hash` command][9].
+
+4. **Docker Compose initialization.** 
+
+   ```
+   $ sudo docker-compose up -d
+   Creating network "workshop_default" with the default driver
+   Creating volume "workshop_sensuctl_data" with local driver
+   Creating volume "workshop_sensu_data" with local driver
+   Creating volume "workshop_timescaledb_data" with local driver
+   Creating volume "workshop_grafana_data" with local driver
+   Creating workshop_grafana_1       ... done
+   Creating workshop_sensu-agent_1   ... done
+   Creating workshop_timescaledb_1   ... done
+   Creating workshop_sensuctl_1      ... done
+   Creating workshop_sensu-backend_1 ... done
+   Creating workshop_configurator_1  ... done
+   ```   
+
+   > _NOTE: the first time you run the `docker-compose up` command you will 
+   > likely see output related to the pulling and building of the workshop 
+   > container images, this process shouldn't take more than 2-3 minutes, 
+   > depending on your system._
+
+   > **PROTIP:** To prefetch and/or prebuild the workshop container images 
+   > (e.g. for offline use), please run the following commands: 
+   > ```
+   > $ sudo docker-compose pull && sudo docker-compose build
+   > ```
+
+3. **Verify your workshop installation.**
+
+   ```
+   $ sudo docker-compose ps 
+             Name                        Command                  State                             Ports                       
+   -----------------------------------------------------------------------------------------------------------------------------
+   workshop_configurator_1    generate_user_rbac               Exit 0
+   workshop_grafana_1         /run.sh                          Up (healthy)   0.0.0.0:3001->3000/tcp
+   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)   0.0.0.0:32830->3031/tcp, 0.0.0.0:32821->8125/udp
+   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)   0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp
+   workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
+   workshop_timescaledb_1     docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp
+  ```
+
+  > **NEXT:** if all of the containers show a `Up (healthy)` or `Exit 0` state,
+  > then you're ready to start the workshop! 
+ 
+  > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if 
+  > any containers have the status `Up` or `Up (health: starting)`, please wait 
+  > a few seconds and re-run the `sudo docker-compose ps` command. Otherise, if 
+  > any containers have reached the `Exit 1` or `Exit 2` state, it's possible 
+  > that these were the result of an intermittent failure (e.g. if the 
+  > sensu-backend container was slow to start) and re-running the `sudo 
+  > docker-compose up -d` command will resolve the issue._  
+
+5. **Create workshop trainee user accounts.**
+
+   Use the workshop configurator Docker container to execute the user account 
+   creation script, as follows: 
+      
+   ```
+   $ sudo docker-compose run --rm configurator create_user_accounts 
+   Successfully created the following workshop user accounts:
+   
+      Name    
+    ───────── 
+     default  
+     example  
+     lizy    
+   ```
+
+   > **NEXT:** you're ready to start the workshop! 
+
+   > _NOTE: if you add additional users to `users/users.json` after you execute
+   > this script you'll need to repeat this step._
+
+## References 
+
+### Workshop contents
 
 1. A Docker Compose environment file for customizing the workshop environment
 
@@ -32,7 +223,7 @@
 
 5. Sensu resource templates for configuring an example pipeline
 
-## Prerequisites
+### Prerequisites
 
 1. **Docker + Docker Compose**
 
@@ -46,77 +237,8 @@
    workshop environment on their workstations, though they may find it 
    advantageous to deploy._ 
 
-## Setup
 
-1. **Clone this repository.**
-
-   ```
-   $ git clone git@github.com:sensu/sensu-go-workshop.git
-   $ cd sensu-go-workshop/
-   $ source .envrc
-   ```
-   
-2. **Customize the Docker Compose environment file (`.env`), as needed.**
-   
-   > _NOTE: complete this step **BEFORE** you run any `docker-compose` 
-   > commands._
-   
-   See [Customization](#customization) for more information.    
-   
-3. **[OPTIONAL] Add user accounts for workshop trainees.** 
-
-   > _NOTE: **self-guided trainees should skip this step**._ 
-   
-   Instructors who are setting up a shared workshop environment for multiple 
-   trainees should edit the `users/users.json` file, adding as many rows as 
-   needed (one per trainee). If you modify this file before you complete the 
-   next step, RBAC profiles for each user will be automatically generated. 
-   
-4. **Bootstrap our Sensu Go environment!**
-
-   ```
-   $ sudo docker-compose up -d
-   Creating network "workshop_default" with the default driver
-   Creating volume "workshop_sensu_data" with local driver
-   Creating volume "workshop_timescaledb_data" with local driver
-   Creating volume "workshop_grafana_data" with local driver
-   Creating workshop_sensu-backend_1 ... done
-   Creating workshop_sensu-agent_1   ... done
-   Creating workshop_timescaledb-server_1 ... done
-   Creating workshop_grafana-server_1     ... done
-   ```
-
-   _NOTE: you may see some `docker pull` and `docker build` output on your first
-   run as Docker pulls down our base images and builds a few custom images._
-
-   Once `docker-compose` is done standing up our systems we should be able to
-   login to the Sensu Go dashboard! If you have deployed the workshop 
-   environment on your local machine, visit http://localhost:3000/, otherwise 
-   use the corresponding IP address or hostname for your Docker host in place 
-   of "localhost".
-
-   _NOTE: you may login to the dashboard using the username and password
-   provided in the `.env` file._
-   
-   > _NOTE: self-guided trainees can return to the workshop and begin their 
-   > first lessons._
-
-5. **[OPTIONAL] Create RBAC resources**
-   
-   > _NOTE: **self-guided trainees should skip this step**._ 
-   
-   ```
-   $ sudo docker-compose run --rm configurator create_user_accounts 
-   Successfully created the following workshop user accounts:
-   
-      Name    
-    ───────── 
-     default  
-     example  
-     lizy    
-   ```
-
-## Customization 
+### Customization 
 
 Please note the following configuration parameters: 
    
@@ -318,6 +440,7 @@ documentation][8].
 [6]: https://docs.sensu.io/sensu-go/latest/
 [7]: https://docs.sensu.io/sensu-go/latest/reference/rbac/ 
 [8]: https://docs.sensu.io/sensu-go/latest/operations/control-access/auth/ 
+[9]: https://docs.sensu.io/sensu-go/latest/sensuctl/#generate-a-password-hash
 
 [fargate]: https://www.docker.com/blog/from-docker-straight-to-aws/
 [heroku]: https://devcenter.heroku.com/categories/deploying-with-docker 

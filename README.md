@@ -64,17 +64,17 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    $ git clone git@github.com:sensu/sensu-go-workshop.git 
    $ cd sensu-go-workshop/ 
    $ source .envrc
-   $ echo $SENSU_USERNAME
+   $ echo $SENSU_WORKSHOP_USERNAME
    sensu
    ```
-   
-   If you see a username output after the `echo $SENSU_USERNAME` command, 
-   you're ready to go to the next step! 
+
+   > **NEXT:** if you see a username output after the `echo $SENSU_WORKSHOP_USERNAME` 
+   > command, you're ready to go to the next step!
 
    > _NOTE: self-guided users should see the username `sensu`. Instructor-led 
    > workshop users should see the username assigned to them by the instructor. 
-   > If you don't see a username printed out after the `echo $SENSU_USERNAME` 
-   > command, please check with your instructor._   
+   > If you don't see a username printed out after the `echo $SENSU_WORKSHOP_USERNAME` 
+   > command, please check with your instructor._
    
 2. **Visit the Sensu web app!**  
 
@@ -112,7 +112,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    username, password, namespace, and preferred output format.  
    
    ```shell
-   $ sensuctl configure
+   $ sensuctl configure --api-url ${SENSU_API_URL}
      ? Sensu Backend URL: http://127.0.0.1:8080
      ? Username: sensu
      ? Password: *****
@@ -133,6 +133,7 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
    connected to the cluster: 
    
    ```shell
+   $ sensuctl cluster health --format json
    === Etcd Cluster ID: xxxxxxxxxxxxxxxx
             ID           Name     Error   Healthy  
     ────────────────── ───────── ─────── ───────── 
@@ -358,7 +359,7 @@ Please consult [SETUP.md][0-1] for more information.
      -d "{
           \"metadata\": {
             \"name\": \"server-01\",
-            \"namespace\": \"${SENSU_NAMESPACE}\",
+            \"namespace\": \"${SENSU_NAMESPACE:-default}\",
             \"labels\": {
               \"app\": \"workshop\",
               \"environment\": \"production\"

@@ -98,7 +98,7 @@ metadata:
   name: influxdb_addr
 spec:
   provider: env
-  id: INFLUXDB_ADDR
+  id: SENSU_INFLUXDB_ADDR
 ---
 type: Secret
 api_version: secrets/v1
@@ -106,7 +106,7 @@ metadata:
   name: influxdb_db
 spec:
   provider: env
-  id: INFLUXDB_DB
+  id: SENSU_INFLUXDB_DB
 ---
 type: Secret
 api_version: secrets/v1
@@ -114,7 +114,7 @@ metadata:
   name: influxdb_user
 spec:
   provider: env
-  id: INFLUXDB_USER
+  id: SENSU_INFLUXDB_USER
 ---
 type: Secret
 api_version: secrets/v1
@@ -122,7 +122,7 @@ metadata:
   name: influxdb_password
 spec:
   provider: env
-  id: INFLUXDB_PASSWORD
+  id: SENSU_INFLUXDB_PASSWORD
 ---
 type: Asset
 api_version: core/v2

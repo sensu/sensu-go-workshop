@@ -64,7 +64,7 @@ metadata:
   name: pagerduty_token
 spec:
   provider: env
-  id: PAGERDUTY_TOKEN
+  id: SENSU_PAGERDUTY_TOKEN
 ---
 type: Asset
 api_version: core/v2

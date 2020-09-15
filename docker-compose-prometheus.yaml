@@ -23,7 +23,7 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - PAGERDUTY_TOKEN
+    - SENSU_PAGERDUTY_TOKEN
     volumes:
     - type: volume 
       source: sensu_data

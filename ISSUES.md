@@ -37,3 +37,8 @@ lessons contained in this workshop:
    
    - https://github.com/sensu/sensu-go/issues/2623  
 
+5. **The `sensuctl user hash-password` command requires valid configuration.**
+
+   Related:
+   - https://github.com/sensu/sensu-go/issues/4003 
+

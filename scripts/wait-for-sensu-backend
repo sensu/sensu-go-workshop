@@ -26,7 +26,7 @@ if [ $SUCCESS -eq 0 ]; then
   exit 2
 fi
 
-if [ $ATTEMPT -gt 0 -a $SUCCESS -gt 0 ]; then
+if [ $ATTEMPT -gt 0 ] && [ $SUCCESS -gt 0 ]; then
   # only display success message if we don't connect on the first try
   echo "Successfully connected to ${SENSU_API_URL}"  
   touch ${SENSU_INIT_TEMP_FILE}

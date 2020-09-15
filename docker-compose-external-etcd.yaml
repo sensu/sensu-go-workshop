@@ -66,7 +66,6 @@ services:
       --debug=true
       --no-embed-etcd
       --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
-      --statsd-event-handlers timescaledb
 
 
   # Sensu Agent 
@@ -106,6 +105,7 @@ services:
       --deregister=true 
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+      --statsd-event-handlers timescaledb
 
   # Sensu Backend Load Balancer
   # 

@@ -34,12 +34,13 @@ sensu_backend_init() {
       sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
       if [ $? -eq 0 ]; then
         touch ${SENSU_INIT_TEMP_FILE}
-        exit 0
+        return 0
       fi
-      exit 1
+      echo "Failed to initialize the Sensu backend"
+      return 1
     fi
   fi
-  exit 0
+  return 0
 }
 
 check_deps() {
@@ -88,6 +89,7 @@ wait_for_sensuctl() {
     export SENSUCTL_READY=$(sensuctl user hash-password password 2> /dev/null)
   done
   if [ -z ${SENSUCTL_READY} ]; then
+    echo "No sensuctl configuration found; exiting..."
     exit 2
   fi
 }
@@ -114,9 +116,12 @@ create_users() {
   done
 }
 
+sensu_backend_init
+if [ $? -gt 0 ]; then 
+  echo "Failed to initialize the sensu-backend!"
+fi
 check_deps
 validate_io
 validate_json
 wait_for_sensuctl
 create_users
-sensu_backend_init

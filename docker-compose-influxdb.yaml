@@ -127,8 +127,11 @@ services:
     - GF_SECURITY_ADMIN_PASSWORD
     volumes:
     - type: bind
-      source: ./config/grafana/provisioning/datasources/
-      target: /etc/grafana/provisioning/datasources/
+      source: ./config/grafana/provisioning 
+      target: /etc/grafana/provisioning
+    - type: bind
+      source: ./config/grafana/dashboards/influxdb
+      target: /etc/grafana/dashboards
     - type: volume 
       source: grafana_data
       target: /var/lib/grafana

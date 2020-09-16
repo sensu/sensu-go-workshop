@@ -120,10 +120,14 @@ services:
     - GF_AUTH_BASIC_ENABLED
     - GF_SECURITY_ADMIN_USER
     - GF_SECURITY_ADMIN_PASSWORD
+    - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
     - type: bind
-      source: ./config/grafana/provisioning/datasources/timescaledb.yaml 
-      target: /etc/grafana/provisioning/datasources/timescaledb.yaml
+      source: ./config/grafana/provisioning 
+      target: /etc/grafana/provisioning
+    - type: bind
+      source: ./config/grafana/dashboards/timescaledb
+      target: /etc/grafana/dashboards
     - type: volume 
       source: grafana_data
       target: /var/lib/grafana

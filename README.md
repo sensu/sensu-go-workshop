@@ -337,7 +337,7 @@ Please consult [SETUP.md][0-1] for more information.
 
    As we learned in step 3, every observation (i.e. every event) in Sensu must 
    be associated with an [Entity][1-3], and if no such entity exists in Sensu 
-   when an event is processed, Sensu will automatically an entity for you. When
+   when an event is processed, Sensu will automatically create an entity for you. When
    an event is processed for an entity that is already registered, Sensu will 
    overwrite the event `"entity"` information with the information from the 
    [Sensu Entities API][1-4]. 
@@ -427,7 +427,7 @@ Please consult [SETUP.md][0-1] for more information.
    above). 
 
    ```shell
-   $ sensuctl create -f lessons/1/shared/production-only.yaml
+   $ sensuctl create -f lessons/1/shared/filter-production-only.yaml
    ```
 
    Now let's modify our Pagerduty handler to apply this filter by modifying the
@@ -443,7 +443,7 @@ Please consult [SETUP.md][0-1] for more information.
    Now let's update Sensu with the revised Pagerduty configuration: 
 
    ```shell
-   $ sensuctl create -f lessons/1/pagerduty.yaml
+   $ sensuctl create -f lessons/1/pipelines/pagerduty.yaml
    ```
    
    Now let's create two new "critical" severity events – one for each of 

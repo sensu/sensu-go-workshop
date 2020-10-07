@@ -96,6 +96,8 @@ services:
     - type: volume 
       source: timescaledb_data
       target: /var/lib/postgresql/data
+    command: >-
+      postgres
       
   # Grafana 
   #

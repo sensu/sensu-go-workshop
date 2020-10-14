@@ -18,11 +18,18 @@ spec:
   - sensu/monitoring-plugins:2.6.0
   publish: true
   subscriptions:
-  - linux
+  - system/linux
+  - system/linux/ntp
   interval: 30
   timeout: 10
   output_metric_format: nagios_perfdata
-  output_metric_handlers: []
+  output_metric_handlers:
+  - timescaledb
+  output_metric_tags:
+  - name: entity
+    value: "{{ .name }}"
+  - name: namespace 
+    value: "{{ .namespace }}"
 ---
 type: Asset
 api_version: core/v2

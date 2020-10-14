@@ -10,16 +10,17 @@ metadata:
 spec:
   check_hooks: null
   command: >-
-    check_ntp_time 
-    -H time.nist.gov 
-    --warn 0.5 
-    --critical 1.0
+    check_ntp_time -H time.nist.gov 
+    --warn {{ .labels.ntp_warn_threshold | default "0.5" }} 
+    --critical {{ .labels.ntp_crit_threshold | default "1.0" }}
   runtime_assets:
   - sensu/monitoring-plugins:2.6.0
   publish: true
   subscriptions:
   - system/linux
   - system/linux/ntp
+  - system/windows
+  - system/window/ntp
   interval: 30
   timeout: 10
   output_metric_format: nagios_perfdata
@@ -34,17 +35,6 @@ spec:
 type: Asset
 api_version: core/v2
 metadata:
-  annotations:
-    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/monitoring-plugins
-    io.sensu.bonsai.name: monitoring-plugins
-    io.sensu.bonsai.namespace: sensu
-    io.sensu.bonsai.tags: dns, http, ntp, ping, procs, smtp, snmp, ssh, swap, tcp, time, users
-    io.sensu.bonsai.tier: Community
-    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/monitoring-plugins
-    io.sensu.bonsai.version: 2.6.0
-  created_by: sensu
-  labels:
-    sensu.io/managed_by: sensuctl
   name: sensu/monitoring-plugins:2.6.0
 spec:
   builds:

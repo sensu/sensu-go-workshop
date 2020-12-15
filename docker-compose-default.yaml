@@ -22,6 +22,7 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_TIMESCALEDB_DSN
     - SENSU_PAGERDUTY_TOKEN
     volumes:
@@ -133,6 +134,24 @@ services:
     - type: volume 
       source: grafana_data
       target: /var/lib/grafana
+
+  # Vault
+  # 
+  # Includes a Vault "devmode" server for secrets management. 
+  vault:
+    image: vault:latest
+    ports: 
+    - 8200:8200
+    environment:
+    - VAULT_DEV_ROOT_TOKEN_ID
+    - VAULT_DEV_LISTEN_ADDRESS
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: >-
+      vault server -dev -log-level debug 
 
   # Configurator
   # 

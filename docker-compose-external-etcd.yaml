@@ -67,7 +67,6 @@ services:
       --no-embed-etcd
       --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
 
-
   # Sensu Agent 
   #
   # Includes monitoring agent, local API, and local StatsD socket.

@@ -18,3 +18,7 @@ Events can contain metrics.==
 ## EXERCISE: create an event using curl and the Sensu Events API (handled)
 
 ## Learn more
+
+## Next steps 
+
+[Lesson 6: Introduction to Filters](../06/README.md#readme)

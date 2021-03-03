@@ -62,3 +62,6 @@ Extensibility (any programming language in the world)...==
 
 ## Learn more
 
+## Next steps 
+
+[Lesson 9: Introduction to Check Hooks](../09/README.md#readme)

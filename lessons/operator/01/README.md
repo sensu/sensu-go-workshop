@@ -16,6 +16,6 @@
 
 ## Learn more 
 
-## Next lesson 
+## Next steps 
 
 [Lesson 2: Introduction to the Observability Data Model](../02/README.md#readme)

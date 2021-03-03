@@ -23,3 +23,6 @@
 
 ## Learn more
 
+## Next steps 
+
+[Lesson 7: Introduction to Agents & Entities](../07/README.md#readme)

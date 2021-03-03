@@ -8,7 +8,8 @@
 
 ## Overview 
 
-==TODO: check hooks are for "automated diagnosis"; SRE automation.== 
+==TODO: check hooks are for "automated diagnosis"; 
+SRE automation...== 
 
 ## Context, not remediation 
 
@@ -23,3 +24,7 @@
 ## EXERCISE: configure a check hook 
 
 ## Learn more
+
+## Next steps 
+
+[Lesson 10: Introduction to Assets](../10/README.md#readme)

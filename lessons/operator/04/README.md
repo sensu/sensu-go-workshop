@@ -37,3 +37,7 @@
 ## EXERCISE: configure a metrics handler 
 
 ## Learn more 
+
+## Next steps 
+
+[Lesson 5: Introduction to Events](../05/README.md#readme)

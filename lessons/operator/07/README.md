@@ -60,3 +60,6 @@ Add at least one label/annotation, for use in Lesson 8 (tokens).==
 
 ## Learn more 
 
+## Next steps 
+
+[Lesson 8: Introduction to Checks](../08/README.md#readme)

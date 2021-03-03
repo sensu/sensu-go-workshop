@@ -67,6 +67,6 @@ To learn more about the Sensu APIs, please visit the API reference documentation
 
 ## Learn more
 
-## Next lesson 
+## Next steps 
 
 [Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)

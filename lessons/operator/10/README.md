@@ -13,7 +13,8 @@
 
 ## Overview 
 
-==TODO: on-demand monitoring instrumentation.== 
+==TODO: on-demand monitoring instrumentation.
+We've already been using Assets so far in our training, but they were pre-configured.== 
 
 ## Why not containers? 
 
@@ -43,3 +44,7 @@ developer training (coming soon).==
 ## EXERCISE: package a shell script as an asset
 
 ## Learn more
+
+## Next steps 
+
+[Lesson 11: Introduction to Mutators](../11/README.md#readme)

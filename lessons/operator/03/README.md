@@ -57,6 +57,8 @@ To learn more about the Sensu APIs, please visit the API reference documentation
 
 ## EXERCISE: install and configure `sensuctl` 
 
+## EXERCISE: use the `sensuctl --help` command
+
 ## EXERCISE: inspect an event in JSON format 
 
 ## EXERCISE: explore Sensu resources using `sensuctl` 

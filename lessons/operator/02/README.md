@@ -21,3 +21,7 @@
 ### Metadata
 
 ## Learn more
+
+## Next lesson 
+
+[Lesson 3: Introduction to Sensu Go](../03/README.md#readme)

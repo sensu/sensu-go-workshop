@@ -15,3 +15,7 @@
 ## Architecture 
 
 ## Learn more 
+
+## Next lesson 
+
+[Lesson 2: Introduction to the Observability Data Model](../02/README.md#readme)

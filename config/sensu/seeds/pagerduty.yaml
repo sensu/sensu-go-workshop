@@ -1,0 +1,58 @@
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: pagerduty_token
+spec:
+  provider: vault
+  id: secret/sensu/pagerduty#token
+---
+type: Asset
+api_version: core/v2
+metadata:
+  annotations:
+    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/sensu-pagerduty-handler
+    io.sensu.bonsai.name: sensu-pagerduty-handler
+    io.sensu.bonsai.namespace: sensu
+    io.sensu.bonsai.tags: handler
+    io.sensu.bonsai.tier: Supported
+    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler
+    io.sensu.bonsai.version: 2.1.0
+  name: sensu/sensu-pagerduty-handler:2.1.0
+spec:
+  builds:
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_windows_386.tar.gz
+      sha512: 8f998bb6152ebbff8b0f18b395776506001c2d26414f3ed6b184acdd7b237cd28697b946c1d6fd99c265909d46d7d3a61124d636991efe830e4256473b7853f0
+      filters:
+        - entity.system.os == 'windows'
+        - entity.system.arch == '386'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_windows_amd64.tar.gz
+      sha512: cb33ea824fa6228a60b60e742ac00e138d09cdff0558eb9dec0f8ba69631425453a6825ba77f2d917fed035492a75f022c8bcb180289f567fdae0088a0599002
+      filters:
+        - entity.system.os == 'windows'
+        - entity.system.arch == 'amd64'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_darwin_amd64.tar.gz
+      sha512: 50dc7970ef8d2f7c6981f0debc13c295c1b1b15380fdbef4e4d50149d379201871132336649786d23ade89978fea490ec812b24a9a79a21eba86bed76af0c698
+      filters:
+        - entity.system.os == 'darwin'
+        - entity.system.arch == 'amd64'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_linux_armv7.tar.gz
+      sha512: 8b43b938264a96b236fbec55814d34745cd695b092a9806e21f58f041d8a00a56e8aeadb1bdeb26e0612b332b51c998d3273906e045add4c14c5173f49b2aa3b
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'armv7'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_linux_arm64.tar.gz
+      sha512: f21d23eda9ebb9af05deb88bab4082ecd037c0f5cf17713f7dbb8c389c7740f51295a7a224ea7035a8af203bf094dc0d7fde5d978a890326ab5d0b43f8a896ed
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'arm64'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_linux_386.tar.gz
+      sha512: 2131e7ec02a5a8aa4d00557e7850502d01b3589965e2891971e8996e2f5bb01d814ea3c6adc6a475e0c22a4dfa04cdbe6eb51dde0ebd2287f6aeb1a21d87d0c8
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == '386'
+    - url: https://assets.bonsai.sensu.io/88e12e734df92cbdf1a1a41aa1a6c8453c84344b/sensu-pagerduty-handler_2.1.0_linux_amd64.tar.gz
+      sha512: 9f2972c42c6102d117ed424dbfa94b9a1ed19b80fa9e409aefcebd9da971c02af76a076ff0883caba53e0cab1092ad352e039ca7a90047400962291db25f1f35
+      filters:
+        - entity.system.os == 'linux'
+        - entity.system.arch == 'amd64'

@@ -1,0 +1,11 @@
+---
+type: EventFilter
+api_version: core/v2
+metadata:
+  name: filter_repeated_hourly
+  namespace: default
+spec:
+  action: allow
+  expressions:
+  - event.check.occurrences == 1 || event.check.occurrences % (3600 / event.check.interval) == 0
+  runtime_assets: null

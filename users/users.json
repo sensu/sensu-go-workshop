@@ -1,4 +1,4 @@
 [
-  {"username": "example","password": "workshop"},
-  {"username": "lizy@sensu.io","password": "workshop"}
+  {"username": "user@company.com","password": "workshop"},
+  {"username": "trainee","password": "workshop"}
 ]

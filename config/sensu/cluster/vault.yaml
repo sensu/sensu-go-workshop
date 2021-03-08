@@ -1,0 +1,17 @@
+---
+type: VaultProvider
+api_version: secrets/v1
+metadata:
+  name: vault
+spec:
+  client:
+    address: http://vault:8200
+    token: secretsmanager
+    version: v2
+    # tls: 
+    #   ca_cert: "/etc/ssl/certs/vault_ca_cert.pem"
+    max_retries: 2
+    timeout: 20s
+    rate_limiter:
+      limit: 10
+      burst: 100

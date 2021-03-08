@@ -1,14 +1,11 @@
 #!/bin/sh
 
 USERS_RBAC=${1:-"config/sensu/rbac"}
-SENSU_API_URL=${2:-"http://sensu-backend:8080"}
-SENSU_USERNAME=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME:-"sensu"}
-SENSU_PASSWORD=${SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD:-"sensu"}
+SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
-SENSU_WORKSHOP_SEEDS=${SENSU_WORKSHOP_SEEDS:-"config/sensu/seeds"}
 
 check_deps() {
-  for DEP in sensuctl
+  for DEP in sensuctl jq
   do
     command -v ${DEP} > /dev/null 2>&1
     if [ $? -ne 0 ]; then
@@ -30,9 +27,9 @@ validate_io() {
 }
 
 validate_api_url() {
-  curl -XGET ${SENSU_API_URL}/version > /dev/null 2>&1
+  curl -XGET ${SENSU_API_URL}/health > /dev/null 2>&1
   if [ $? -ne 0 ]; then
-    echo "No Sensu Backend found at ${SENSU_API_URL}"
+    echo "No Sensu API found at ${SENSU_API_URL}"
     exit 2
   fi
 }
@@ -49,20 +46,7 @@ create_user_accounts() {
   fi 
 }
 
-seed_user_accounts() {
-  for NAMESPACE in $(/usr/local/bin/sensuctl namespace list --format json | jq -r .[].name)
-  do 
-    echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
-    /usr/local/bin/sensuctl create -r -f ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
-    if [ $? -ne 0 ]; then 
-      echo "Error encountered while seeding workshop user namespaces"
-      exit 2
-    fi 
-  done
-}
-
 check_deps
 validate_io
 validate_api_url
 create_user_accounts
-seed_user_accounts

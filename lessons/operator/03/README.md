@@ -37,6 +37,17 @@
 
 ## EXERCISE: log in to the Sensu web app 
 
+1. Log in to the Sensu web app. 
+
+   - **Self guided users:** please visit http://127.0.0.1:3000 and login with the default workshop admin username (`sensu`) and password (`sensu`). 
+   - **Instructor-led workshop users:** please visit the URL provided by your instructor and login using the username and password provided by your instructor. 
+
+   ![](/docs/img/login.png)
+
+   > **NEXT:** if you were able to login you're ready to continue with the workshop. 
+
+   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in /SETUP.md before proceeding._
+
 ## Command line interface (CLI)
 
 ### API client

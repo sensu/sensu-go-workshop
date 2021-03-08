@@ -46,7 +46,7 @@
 
    > **NEXT:** if you were able to login you're ready to continue with the workshop. 
 
-   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/SETUP.md) before proceeding._
+   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/docs/SETUP.md) before proceeding._
 
 ## Command line interface (CLI)
 

@@ -1,0 +1,69 @@
+{
+  "type": "Event",
+  "api_version": "core/v2",
+  "metadata": {},
+  "spec": {
+    "timestamp": 1615358668,
+    "entity": {
+      "metadata": {
+        "name": "learn.sensu.io",
+        "labels": {
+          "app": "workshop"
+        }
+      },
+      "entity_class": "example",
+      "subscriptions": [],
+      "user": "workshop",
+      "deregister": true,
+      "deregistration_handler": "deregister",
+      "system": {
+        "os": "Workshop",
+        "platform": "Sensu Go",
+        "platform_family": "Training",
+        "platform_version": "1.0",
+        "arch": "arm",
+        "hostname": "learn.sensu.io",
+        "network": {
+          "interfaces": [
+            {
+              "addresses": [
+                "127.0.0.1/8",
+                "::1/128"
+              ],
+              "mac": "00:00:00:00:00:00",
+              "name": "lo"
+            },
+            {
+              "addresses": [
+                "10.0.0.1/8"
+              ],
+              "mac": "00:00:00:00:00:00",
+              "name": "eth0"
+            }
+          ]
+        }
+      }
+    },
+    "check": {
+      "metadata": {
+        "name": "helloworld",
+        "labels": {}
+      },
+      "command": "echo 'Hello, {{ .labels.app }} world.",
+      "interval": 60,
+      "subscriptions": [
+        "workshop"
+      ],
+      "publish": true,
+      "handlers": [
+        "alert"
+      ],
+      "issued": 1615358668,
+      "executed": 1615358668,
+      "duration": 7.3678,
+      "status": 1,
+      "output": "Hello, workshop world."
+    },
+    "metrics": {}
+  }  
+}

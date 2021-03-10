@@ -1,4 +1,20 @@
 ---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: slack_webhook_url
+spec:
+  provider: vault
+  id: secret/sensu/slack#webhook_url
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: slack_channel
+spec:
+  provider: vault
+  id: secret/sensu/slack#channel
+---
 type: Asset
 api_version: core/v2
 metadata:

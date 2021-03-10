@@ -68,16 +68,216 @@ To learn more about the Sensu APIs, please visit the API reference documentation
 
 ## EXERCISE: install and configure `sensuctl` 
 
-## EXERCISE: use the `sensuctl --help` command
+1. Download and install `sensuctl`.
+
+   Mac users:
+
+   ```shell
+   SENSU_CLI_VERSION=${SENSU_CLI_VERSION:-"6.2.5"}
+   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz"
+   sudo tar -xzf "sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
+   rm sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz
+   ```
+
+   > _NOTE: Windows and Linux users can find [installation instructions][3-2] 
+   > in the Sensu [user documentation][3-3]. The complete list of Sensu 
+   > downloads is available at https://sensu.io/downloads._
+
+1. Configure `sensuctl`. 
+
+   Configure the Sensu CLI to connect to your backend by running the `sensuctl 
+   configure` command. 
+   Sensuctl will prompt you to provide a Sensu Backend URL, 
+   username, password, namespace, and preferred output format.  
+   
+   ```shell
+   sensuctl configure --interactive
+   ```
+
+   Backend URL:
+
+   - **Self guided users:** self-guided trainees who are running the workshop on their local workstation should use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
+   - **Instructor-led workshop users:** please use the Backend URL provided by your instructor. 
+
+   The `sensuctl configure --interactive` mode will prompt you for the following settings: 
+
+   ```shell
+   ? Authentication method: username/password
+   ? Sensu Backend URL: http://127.0.0.1:8080
+   ? Namespace: default
+   ? Preferred output format: tabular
+   ? Username: sensu
+   ? Password: *****
+   ```
+
+1. Verify your `sensuctl` configuration.
+
+   If you do not receive an error message after entering your username and password you should have a successfully configured CLI. 
+   To confirm, let's run a `sensuctl` command to verify that we are successfully connected to the cluster: 
+   
+   ```shell
+   sensuctl namespace list
+   ```
+
+   The output should look something like the following: 
+
+   ```
+      Name    
+    ───────── 
+     default  
+     user
+   ```
+   
+   > **NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step! 
+
+## EXERCISE: use the `sensuctl --help` command 
+
+Sensuctl includes a `--help` flag for getting help with every command and subcommand. 
+
+Try running some of the following commands: 
+
+1. See all available `sensuctl` commands and global flags: 
+
+   ```
+   sensuctl --help
+   ```
+
+1. See all of the available subcommands and flags for the `sensuctl check` command: 
+
+   ```
+   sensuctl check --help
+   ```
+
+1. See all of the available flags for the `sensuctl check create` subcommand: 
+
+   ```
+   sensuctl check create --help
+   ```
+
+Learning how to navigate the `sensuctl` tool with the assistance of the `--help` flag will make the Sensu CLI much easier to use. 
 
 ## EXERCISE: inspect an event in JSON format 
 
-## EXERCISE: explore Sensu resources using `sensuctl` 
+1. Use the `sensuctl event info` command to get information about an event.
+
+   ```
+   sensuctl event info learn.sensu.io helloworld
+   ```
+   
+   The Sensu CLI will use your default output format (which defaults to "tabular") for displaying information about most resources. 
+   The tabular output format is usually easier to read, but doesn't show all of the available properties for a given resource. 
+   
+   Example tabular output: 
+   
+   ```
+   === learn.sensu.io - helloworld
+   Entity:    learn.sensu.io
+   Check:     helloworld
+   Output:    Hello, workshop world.
+   Status:    1
+   History:   
+   Silenced:  false
+   Timestamp: 2021-03-09 22:44:28 -0800 PST
+   UUID:      7d0721c8-d203-4e80-a399-05070a914b20
+   ```
+   
+   To modify the output format on a per-command basis use the `--format` flag: 
+   
+   ```
+   sensuctl event info learn.sensu.io helloworld --format json
+   ```
+   
+   Sensuctl should now output a JSON formatted event.
+
+## EXERCISE: explore Sensu resources using `sensuctl`
+
+1. Use the `sensuctl namespace list` command to get a list of namespaces.
+
+   ```
+   sensuctl namespace list
+   ```
+   
+   _NOTE: the output of this command is filtered based on RBAC, so different users may see different results._
+
+1. Use the `sensuctl event list` command to get a list of events. 
+
+   ```
+   sensuctl event list
+   ```
+   
+   _NOTE (for trainees in instructor-led workshops): try adding `--namespace default` to get a list of events from the `default` namespace._
+   
+1. Use the `sensuctl entity list` command to get a list of nodes under management.
+
+   ```
+   sensuctl entity list
+   ```
+   
+   _NOTE: try adding `--format json` or `--format yaml` to view the list in JSON or YAML format._
+   
+1. Get information about a specific entity using the `sensuctl entity info` command
+
+   ```
+   sensuctl entity info learn.sensu.io
+   ```
+   
+1. Try exploring some other resources. 
+
+   _NOTE: don't forget to use `--help`; for example, `sensuctl --help` will output a list of "management commands" which are effectively API resources that are accessible via `sensuctl`._
 
 ## EXERCISE: export Sensu resources using `sensuctl dump` 
+
+The `sensuctl dump` command is a built-in solution for exporting & importing Sensu API resources.
+You can use `sensuctl dump` to output Sensu configuration resources to STDOUT (i.e. for viewing in the terminal), or to a file. 
+The `sensuctl dump` command has a wide range of use cases from simple backup and restore, to inspecting configuration resources, scripting maintenance tasks (e.g. bulk deletion of entities), and more.
+
+1. Export all resources. 
+
+   ```
+   sensuctl dump all
+   ```
+   
+1. Export resources for a single namespace. 
+
+   ```
+   sensuctl dump all --namespace default
+   ```
+
+1. Export specific resources, by type. 
+
+   ```
+   sensuctl export checks,handlers
+   ```
+   
+   _NOTE: at this stage in the workshop this command may not generate any output (becase we haven't created any checks or handlers yet)._
+   
+1. Get a complete list of resource types supported by `sensuctl dump`. 
+
+   ```
+   sensuctl describe-type all --format yaml
+   ```
+   
+   Notice that some resources have "short names" (e.g. `core/v2.CheckConfig` has the short name `check`).
+   Try exporting a resource by its Fully Qualified Name. 
+   
+   ```
+   sensuctl dump core/v2.Entity --format wrapped-json
+   sensuctl dump secrets/v1.Secret --format yaml
+   ```
 
 ## Learn more
 
 ## Next steps 
 
 [Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)
+
+[3-0]: #
+[3-1]: #
+[3-2]: #
+[3-3]: #
+[3-4]: #
+[3-5]: #
+[3-6]: #
+[3-7]: #
+[3-8]: #
+[3-9]: #

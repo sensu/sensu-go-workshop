@@ -164,22 +164,22 @@ services:
       target: /var/run/docker.sock
     - type: bind
       source: ./.env
-      target: /var/lib/sensu/workshop/.env
+      target: /workshop/.env
     - type: bind
       source: ./${COMPOSE_FILE}
-      target: /var/lib/sensu/workshop/docker-compose.yaml
+      target: /workshop/docker-compose.yaml
     - type: bind
       source: ./docker
-      target: /var/lib/sensu/workshop/docker
+      target: /workshop/docker
     - type: bind 
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
       source: ./users
-      target: /var/lib/sensu/workshop/users
+      target: /workshop/users
     - type: bind
       source: ./config/sensu
-      target: /var/lib/sensu/workshop/config/sensu
+      target: /workshop/config/sensu
       consistency: consistent
     - type: volume
       source: sensuctl_data
@@ -209,6 +209,8 @@ services:
     - SENSU_USERNAME
     - SENSU_PASSWORD
     - SENSU_NAMESPACE
+    - VAULT_ADDR
+    - VAULT_DEV_ROOT_TOKEN_ID
     working_dir: /root
     volumes:
     - type: bind

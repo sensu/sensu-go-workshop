@@ -139,7 +139,7 @@ services:
   # 
   # Includes a Vault "devmode" server for secrets management. 
   vault:
-    image: vault:latest
+    image: vault:${VAULT_VERSION}
     ports: 
     - 8200:8200
     environment:
@@ -171,6 +171,7 @@ services:
       dockerfile: Dockerfile
       args: 
       - SENSU_CLI_VERSION
+      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - sensu-backend
@@ -179,28 +180,34 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - VAULT_ADDR
+    - VAULT_TOKEN
     volumes:
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
     - type: bind
       source: ./.env
-      target: /var/lib/sensu/workshop/.env
+      target: /workshop/.env
     - type: bind
       source: ./${COMPOSE_FILE}
-      target: /var/lib/sensu/workshop/docker-compose.yaml
+      target: /workshop/docker-compose.yaml
     - type: bind
       source: ./docker
-      target: /var/lib/sensu/workshop/docker
+      target: /workshop/docker
     - type: bind 
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
       source: ./users
-      target: /var/lib/sensu/workshop/users
+      target: /workshop/users
     - type: bind
       source: ./config/sensu
-      target: /var/lib/sensu/workshop/config/sensu
+      target: /workshop/config/sensu
+      consistency: consistent
+    - type: bind
+      source: ./config/vault
+      target: /workshop/config/vault
       consistency: consistent
     - type: volume
       source: sensuctl_data
@@ -222,6 +229,7 @@ services:
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
+      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
@@ -230,6 +238,8 @@ services:
     - SENSU_USERNAME
     - SENSU_PASSWORD
     - SENSU_NAMESPACE
+    - VAULT_ADDR
+    - VAULT_TOKEN
     working_dir: /root
     volumes:
     - type: bind

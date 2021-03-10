@@ -32,9 +32,81 @@
 
 ### Configuration overrides 
 
-## EXERCISE: configure an alert handler 
+## EXERCISE: configure an alert handler
 
-## EXERCISE: configure a metrics handler 
+1. Create a Sensu Event Handler template for sending alerts via Slack.
+
+   Copy and paste the following contents to a file named `slack.yaml`: 
+
+   ```
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: slack
+   spec:
+     type: pipe
+     command: sensu-slack-handler 
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.4.0
+     timeout: 10
+     secrets: 
+     - name: SLACK_WEBHOOK_URL
+       secret: slack_webhook_url
+     - name: SLACK_CHANNEL
+       secret: slack_channel
+     filters: 
+     - is_incident
+     mutator: ""
+   ```
+   
+1. Create the Handler using the `sensuctl create -f` command.
+   
+   ```
+   sensuctl create -f slack.yaml
+   ```
+   
+   Verify that your Handler was successfully created using the `sensuctl handler list` command: 
+   
+   ```
+   sensuctl handler list
+   ```
+   
+   If you see the `slack` handler in the output, you're ready to proceed to the next step! 
+   
+   ```
+   
+   ```
+
+## EXERCISE: configure a metrics handler
+
+1. Create a Sensu Event Handler template for sending metrics to a time-series database.
+
+   Copy and paste the following contents to a file named `influxdb.yaml`: 
+   
+   ```
+   type: Handler 
+   api_version: core/v2
+   metadata:
+     name: influxdb
+   spec:
+     type: pipe
+     command: >- 
+       sensu-influxdb-handler 
+     runtime_assets:
+     - sensu/sensu-influxdb-handler:3.5.0
+     timeout: 10
+     secrets:
+     - name: INFLUXDB_ADDR
+       secret: influxdb_addr
+     - name: INFLUXDB_HOST
+       secret: influxdb_host
+     - name: INFLUXDB_PORT
+       secret: influxdb_port
+     filters:
+     - has_metrics
+     mutator: ""
+   ```
 
 ## Learn more 
 

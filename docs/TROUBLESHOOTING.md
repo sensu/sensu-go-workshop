@@ -1,44 +1,71 @@
-# Troubleshooting 
+# Troubleshooting
 
-- [1. Using the `sensuctl` container as a workstation sandbox][1-0]
-- [2. Copy files into running containers][2-0]
+- [Certain `sensuctl` commands produce authorization errors](#certain-sensuctl-commands-produce-authorization-errors)
+- [Using the `sensuctl` container as a sandboxed workstation](#using-the-sensuctl-container-as-a-sandboxed-workstation)
+- [Copy files into running containers](#copy-files-into-running-containers)
 
-## 1. Using the `sensuctl` container as a workstation sandbox
+## Certain `sensuctl` commands produce authorization errors
 
-This workshop includes a Docker container image with `sensuctl` and some 
-additional helper utilities pre-installed. This Docker image can be used as a
-"clean" workstation environment to avoid conflicts on your local workstation.
+Trainees in instructor-led workshops may occassional encounter errors with messages like "Error putting resource..." and "unauthorized to perform action".
+These messages are typically the result of Sensu's role-based access controls (RBAC) working as intended and informing users that they do not have the correct permissions.
+In the sensu-go-workshop environment, the most common reason for these errors is a misconfiguration of `sensuctl`.
+
+Sensu Go is a multi-tenant platform (multi-user, and multi-org), so a user may be authorized to perform a given action in one context, but unauthorized to perform the same action in another context.
+For example, in the sensu-go-workshop environment, trainees in instructor-led workshops have full read/write access to their individual namespaces, and read-only access to the `default` namespace.
+The most common `sensuctl` functions (e.g. `sensuctl event list`) are designed to interact with namespaced resources; if no namespace is explicitly provided (e.g. `sensuctl event list --namespace default`) then `sensuctl` will use the currently configured namespace.
+
+To view the current `sensuctl` configuration, run the following command:
+
+```shell
+sensuctl config view
+```
+
+It should output the following information:
 
 ```
-$ cd sensu-go-workshop
-$ sudo docker-compose run --entrypoint="" sensuctl /bin/ash
-~ # sensuctl version
-sensuctl version 5.21.0+ee, enterprise edition, build 081a854d483d7881bbcf4cb60c44f87ea5fdf425, built 2020-06-11T19:49:27Z, built with go1.13.7
-~ #
+=== Active Configuration
+API URL:                  http://127.0.0.1:8080
+Namespace:                default
+Format:                   tabular
+Timeout:                  15s
+Username:                 trainee
+JWT Expiration Timestamp: 1615511071
 ```
 
-## 2. Copy files into running containers 
+In the example above the `trainee` user has read-only permissions to the "default" namespace, so any attempts to create or update resources with commands like `sensuctl create -f` without the `--namespace trainee` flag will use the configure namespace (i.e. "default") and result in authorization errors.
 
-In some cases it may be useful for troubleshooting and/or one-off customization
-of the workshop environment to copy files into a running container. In a Docker
-environment this can be accomplished via the `docker cp` command, which is very
-similar to how you might use `scp` in a traditional virtualization environment.
+To update the current configuration, please run the following command:
+
+```
+sensuctl config set-namespace trainee
+```
+
+> _**NOTE:** please use the namespace as provided by your instructure (hint: this is usually the same as the username provided by your instructor)._
+
+## Using the `sensuctl` container as a sandboxed workstation
+
+This workshop includes a Docker container image with `sensuctl` and some additional helper utilities pre-installed.
+This Docker image can be used as a "clean" workstation environment to avoid conflicts on your local workstation.
+
+```
+cd sensu-go-workshop
+sudo docker-compose run --entrypoint="" sensuctl /bin/ash
+```
+
+You should now be presented with a prompt inside the running container.
+This container has a volume mount of the contents of your local `sensu-go-workshop/` directory, so files you edit from your favorite editor on your local workstation will also be available inside the running container (at `/root/workshop`).
+
+## Copy files into running containers
+
+In some cases it may be useful for troubleshooting and/or one-off customization of the workshop environment to copy files into a running container.
+In a Docker environment this can be accomplished via the `docker cp` command, which is very similar to how you might use `scp` in a traditional virtualization environment.
 
 ```
 $ sudo docker cp example.json workshop_sensu-backend_1:/tmp/example.json
 ```
 
-The `docker cp` utility can also be used to _extract_ files from a running 
-container. 
+The `docker cp` utility can also be used to _extract_ files from a running container.
 
 ```
 $ sudo docker cp workshop_sensu-backend_1:/tmp/example.json example.json
 ```
-
-[1-0]: #1-using-the-sensuctl-container-as-a-workstation-sandbox
-[2-0]: #2-copy-files-into-running-containers
-[3]: #
-[4]: #
-[5]: #
-[6]: # 
-[7]: #

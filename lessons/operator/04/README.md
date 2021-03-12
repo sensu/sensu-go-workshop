@@ -34,7 +34,7 @@
 
 ## EXERCISE: configure an alert handler
 
-1. Create a Sensu Event Handler template for sending alerts via Slack.
+1. Configure a Sensu Event Handler for sending alerts via Slack.
 
    Copy and paste the following contents to a file named `slack.yaml`:
 
@@ -56,8 +56,7 @@
      runtime_assets:
      - sensu/sensu-slack-handler:1.3.2
      timeout: 10
-     filters:
-     - is_incident
+     filters: []
      secrets:
      - name: SLACK_WEBHOOK_URL
        secret: slack_webhook_url
@@ -77,7 +76,7 @@
    sensuctl handler list
    ```
 
-   If you see the `slack` handler in the output, you're ready to proceed to the next step!
+   Example output:
 
    ```
      Name    Type   Timeout     Filters     Mutator            Execute            Environment Variables               Assets
@@ -85,9 +84,12 @@
      slack   pipe        10   is_incident             RUN:  sensu-slack-handler                           sensu/sensu-slack-handler:1.4.0
    ```
 
+**NEXT:** Do you see the `slack` handler in the output?
+If so, you're ready to proceed to the next step!
+
 ## EXERCISE: configure a metrics handler
 
-1. Create a Sensu Event Handler template for sending metrics to a time-series database.
+1. Configure a Sensu Event Handler for sending metrics to a time-series database.
 
    Copy and paste the following contents to a file named `influxdb.yaml`:
 
@@ -114,6 +116,21 @@
      - has_metrics
      mutator: ""
    ```
+
+1. Create the Handler using the `sensuctl create -f` command.
+
+   ```shell
+   sensuctl create -f influxdb.yaml
+   ```
+
+   Verify that your handler was created:
+
+   ```shell
+   sensuctl handler list
+   ```
+
+**NEXT:** Do you see the `influxdb` handler in the output?
+If so, you're ready to move on to the next step!
 
 ## Learn more
 

@@ -129,7 +129,7 @@ To learn more about the Sensu APIs, please visit the API reference documentation
      user
    ```
 
-   > **NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
+**NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
 
 ## EXERCISE: use the `sensuctl --help` command
 
@@ -157,6 +157,8 @@ Try running some of the following commands:
 
 Learning how to navigate the `sensuctl` tool with the assistance of the `--help` flag will make the Sensu CLI much easier to use.
 
+**NEXT:** after you've tried a few `--help` commands you're ready to move on to the next step.
+
 ## EXERCISE: inspect an event in JSON format
 
 1. Use the `sensuctl event info` command to get information about an event.
@@ -182,13 +184,17 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    UUID:      7d0721c8-d203-4e80-a399-05070a914b20
    ```
 
+1. View event information in JSON format.
+
    To modify the output format on a per-command basis use the `--format` flag:
 
    ```shell
    sensuctl event info learn.sensu.io helloworld --format json
    ```
 
-   Sensuctl should now output a JSON formatted event.
+   > **NOTE:** the `--output` flag is available for a variety of `sensuctl` commands, which can be quite helpful for writing scripts that leverage data from Sensu APIs.
+
+**NEXT:** If `sensuctl` output a JSON formatted event, you're ready to move on to the next step.
 
 ## EXERCISE: explore Sensu resources using `sensuctl`
 
@@ -225,6 +231,8 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 1. Try exploring some other resources.
 
    _NOTE: don't forget to use `--help`; for example, `sensuctl --help` will output a list of "management commands" which are effectively API resources that are accessible via `sensuctl`._
+
+**NEXT:** when you're done exploring `sensuctl` resource list and info commands, you're ready to move on to the next step.
 
 ## EXERCISE: create an API Key for personal use
 
@@ -268,12 +276,11 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    key:
 
    ```shell
-   $ echo $SENSU_API_KEY
+   echo $SENSU_API_KEY
    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-   > **NEXT:** If you see your API key, you're ready to move on to the next
-   > step!
+**NEXT:** If you see your API key, you're ready to move on to the next step!
 
 ## EXERCISE: export Sensu resources using `sensuctl dump`
 
@@ -297,6 +304,8 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 
    ```shell
    sensuctl dump checks,handlers
+   sensuctl dump checks > checks.yaml
+   sensuctl dump handlers > handlers.yaml
    ```
 
    _NOTE: at this stage in the workshop this command may not generate any output (becase we haven't created any checks or handlers yet)._
@@ -314,6 +323,8 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
    sensuctl dump core/v2.Entity --format wrapped-json
    sensuctl dump secrets/v1.Secret --format yaml
    ```
+
+**NEXT:** once you have exported your secrets you're ready to move on to the next step!
 
 ## Learn more
 

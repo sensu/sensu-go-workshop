@@ -88,7 +88,7 @@
    # export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-   _NOTE: don't worry about setting `SENSU_API_KEY` for now - we'll cover that in [Lesson 3](/lessons/03/README.md#readme)._
+   _NOTE: don't worry about setting `SENSU_API_KEY` for now - we'll cover that in [Lesson 3](/lessons/operator/03/README.md#readme)._
 
 1. **Configure environment variables.**
 

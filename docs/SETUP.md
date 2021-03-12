@@ -66,7 +66,42 @@
 
 ### Instructor-led workshop setup (for trainees)
 
-Coming soon.
+1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
+
+   Self-guided trainees may skip this step, as you should have already downloaded the workshop materials as part of the instructions in [SETUP.md][0-1].
+
+   ```shell
+   git clone git@github.com:sensu/sensu-go-workshop.git
+   cd sensu-go-workshop/
+   ```
+
+1. **Modify the contents of the `.envrc` file.**
+
+   Modify the contents of `.envrc` using the details provided by your instructor.
+
+   ```shell
+   export SENSU_VERSION=6.2.5
+   export SENSU_BACKEND_HOST=127.0.0.1
+   export SENSU_NAMESPACE=trainee
+   export SENSU_BACKEND_URL=http://${SENSU_BACKEND_HOST}:8081
+   export SENSU_API_URL=http://${SENSU_BACKEND_HOST}:8080
+   # export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+
+   _NOTE: don't worry about setting `SENSU_API_KEY` for now - we'll cover that in [Lesson 3](/lessons/03/README.md#readme)._
+
+1. **Configure environment variables.**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   > _NOTE: self-guided users should see the username `sensu`.
+   > Instructor-led workshop users should see the username assigned to them by the instructor.
+   > If you don't see a username printed out after the `echo $SENSU_WORKSHOP_USERNAME` command, please check with your instructor._
+
+**NEXT:** if you see the expected values output after you run the `env | grep SENSU` command, you're ready for your workshop!
 
 ### Instructor-led workshop setup (for instructors)
 
@@ -76,7 +111,7 @@ Coming soon.
    $ git clone git@github.com:sensu/sensu-go-workshop.git
    $ cd sensu-go-workshop/
    ```
-2. **Customize the Docker Compose environment file (`.env`), as needed.**
+1. **Customize the Docker Compose environment file (`.env`), as needed.**
 
    All of the workshop configuration variables have been consolidated into a single configuration file for your convenience.
    These configuration variables make it easy to use a specific version of Sensu Go (see: `SENSU_BACKEND_VERSION`, `SENSU_AGENT_VERSION`, and `SENSU_CLI_VERSION`), or change default passwords, and more.
@@ -87,7 +122,7 @@ Coming soon.
 
    > _NOTE: complete this step **BEFORE** you run any `docker-compose` commands._
 
-3. **Configure workshop user accounts.**
+1. **Configure workshop user accounts.**
 
    This workshop contains various templates and scripts for configuring workshop trainee user accounts (dedicated namespaces and RBAC profiles for each trainee).
    To automatically generate these profiles, edit the `users/users.json` file **BEFORE** you run any `docker-compose` commands.
@@ -104,7 +139,7 @@ Coming soon.
    If a `password_hash` _and_ `password` value are provided for the same user, the `password` will be ignored.
    The Sensu CLI provides a built-in utility for generating valid `password_hash` values, via [the `sensuctl user password-hash` command][9].
 
-4. **Docker Compose initialization.**
+1. **Docker Compose initialization.**
 
    ```
    $ sudo docker-compose up -d
@@ -129,7 +164,7 @@ Coming soon.
 
    > _NOTE: the first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images, this process shouldn't take more than 2-3 minutes, depending on your system._
 
-3. **Verify your workshop installation.**
+1. **Verify your workshop installation.**
 
    ```
    $ sudo docker-compose ps
@@ -148,12 +183,17 @@ Coming soon.
    > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if any containers have the status `Up` or `Up (health: starting)`, please wait a few seconds and re-run the `sudo docker-compose ps` command.
    > Otherwise, if any containers have reached the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the sensu-backend container was slow to start) and re-running the `sudo docker-compose up -d` command will resolve the issue._
 
-5. **Create workshop trainee user accounts.**
+1. **Create workshop trainee user accounts.**
 
    Use the workshop configurator Docker container to execute the user account creation script, as follows:
 
+   ```shell
+   sudo docker-compose run --rm configurator create_user_accounts
    ```
-   $ sudo docker-compose run --rm configurator create_user_accounts
+
+   The script should output a message like:
+
+   ```shell
    Successfully created the following workshop user accounts:
 
       Name
@@ -163,9 +203,28 @@ Coming soon.
      lizy
    ```
 
-   > **NEXT:** you're ready to start the workshop!
-
    > _NOTE: if you add additional users to `users/users.json` after you execute this script you'll need to repeat this step._
+
+1. **Configure secrets.**
+
+   This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
+   To configure Vault secrets that trainees will need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
+   Additional secrets may be added to Vault by adding JSON files in `/config/vault/secrets`, but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
+   Additional/custom Sensu Secret resources may be added in the following step.
+
+1. **Seed workshop trainee namespaces with some example resources.**
+
+   Use the workshop configurator Docker container to execute the user namespace seeding script, as follows:
+
+   ```
+   sudo docker-compose run --rm configurator seed_workshop_resources
+   ```
+
+   > **PROTIP:** to customize the workshop, add valid sensu resource definitions to `/config/sensu/seeds` and re-run the `seed_workshop_resources` command.
+
+   The script will ouput several messages
+
+**NEXT:** if you're seeing seeded resources in your trainee namespaces, you're ready to start the workshop!
 
 ## References
 

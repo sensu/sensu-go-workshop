@@ -125,6 +125,8 @@ If so you're ready to move on to the next step!
 
 ## Troubleshooting
 
+-----
+
 ### Sensu API Keys
 
 If you need help creating an API Key for Sensu Go, please refer to the [Lesson 3 EXERCISE: create an API Key for personal use](/lessons/operator/03/README.md#exercise-create-an-api-key-for-personal-use)._

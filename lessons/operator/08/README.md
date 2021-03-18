@@ -106,7 +106,7 @@ Extensibility (any programming language in the world)...==
 
    ```shell
      Name                                                                         Command                                                                         Interval   Cron   Timeout   TTL                           Subscriptions                            Handlers               Assets               Hooks   Publish?   Stdin?    Metric Format    Metric Handlers
-   ────── ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────── ───────── ───── ──────────────────────────────────────────────────────────────── ────────── ──────────────────────────────── ─────── ────────── ──────── ───────────────── ─────────────────
+    ────── ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────── ───────── ───── ──────────────────────────────────────────────────────────────── ────────── ──────────────────────────────── ─────── ────────── ──────── ───────────────── ─────────────────
      ntp    check_ntp_time -H time.nist.gov --warn {{ .labels.ntp_warn_threshold | default "0.5" }} --critical {{ .labels.ntp_crit_threshold | default "1.0" }}         30               10     0   system/linux,system/linux/ntp,system/windows,system/window/ntp              sensu/monitoring-plugins:2.6.0           true       false    nagios_perfdata   influxdb
    ```
 

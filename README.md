@@ -11,27 +11,19 @@
 
 ## Overview
 
-This project is intended to provide a simple template for developing training
-modules for Sensu Go. The workshop lessons outlined below are effectively the
-introductory modules – they are designed to help new Sensu users learn the
-basic concepts of an [Observability Pipeline][0-0] and help them get started
-with Sensu Go.
+This project is intended to provide a simple template for developing training modules for Sensu Go.
+The workshop lessons included with this project are designed to help new Sensu users learn the basic concepts of an [Observability Pipeline](#) and help them get started with Sensu Go.
 
-This project has also be designed with both self-guided learning _and_
-instructor-led training workshops in mind. It's easy to deploy the workshop
-environment on a laptop for personal use, or to a shared server (or cloud
-provider) for multiple users. See [SETUP.md][0-1] for more information on
-setting up the workshop environment.
+This project has also be designed with both self-guided learning _and_ instructor-led training workshops in mind.
+It's easy to deploy the workshop environment on a laptop for personal use, or to a shared server (or cloud provider) for multiple users.
+See [SETUP.md](/docs/SETUP.md#readme) for more information on setting up the workshop environment.
 
 ## Setup
 
-This workshop is designed to be simple enough for self-guided training, while
-also providing a tool for trainers to host a workshop for multiple attendees.
-See [SETUP.md][0-1] for more details on setting up the workshop environment.
+This workshop is designed to be simple enough for self-guided training, while also providing a tool for trainers to host a workshop for multiple attendees.
+See [SETUP.md](/docs/SETUP.md#readme) for more details on setting up the workshop environment.
 
-Once you have deployed a workshop environment, you may proceed with the
-following local workstation setup instructions which will help you install
-the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
+Once you have deployed a workshop environment, you may proceed with the following local workstation setup instructions which will help you install the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
 ## Lessons
 
@@ -91,15 +83,13 @@ When it arrives it will cover the following topics:
 
 ## Next Steps
 
-I hope you enjoyed this workshop and found it helpful for learning more about
-Sensu Go! At this point we have covered Sensu's most common concepts, which
-should give you a much better sense for how Sensu works – but we've only really
-just scratched the surface. If you're interest in learning more, pleaes
-consider the following resources:
+We hope you enjoyed this workshop and found it helpful for learning more about Sensu Go!
+At this point we have covered Sensu's most common concepts, which should give you a much better sense for how Sensu works – but we've only really just scratched the surface.
+If you're interest in learning more, pleaes consider the following resources:
 
 ### Join the Sensu Community
 
-The primary home of the Sensu Community is the [Sensu Community Forums][Z-1].
+The primary home of the Sensu Community is the [Sensu Community Forums](https://discourse.sensu.io/signup).
 Sign up to get notified about upcoming events (e.g. webinars and virtual
 meetups), and new releases.
 
@@ -107,17 +97,13 @@ https://discourse.sensu.io/signup
 
 ### Contribute to Sensu Community Projects on GitHub
 
-The [Sensu GitHub org][Z-2] is home to a number of open source projects that will help you get the most out of Sensu, including:
+The [Sensu GitHub org](https://github.com/sensu) is home to a number of open source projects that will help you get the most out of Sensu, including:
 
-- [sensu/catalog (Sensu monitoring code templates)][Z-3]
-- [sensu/sensu-plugin-sdk][Z-4]
-- [sensu/check-plugin-template][Z-5]
-- Last but not least: [sensu/sensu-go][Z-6] (_the_ Sensu Go OSS project)
+- [sensu/catalog (Sensu monitoring code templates)](https://github.com/sensu/catalog)
+- [sensu/sensu-plugin-sdk](https://github.com/sensu/sensu-plugin-sdk)
+- [sensu/check-plugin-template](https://github.com/sensu/check-plugin-template)
+- Last but not least: [sensu/sensu-go](https://github.com/sensu/sensu-go) (_the_ Sensu Go OSS project)
 
-[x-x]: #
-
-[0-0]: #observability-pipeline
-[0-1]: /docs/SETUP.md
 [0-2]: https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
 [0-3]: https://docs.sensu.io/sensu-go/latest/
 [0-4]: https://docs.sensu.io/sensu-go/latest/reference/apikeys/
@@ -134,9 +120,3 @@ The [Sensu GitHub org][Z-2] is home to a number of open source projects that wil
 [2-4]: https://docs.sensu.io/sensu-go/latest/reference/events/
 [2-5]: https://en.wikipedia.org/wiki/Standard_streams
 
-[Z-1]: https://discourse.sensu.io
-[Z-2]: https://github.com/sensu/
-[Z-3]: https://github.com/sensu/catalog
-[Z-4]: https://github.com/sensu/sensu-plugin-sdk
-[Z-5]: https://github.com/sensu/check-plugin-template
-[Z-6]: https://github.com/sensu/sensu-go

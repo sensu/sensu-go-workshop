@@ -55,7 +55,39 @@ the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
 
 ### Developer Workshop
 
-COMING SOON!
+The Sensu Developer Workshop is coming soon!
+When it arrives it will cover the following topics:
+
+- **Sensu Data Model**
+  - Endpoint specification (Entities)
+  - Event data specification
+  - Metrics specification
+- **Sensu API overview**
+- **Sensu API authentication**
+- **Sensu configuration APIs (basic CRUD functions)**
+  - Auth (Authentication API, APIKeys API)
+  - RBAC (Roles API, RoleBindings API, ClusterRoles API, ClusterRoleBindings API, Users API)
+  - Namespaces API
+  - Assets API
+  - Checks API
+  - Filters API
+  - Handlers API
+  - Secrets API
+  - Prune API
+- **Sensu observability APIs**
+  - Events API
+  - Entities API
+  - Silencing API
+- **Sensu automation APIs**
+  - Execute API
+  - Entity PATCH API
+- **Sensu Agent APIs**
+  - Events HTTP API
+  - Events TCP/UDP Socket
+  - StatsD API
+- **Sensu Plugins overview**
+- **Sensu Plugins SDK**
+- **Advanced Topics**
 
 ## Next Steps
 

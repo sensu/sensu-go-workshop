@@ -16,6 +16,8 @@
 - [EXERCISE: install and start your first agent](#exercise-install-and-start-your-first-agent)
 - [EXERCISE: customize agent and entity configuration](#exercise-customize-agent-and-entity-configuration)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 

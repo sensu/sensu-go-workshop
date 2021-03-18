@@ -81,9 +81,11 @@
 
    ```shell
    export SENSU_VERSION=6.2.5
+   export SENSU_PLATFORM=linux
+   export SENSU_ARCH=amd64
    export SENSU_BACKEND_HOST=127.0.0.1
-   export SENSU_NAMESPACE=trainee
-   export SENSU_BACKEND_URL=http://${SENSU_BACKEND_HOST}:8081
+   export SENSU_NAMESPACE=default
+   export SENSU_BACKEND_URL=ws://${SENSU_BACKEND_HOST}:8081
    export SENSU_API_URL=http://${SENSU_BACKEND_HOST}:8080
    # export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```

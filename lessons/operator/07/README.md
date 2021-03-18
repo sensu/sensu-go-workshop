@@ -12,7 +12,8 @@
   - [StatsD API](#statsd-api)
   - [Platform detection](#platform-detection)
   - [Command allow list](#command-allow-list)
-- [EXERCISE: install and start your first agent](#exercuse-install-and-start-your-first-agent)
+- [EXERCISE: register a proxy entity](#exercise-register-a-proxy-entity)
+- [EXERCISE: install and start your first agent](#exercise-install-and-start-your-first-agent)
 - [EXERCISE: customize agent and entity configuration](#exercise-customize-agent-and-entity-configuration)
 - [Learn more](#learn-more)
 

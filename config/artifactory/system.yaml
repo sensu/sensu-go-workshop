@@ -1,0 +1,7 @@
+---
+shared:
+  node:
+    id: artifactory
+  security:
+    joinKeyFile: /opt/jfrog/artifactory/var/etc/security/join.key
+    masterKeyFile: /opt/jfrog/artifactory/var/etc/security/master.key

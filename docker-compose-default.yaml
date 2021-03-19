@@ -1,10 +1,10 @@
 ---
 version: "3.3"
 services:
-  # Sensu Backend 
+  # Sensu Backend
   #
-  # Includes embedded database, API, event processor, and web UI). 
-  # 
+  # Includes embedded database, API, event processor, and web UI).
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
@@ -26,18 +26,18 @@ services:
     - SENSU_WORKSHOP_ENV_SECRET
     - SENSU_TIMESCALEDB_DSN
     volumes:
-    - type: volume 
+    - type: volume
       source: sensu_data
       target: /var/lib/sensu
     command: >-
-      sensu-backend start 
+      sensu-backend start
       --log-level=debug
       --debug=true
 
-  # Sensu Agent 
+  # Sensu Agent
   #
   # Includes monitoring agent, local API, and local StatsD socket.
-  # 
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
@@ -63,17 +63,17 @@ services:
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
     command: >-
-      sensu-agent start 
+      sensu-agent start
       --log-level=info
-      --deregister=true 
+      --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
       --statsd-event-handlers timescaledb
 
-  # TimescaleDB  
+  # TimescaleDB
   #
   # Includes TimescaleDB (Postgres database) for storage of telemetry data.
-  # 
+  #
   # See: https://docs.timescale.com/latest/introduction
   timescaledb:
     # container_name: timescaledb
@@ -90,21 +90,21 @@ services:
     environment:
     - POSTGRES_PASSWORD
     - POSTGRES_DB
-    volumes: 
-    - type: bind 
-      source: ./config/timescaledb/100-sensu-metrics.sql
-      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
-    - type: volume 
+    volumes:
+    - type: volume
       source: timescaledb_data
       target: /var/lib/postgresql/data
+    - type: bind
+      source: ./config/timescaledb/100-sensu-metrics.sql
+      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
     command: >-
       postgres
-      
-  # Grafana 
+
+  # Grafana
   #
-  # Includes Grafana dashboard and datasource configuration files for 
-  # Timescaledb. 
-  # 
+  # Includes Grafana dashboard and datasource configuration files for
+  # Timescaledb.
+  #
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
     # container_name: grafana
@@ -125,22 +125,22 @@ services:
     - GF_SECURITY_ADMIN_PASSWORD
     - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
+    - type: volume
+      source: grafana_data
+      target: /var/lib/grafana
     - type: bind
-      source: ./config/grafana/provisioning 
+      source: ./config/grafana/provisioning
       target: /etc/grafana/provisioning
     - type: bind
       source: ./config/grafana/dashboards/timescaledb
       target: /etc/grafana/dashboards
-    - type: volume 
-      source: grafana_data
-      target: /var/lib/grafana
 
   # Vault
-  # 
-  # Includes a Vault "devmode" server for secrets management. 
+  #
+  # Includes a Vault "devmode" server for secrets management.
   vault:
     image: vault:${VAULT_VERSION}
-    ports: 
+    ports:
     - 8200:8200
     environment:
     - VAULT_DEV_ROOT_TOKEN_ID
@@ -151,11 +151,31 @@ services:
       timeout: 5s
       retries: 6
     command: >-
-      vault server -dev -log-level debug 
+      vault server -dev -log-level debug
+
+  # Artifactory
+  #
+  # Private Sensu Asset service.
+  artifactory:
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:${ARTIFACTORY_VERSION}
+    ports:
+    - 8881:8081
+    - 8882:8082
+    environment:
+    - JFROG_HOME
+    volumes:
+    - type: volume
+      source: artifactory_data
+      target: /opt/jfrog/artifactory/var
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8081/artifactory/api/system/ping
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Configurator
-  # 
-  # Configuration automation for instructor-led workshops (e.g. user profile 
+  #
+  # Configuration automation for instructor-led workshops (e.g. user profile
   # generation) using a super light-weight "configuration management" stack:
   #
   # - curl
@@ -163,13 +183,13 @@ services:
   # - envsubst (part of the gettext package)
   # - sensuctl
   # - docker & docker-compose
-  # 
+  #
   # See: ./scripts/
   configurator:
     build:
       context: docker/workshop/
       dockerfile: Dockerfile
-      args: 
+      args:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
@@ -195,7 +215,7 @@ services:
     - type: bind
       source: ./docker
       target: /workshop/docker
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
@@ -214,13 +234,13 @@ services:
       target: /root/.config
     command: |-
       generate_user_rbac
-  
+
   # Workstation
-  # 
-  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl 
-  # pre-installed in case the trainee workstation is missing a required 
-  # dependency. 
-  # 
+  #
+  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
+  # pre-installed in case the trainee workstation is missing a required
+  # dependency.
+  #
   # See: https://alpinelinux.org
   sensuctl:
     # container_name: sensuctl
@@ -245,26 +265,26 @@ services:
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
       source: ./
       target: /root/workshop
-      consistency: consistent 
+      consistency: consistent
     - type: volume
       source: sensuctl_data
       target: /root/.config
-      consistency: consistent 
+      consistency: consistent
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
-      configure -n 
+      configure -n
       --url ${SENSU_API_URL}
       --username ${SENSU_USERNAME}
       --password ${SENSU_PASSWORD}
       --namespace ${SENSU_NAMESPACE}
       --format tabular
-      
+
 volumes:
   sensuctl_data:
     driver: local
@@ -273,4 +293,6 @@ volumes:
   timescaledb_data:
     driver: local
   grafana_data:
+    driver: local
+  artifactory_data:
     driver: local

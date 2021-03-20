@@ -21,6 +21,7 @@
 - [EXERCISE: create an API Key for personal use](#exercise-create-an-api-key-for-personal-use)
 - [EXERCISE: export Sensu resources using `sensuctl dump`](#exercise-export-sensu-resources-using-sensuctl-dump)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
 
 ## Web App
 
@@ -80,9 +81,8 @@ To learn more about the Sensu APIs, please visit the API reference documentation
    rm sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz
    ```
 
-   > _NOTE: Windows and Linux users can find [installation instructions][3-2]
-   > in the Sensu [user documentation][3-3]. The complete list of Sensu
-   > downloads is available at https://sensu.io/downloads._
+   > _NOTE: Windows and Linux users can find [installation instructions](#) in the Sensu [user documentation](#).
+   > The complete list of Sensu downloads is available at https://sensu.io/downloads._
 
 1. Configure `sensuctl`.
 
@@ -331,14 +331,3 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 ## Next steps
 
 [Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)
-
-[3-0]: #
-[3-1]: #
-[3-2]: #
-[3-3]: #
-[3-4]: #
-[3-5]: #
-[3-6]: #
-[3-7]: #
-[3-8]: #
-[3-9]: #

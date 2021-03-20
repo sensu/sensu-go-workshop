@@ -5,6 +5,8 @@
 - [EXERCISE: create an event using curl and the Sensu Events API](#exercise-create-an-event-using-curl-and-the-Sensu-Events-API-no-op)
 - [EXERCISE: create an event that triggers an alert](#exercise-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -123,9 +125,9 @@ If so you're ready to move on to the next step!
 
 [Lesson 6: Introduction to Filters](../06/README.md#readme)
 
-## Troubleshooting
-
 -----
+
+## Troubleshooting
 
 ### Sensu API Keys
 

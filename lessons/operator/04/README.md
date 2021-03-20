@@ -11,6 +11,7 @@
 - [EXERCISE: configure an alert handler](#exercise-configure-an-alert-handler)
 - [EXERCISE: configure a metrics handler](#exercise-configure-a-metrics-handler)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
 
 ## Overview
 

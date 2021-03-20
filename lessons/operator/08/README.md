@@ -67,28 +67,20 @@ Extensibility (any programming language in the world)...==
    metadata:
      name: ntp
    spec:
-     command: >-
-       check_ntp_time -H time.google.com
-       --warn {{ .labels.ntp_warn_threshold | default "0.5" }}
-       --critical {{ .labels.ntp_crit_threshold | default "1.0" }}
+     command: check_ntp_time -H time.google.com --warn 0.5 --critical 1.0
      runtime_assets:
      - sensu/monitoring-plugins:2.6.0
      publish: true
      subscriptions:
-     - ntp
-     interval: 10
-     timeout: 9
-     handlers:
-     - alert
-     output_metric_format: nagios_perfdata
-     output_metric_handlers:
-     - metrics
-     output_metric_tags:
-     - name: entity
-       value: "{{ .name }}"
-     - name: namespace
-       value: "{{ .namespace }}"
+     - linux
+     - system/linux
+     interval: 30
+     timeout: 10
+     check_hooks: []
    ```
+
+   Notice the value of `subscriptions` and `interval` – this will instruct the Sensu platform to schedule (or "publish") monitoring jobs every 30 seconds on any agent with the `linux` or `system/linux` subscriptions.
+   Agents opt-in (or "subscribe") to monitoring jobs by their corresponding `subscriptions` configuration.
 
 1. Create the Check using the `sensuctl create -f` command.
 
@@ -115,7 +107,110 @@ If so, you're ready to move on to the next exercise!
 
 ## EXERCISE: modify check configuration using tokens
 
-==TODO: show alternative check configuration workflows (e.g. `sensuctl create -f`, `sensuctl edit`, and the web app).==
+Sensu's service-oriented configuration model (as opposed to traditional host-based models) makes monitoring configuration easier to manage at scale.
+A single check definition can be used to collect monitoring data from hundreds or thousands of endpoints!
+However, there are often cases when you need to override various monitoring job configuration parameters on an per-endpoint basis.
+For these situations, Sensu provides a templating feature called [Tokens](#).
+
+Let's modify our check from the previous exercise using some Tokens.
+
+1. Update the `ntp` check configuration template.
+
+   Modify `ntp.yaml` with the following contents:
+
+   ```yaml
+   ---
+   type: CheckConfig
+   api_version: core/v2
+   metadata:
+     name: ntp
+   spec:
+     command: >-
+       check_ntp_time -H time.google.com
+       --warn {{ .labels.ntp_warn_threshold | default "0.5" }}
+       --critical {{ .labels.ntp_crit_threshold | default "1.0" }}
+     runtime_assets:
+     - sensu/monitoring-plugins:2.6.0
+     publish: true
+     subscriptions:
+     - linux
+     - system/linux
+     interval: 30
+     timeout: 10
+     check_hooks: []
+   ```
+
+   _NOTE: this example uses a [YAML multiline "block scalar"](https://yaml-multiline.info) (`>-`) for improved readability of a longer check `command`._
+
+   Did you notice?
+   We're now making the NTP warning and critical thresholds configurable via entity labels (`ntp_warn_threshold` and `ntp_crit_threshold`)!
+   Both of the tokens we're using here are offering default values, which will be used if the corresponding label is not set.
+
+1. Update the Check using `sensuctl create -f`.
+
+   ```
+   sensuctl create -f ntp.yaml
+   ```
+
+   Verify that the Check was successfully created using the `sensuctl check list` command:
+
+   ```shell
+   sensuctl check list
+   ```
+
+## EXERCISE: collecting metrics with Sensu Checks
+
+1. Update the `ntp` check configuration template.
+
+   Modify `ntp.yaml` with the following contents:
+
+   ```yaml
+   ---
+   type: CheckConfig
+   api_version: core/v2
+   metadata:
+     name: ntp
+   spec:
+     command: >-
+       check_ntp_time -H time.google.com
+       --warn {{ .labels.ntp_warn_threshold | default "0.5" }}
+       --critical {{ .labels.ntp_crit_threshold | default "1.0" }}
+     runtime_assets:
+     - sensu/monitoring-plugins:2.6.0
+     publish: true
+     subscriptions:
+     - linux
+     - system/linux
+     interval: 30
+     timeout: 10
+     check_hooks: []
+     output_metric_format: nagios_perfdata
+     output_metric_handlers:
+     - metrics
+     output_metric_tags:
+     - name: entity
+       value: "{{ .name }}"
+     - name: namespace
+       value: "{{ .namespace }}"
+   ```
+
+   _NOTE: this example uses a [YAML multiline "block scalar"](https://yaml-multiline.info) (`>-`) for improved readability of a longer check `command`._
+
+   Did you notice?
+   We're now making the NTP warning and critical thresholds configurable via entity labels!
+
+1. Update the Check using `sensuctl create -f`.
+
+   ```
+   sensuctl create -f ntp.yaml
+   ```
+
+   Verify that the Check was successfully created using the `sensuctl check list` command:
+
+   ```shell
+   sensuctl check list
+   ```
+
 
 ## Learn more
 

@@ -8,6 +8,7 @@
 - [EXERCISE: create a custom event filter](#exercise-create-a-custom-event-filter)
 - [EXERCISE: using custom event filters](#exercise-using-custom-event-filters)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
 
 ## Overview
 
@@ -20,6 +21,10 @@ Inclusive (`action: allow`) & exclusive (`action: deny`) filtering.==
 
 ## Filter execution environment & built-in helper functions
 
+> **PROTIP:** Sensu filters are Javascript expressions, executed in a sandboxed Javascript runtime environment.
+> These expressions can be as simple as basic comparison operations (e.g. "less than" `<` or "greater than" `>`, "equal to" `==` or "not equal" `!=`), or as complex as a small Javascript program.
+> You can even import Javascript libraries into the sandbox environment!
+
 ## Filter plugins
 
 ## EXERCISE: using built-in event filters
@@ -29,6 +34,8 @@ Sensu Go ships with built-in event filters for common operations, including:
 - `is_incident`: only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
 - `not_silenced`: prevents processing of events that include the `silenced` attribute.
 - `has_metrics`: only process events containing Sensu Metrics.
+
+Let's see how to use a built-in filter with a handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme).
 
 1. Modify a handler configuration template to use a built-in filter.
 

@@ -111,7 +111,7 @@ developer training (coming soon).==
 
    TODO: upload an asset to Artifactory.
 
-1. Configure an Check + Asset template.
+1. Configure a Check + Asset template.
 
    Copy the following contents to a file called `helloworld.yaml`:
 

@@ -79,7 +79,7 @@ Extensibility (any programming language in the world)...==
      check_hooks: []
    ```
 
-   Notice the value of `subscriptions` and `interval` – this will instruct the Sensu platform to schedule (or "publish") monitoring jobs every 30 seconds on any agent with the `linux` or `system/linux` subscriptions.
+   Notice the values of `subscriptions` and `interval` – these will instruct the Sensu platform to schedule (or "publish") monitoring jobs every 30 seconds on any agent with the `linux` or `system/linux` subscriptions.
    Agents opt-in (or "subscribe") to monitoring jobs by their corresponding `subscriptions` configuration.
 
 1. Create the Check using the `sensuctl create -f` command.

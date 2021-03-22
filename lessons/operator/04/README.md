@@ -292,6 +292,12 @@ If so, you're ready to move on to the next step!
 
 ## Learn more
 
+- [Sensu Handlers (overview)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/)
+- [Sensu Handlers (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/)
+- [Send Pagerduty alerts with Sensu (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-pagerduty-alerts/)
+- [Send Slack alerts with Sensu (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-slack-alerts/)
+- [Supported Handler Integrations (documentation)](https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/)
+
 ## Next steps
 
 [Lesson 5: Introduction to Events](../05/README.md#readme)

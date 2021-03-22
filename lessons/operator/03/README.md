@@ -25,13 +25,59 @@
 
 ## Web App
 
+The Sensu backend process includes a web app that provides a unified view of your observability data (events, entities, and silences) and monitoring configuration (checks, handlers, etc) with user-friendly tools to reduce alert fatigue.
+
 ### Dashboard
+
+The Sensu web app homepage is a dashboard that provides a high level overview of the overall health of the systems under management by Sensu.
+The dashboard includes a summary of active incidents, a breakdown of incidents by severity, information about entities under management, and a high level overview of the namespaces (tenants).
+This dashboard complies with Sensu RBAC, so individual users will see summary information relevant to their access.
+
+![The Sensu dashboard](/docs/img/lessons/operator/03-01-dashboard.png)
+
+_**Figure 1:** the Sensu dashboard._
 
 ### Namespaces switcher
 
+Beyond the overview dashboard, most Sensu data is accessed on a per-namespace basis.
+To select or switch namespaces, press the "Select Namespace" option from the sidebar, or press the `Control + k` keyboard shortcut from anywhere in the Sensu web app.
+
+![The namespace switcher modal](/docs/img/lessons/operator/03-02-namespace-switcher.png)
+
+_**Figure 2:** the namespace switcher._
+
+![The "Select Namespace" option in the navigation sidebar](/docs/img/lessons/operator/03-03-select-namespace.png)
+
+_**Figure 3:** the "Select Namespace" option in the navigation sidebar._
+
 ### Event list & event detail views
 
+The default view that will be opened when navigating to a namespace is the event list view.
+A filter is applied to this view by default to show only events with a "non-passing" status (i.e. `event.check.state != 0-`).
+The event list view provides a number of options for filtering and sorting the list by event status, related entities, and more.
+
+![The event list view](/docs/img/lessons/operator/03-04-event-list-view.png)
+
+_**Figure 4:** the event list view.
+Note the default filter applied here (`event.check.state != 0`)._
+
+![The event detail view](/docs/img/lessons/operator/03-05-event-detail-view.png)
+
+_**Figure 5:** the event detail view._
+
 ### Entity list & entity detail views
+
+The second most popular view in the Sensu web app is the entity list view, which provides realtime inventory information of endpoints under management by Sensu (for a given namespace).
+Selecting an entity from the entity list view will take you to the entity detail view, which provides information about all associated events, system properties (e.g. operating system details and network interfaces), and entity metadata (labels and annotations).
+
+![The entity list view](/docs/img/lessons/operator/03-06-entity-list-view.png)
+
+_**Figure 6:** the entity list view._
+
+![The entity detail view](/docs/img/lessons/operator/03-07-entity-detail-view.png)
+
+_**Figure 7:** the entity detail view.
+Note that the "Events" tab is selected by default)._
 
 ### Silencing
 

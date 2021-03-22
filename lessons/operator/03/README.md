@@ -540,6 +540,12 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 
 ## Learn more
 
+- [Sensu CLI (reference documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/)
+- [Create and manage resources with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
+- [Backup and recover resources with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/back-up-recover/)
+- [Filter responses with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/filter-responses/)
+- [Set environment variables with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
+
 ## Next steps
 
 [Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)

@@ -133,9 +133,9 @@ A similar editor is available for Filters, Mutators, and Handlers._
 
    ![](/docs/img/login.png)
 
-   > **NEXT:** if you were able to login you're ready to continue with the workshop.
-
    > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/docs/SETUP.md) before proceeding._
+
+**NEXT:** if you were able to login you're ready to move on to the next step.
 
 ## Command line interface (CLI)
 

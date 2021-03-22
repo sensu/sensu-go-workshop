@@ -141,19 +141,144 @@ A similar editor is available for Filters, Mutators, and Handlers._
 
 ### API client
 
-==TODO: Sensu is an API-based observability platform; web app and CLI are just API clients.
-Authenticate using `sensuctl configure`.
-To learn more about the Sensu APIs, please visit the API reference documentation and/or Sensu Developer Training (coming soon).==
+Sensu's monitoring as code solution is possible thanks to a robust set of APIs.
+The Sensu web app and CLI are effectly just API clients that streamline access to these APIs.
+Sensuctl is available for Linux, macOS, and Windows.
+Because all access to the Sensu APIs requires authentication, the Sensu CLI (`sensuctl`) must be configured with a username and password before you can use it.
+
+```shell
+$ sensuctl configure --api-url http://127.0.0.1:8080
+? Authentication method: username/password
+? Sensu Backend URL: http://127.0.0.1:8080
+? Namespace: default
+? Preferred output format: tabular
+? Username: sensu
+? Password: *****
+```
+
+To learn more about the Sensu APIs, please checkout the [Sensu API Reference Documentation](https://docs.sensu.io/sensu-go/latest/api/) and [Sensu Developer Workshop](/README.md#developer-workshop) (coming soon).
 
 ### Configuration management
 
-==TODO: declarative configuration files and configuration management commands==
+The primary function of `sensuctl` is to manage Sensu resources.
+It works by calling Sensu's underlying API to create, read, update, and delete (CRUD) resources including events and entities.
+The `sensuctl create` command allows you to idempotently _create or update_ resources by reading from STDIN or a file (via the `sensuctl create -f` flag).
+The create command accepts Sensu resource definitions in `yaml` or `wrapped-json` formats.
+
+All Sensu resource definitions generally have four top-level attributes:
+
+- **`type`:** resource type (e.g. `CheckConfig` or `Handler`)
+- **`api_version`:** resource version (e.g. `core/v2`)
+- **`metadata`:** resource `name`, `namespace`, `labels`, and `annotations`
+- **`spec`:** resource configuration attributes
+
+Example check configuration
+
+```yaml
+---
+type: CheckConfig
+api_version: core/v2
+metadata:
+  name: nginx-status
+  namespace: default
+  labels: []
+  annotations: []
+spec:
+  command: check-nginx-status.rb --url http://127.0.0.1:80/nginx_status
+  publish: true
+  subscriptions:
+    - nginx
+  interval: 30
+  timeout: 10
+  handlers:
+    - slack
+```
+
+Most Sensu resources are namespaced – meaning they must be created in a specific namespace.
+If a resource definition does not contain a `namespace` attribute, the namespace is provided by `sensuctl`.
+Sensuctl namespace assignment can happen implicitly (i.e. using the "current" namespace, which can be viewed via the `sensuctl config view` command, and updated via the `sensuctl config set-namespace` command), or explicitly using the `sensuctl create --namespace` flag.
+
+> **PROTIP:** Omitting the `namespace` attribute allows you to easily replicate resources across multiple namespaces without editing configuration templates.
+
+Please visit the Sensu documentation for a [list of supported resource types for `sensuctl create`](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/#sensuctl-create-resource-types).
+Please consult the [reference documentation](https://docs.sensu.io/sensu-go/latest/reference/) for details on how to configure resource definitions.
 
 ### Inventory
 
+One of the more popular use cases for `sensuctl` is to manage entity resources, which effectively represent a realtime "inventory" of nodes under management by Sensu.
+For example, the `sensuctl entity list` and `sensuctl entity info <entity_name>` commands may be used to list and inspect entities in a given namespace.
+
+Example output of the `sensuctl entity list` command:
+
+```shell
+$ sensuctl entity list
+        ID         Class      OS                       Subscriptions                              Last Seen
+ ──────────────── ─────── ────────── ───────────────────────────────────────────────── ───────────────────────────────
+  0e94f1b82f3b     agent   linux      system/linux,workshop,devel,entity:0e94f1b82f3b   2021-03-22 11:53:00 -0700 PDT
+  775a030edbcc     agent   linux      system/linux,workshop,devel,entity:775a030edbcc   2021-03-22 11:53:03 -0700 PDT
+  911f827c7fb3     agent   linux      system/linux,workshop,devel,entity:911f827c7fb3   2021-03-22 11:53:00 -0700 PDT
+  be180375009e     agent   linux      system/linux,workshop,devel,entity:be180375009e   2021-03-22 11:53:00 -0700 PDT
+  cd27bec9c93c     agent   linux      system/linux,workshop,devel,entity:cd27bec9c93c   2021-03-22 11:53:00 -0700 PDT
+  learn.sensu.io   proxy   Workshop   entity:learn.sensu.io                             N/A
+  server-01        proxy              entity:server-01                                  N/A
+  server-02        proxy              entity:server-02                                  N/A
+  server-03        proxy              entity:server-03                                  N/A
+  server-04        proxy              entity:server-04                                  N/A
+  server-05        proxy              entity:server-05                                  N/A
+  server-06        proxy              entity:server-06                                  N/A
+  server-07        proxy              entity:server-07                                  N/A
+  server-08        proxy              entity:server-08                                  N/A
+  server-09        proxy              entity:server-09                                  N/A
+  server-10        proxy              entity:server-10                                  N/A
+```
+
+Example output of the `sensuctl entity info 0e94f1b82f3b` command:
+
+```shell
+=== 0e94f1b82f3b
+Name:                   0e94f1b82f3b
+Entity Class:           agent
+Subscriptions:          system/linux, workshop, devel, entity:0e94f1b82f3b
+Last Seen:              2021-03-22 11:54:40 -0700 PDT
+Hostname:               0e94f1b82f3b
+OS:                     linux
+Platform:               alpine
+Platform Family:        alpine
+Platform Version:       3.12.3
+Auto-Deregistration:    true
+Deregistration Handler:
+```
+
+These commands can be used in shell scripts for various automation purposes.
+However, for scripting an automation purposes, you may wish to output this information in a structed data format, which capability is discussed below.
+
 ### Output Formats
 
+Sensuctl supports the following output formats:
+
+- `tabular`: A user-friendly, columnar format (which is necessarily less verbose)
+- `wrapped-json`: An accepted format for use with `sensuctl create`
+- `yaml`: An accepted format for use with `sensuctl create`
+- `json`: The format used by the Sensu APIs
+
+You may have noticed that we were prompted to select a "Preferred output format" when configuring `sensuctl` (i.e. `sensuctl configure`).
+After you are logged in, you can change the output format with `sensuctl config set-format` or set the output format per command with the `--format` flag (e.g. `sensuctl entity info <entity_name> --format json`).
+
 ### Interactive and non-interactive modes
+
+Certain `sensuctl` commands support both interactive and non-interactive modes.
+For example, the `sensuctl configure` command runs in interactive mode by default, and can be run non-interactively using the `-n` or `--non-interactive` flags.
+
+Example non-interactive use of `sensuctl configure` (useful for integrating `sensuctl` with a CI/CD pipeline):
+
+```shell
+$ sensuctl configure -n \
+  --api-url http://127.0.0.1:8080 \
+  --namespace default \
+  --username sensu \
+  --password ${SENSU_PASSWORD} \
+  --format json
+```
 
 ## EXERCISE: install and configure `sensuctl`
 

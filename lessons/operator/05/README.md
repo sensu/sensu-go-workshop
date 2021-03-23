@@ -31,7 +31,7 @@ A single Sensu Event payload may include one or more metric `points`, represente
   },
   "spec": {
     "check": {
-      "command": "wget http://127.0.0.1:9099/metrics",
+      "command": "wget -q -O- http://127.0.0.1:9099/metrics",
       "duration": 0.060790838,
       "executed": 1552506033,
       "handlers": [],

@@ -2,6 +2,7 @@
 
 - [Overview](#overview)
 - [Events are observations](#events-are-observations)
+- [Use cases](#use-cases)
 - [EXERCISE: create an event using curl and the Sensu Events API](#exercise-create-an-event-using-curl-and-the-Sensu-Events-API-no-op)
 - [EXERCISE: create an event that triggers an alert](#exercise-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
@@ -16,6 +17,22 @@ Sensu Events are generic containers for all types of observability data.
 In Sensu, every observation is an "event", including metrics (telemetry data).
 
 Sensu Events are structed data identified by a timestamp, entity name (e.g. server, cloud compute instance, container, or service), a check/event name, and optional key-value metadata called "labels" and "annotations".
+
+**Example check structure:**
+
+```json
+{
+  "metadata": {
+    "labels": {},
+    "annotations": {}
+  },
+  "entity": {},
+  "check": {},
+  "metrics": {},
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "timestamp": 0123456789
+}
+```
 
 A single Sensu Event payload may include one or more metric `points`, represented as a JSON object containing a `name`, `tags` (key/value pairs), `timestamp`, and `value` (always a float).
 
@@ -184,6 +201,24 @@ A single Sensu Event payload may include one or more metric `points`, represente
 ```
 
 </details>
+
+## Use cases
+
+Events must reference an `entity` and contain one or both of the `metrics` and service health information objects (i.e. `check` data); e.g. an event that only has `entity` and `metrics` objects (and no `check` object) is a valid Sensu event.
+
+Some common use cases for Sensu Events:
+
+- Reporting service health information (e.g. the result of a service check execution, including Nagios-style check scripts)
+- Collecting metrics using a service check or scraping a metrics API endpoint (e.g. Prometheus exporters)
+- Endpoint discovery (e.g. reporting the discovery of an endpoint, or additional data/metadata about a known entity)
+- Dead mans switches (e.g. emitting events<sup>*</sup> containing a TTL from a shell script, such as a backup script cron job)
+
+_NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction to Agents & Entities](/lessons/operator/07/README.md#readme), and check TTLs are covered in more detail in [Lesson 8: Introduction to Checks](/lessons/operator/08/README.md#readme)._
+
+> **PROTIP:** Events may reference an `entity` that does not exist in Sensu.
+> When a Sensu backend processes an event that references an `entity` that is not present in the Entities API, a "proxy" entity will be created containing the entity properties provided in the event payload.
+>
+> _NOTE: entities and proxy entities are covered in more detail in [Lesson 7: introduction to Agents & Entities](/lessons/operator/07/README.md#readme) and [Lesson 12: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/12/README.md#readme)._
 
 ## EXERCISE: create an event using curl and the Sensu Events API
 

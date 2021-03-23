@@ -12,30 +12,44 @@
 
 ## Overview
 
-==TODO: Filters provide a realtime detection & analysis engine for Sensu...==
+Sensu event filters provide control over which events (observability data) get processed by Sensu event handlers.
+Event filters apply various conditions (Sensu Query Expressions, or SQEs) to incoming events in realtime to determine whether they should be "allowed" (inclusive filtering) or "denied" (exlusive filtering).
+Sensu processes all events with a configured event handler by default; in practice this means that almost all event handlers should be configured with one or more event filters to manage which events are allowed through the pipeline.
 
 ## Use Cases
 
-==TODO: example use cases, including occurrence filtering.
-Inclusive (`action: allow`) & exclusive (`action: deny`) filtering.==
+Sensu event filters provide a realtime detection and analysis engine for the Sensu observability pipeline.
+Some example use cases include:
+
+- **Eliminating alert fatigue** by deduplicating incoming events and limiting repeat processing to predefined conditions (e.g. only alert once per hour per incident)
+- **Optimizing metrics processing** by dropping events that do not contain metric data, or sampling metrics to reduce storage costs
+- **Orchestrating event processing** via occurrence filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
+- **Configuring conditional triggers** by evaluating incoming events to determine which event handler to use (e.g. notify developers via Slack, but send all incidents assigned to operations via Pagerduty using a handler set and corresponding filters)
 
 ## Filter execution environment & built-in helper functions
 
-> **PROTIP:** Sensu filters are Javascript expressions, executed in a sandboxed Javascript runtime environment.
-> These expressions can be as simple as basic comparison operations (e.g. "less than" `<` or "greater than" `>`, "equal to" `==` or "not equal" `!=`), or as complex as a small Javascript program.
-> You can even import Javascript libraries into the sandbox environment!
+SQEs are Javascript expressions, executed in a sandboxed EMCAScript 5 Javascript virtual machine.
+SQEs are valid EMCAScript 5 Javascript expression that return either `true` or `false` (all other return values will result in an error).
+SQEs can be as simple as basic comparison operations – "less than" (`<`) or "greater than" (`>`) "equal to" (`==`) or "not equal" (`!=`) – or as complex as small Javascript programs.
+You can even package filter logic as Javascript libraries and import them into the sandbox environment using Dynamic Runtime Assets!
+
+_NOTE: Dynamic Runtime Assets are covered in greater detail in [Lesson 10: introduction to Assets](/lessons/operator/10/README.md#readme)._
+
+Sensu includes built-in event helper functions and event filters to help you customize event pipelines for metrics and alerts, including:
+
+- **`is_incident` filter:** only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
+- **`not_silenced` filter:** prevents processing of events that include the `silenced` attribute.
+- **`has_metrics` filter:** only process events containing Sensu Metrics.
+- **`hour()` function:** a custom SQE function that returns the hour of a UNIX epoch timestamp in UTC and 24-hour time notation (e.g. `hour(event.timestamp) >= 17`)
+- **`weekday()` function:** a custom SQE function that returns a number that represents the day of the week of a UNIX epoch timestamp (Sunday is `0`; e.g. `weekday(event.timestamp) == 0`)
 
 ## Filter plugins
 
+TODO (coming soon).
+
 ## EXERCISE: using built-in event filters
 
-Sensu Go ships with built-in event filters for common operations, including:
-
-- `is_incident`: only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
-- `not_silenced`: prevents processing of events that include the `silenced` attribute.
-- `has_metrics`: only process events containing Sensu Metrics.
-
-Let's see how to use a built-in filter with a handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme).
+Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme).
 
 1. Modify a handler configuration template to use a built-in filter.
 
@@ -201,6 +215,12 @@ Let's see how to use a built-in filter with a handler we configured in [Lesson 4
 **NEXT:** if you have successfully applied your filter and observed it working as described above, then you're ready to move on to the next lesson!
 
 ## Learn more
+
+- [Event Filters overview (documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/)
+- [Event Filters (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/)
+- [Sensu Query Expressions (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/sensu-query-expressions/)
+- [Reduce alert fatigue with event filters (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/reduce-alert-fatigue/)
+- [Route alerts with event filters (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/route-alerts/)
 
 ## Next steps
 

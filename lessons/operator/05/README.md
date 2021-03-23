@@ -20,7 +20,8 @@ Sensu Events are structed data identified by a timestamp, entity name (e.g. serv
 A single Sensu Event payload may include one or more metric `points`, represented as a JSON object containing a `name`, `tags` (key/value pairs), `timestamp`, and `value` (always a float).
 
 <details>
-<summary><strong>Example event with check + metric data:<strong></summary>
+<summary><strong>Example event with check + metric data:</strong></summary>
+
 ```json
 {
   "type": "Event",
@@ -181,6 +182,7 @@ A single Sensu Event payload may include one or more metric `points`, represente
   }
 }
 ```
+
 <details>
 
 ## EXERCISE: create an event using curl and the Sensu Events API

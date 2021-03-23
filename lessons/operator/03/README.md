@@ -7,7 +7,7 @@
   - [Entity list & entity detail views](#entity-list--entity-detail-views)
   - [Silencing](#silencing)
   - [Configuration](#configuration)
-- [EXERCISE: log in to the Sensu web app](#log-in-to-the-sensu-web-app)
+- [EXERCISE: log in to the Sensu web app](#exercise-log-in-to-the-sensu-web-app)
 - [Command Line Interface (CLI)](#command-line-interface--cli)
   - [API client](#api-client)
   - [Configuration management](#configuration-management)
@@ -541,10 +541,10 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 ## Learn more
 
 - [Sensu CLI (reference documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/)
-- [Create and manage resources with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
-- [Backup and recover resources with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/back-up-recover/)
-- [Filter responses with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/filter-responses/)
-- [Set environment variables with `sensuctl`](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
+- [Create and manage resources with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
+- [Backup and recover resources with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/back-up-recover/)
+- [Filter responses with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/filter-responses/)
+- [Set environment variables with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
 
 ## Next steps
 

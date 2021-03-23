@@ -12,8 +12,176 @@
 
 ## Events are Observations
 
-==TODO: In Sensu, every observation is an event.
-Events can contain metrics.==
+Sensu Events are generic containers for all types of observability data.
+In Sensu, every observation is an "event", including metrics (telemetry data).
+
+Sensu Events are structed data identified by a timestamp, entity name (e.g. server, cloud compute instance, container, or service), a check/event name, and optional key-value metadata called "labels" and "annotations".
+
+A single Sensu Event payload may include one or more metric `points`, represented as a JSON object containing a `name`, `tags` (key/value pairs), `timestamp`, and `value` (always a float).
+
+<details>
+<summary>**Example event with check + metric data:**</summary>
+```json
+{
+  "type": "Event",
+  "api_version": "core/v2",
+  "metadata": {
+    "namespace": "default"
+  },
+  "spec": {
+    "check": {
+      "command": "wget http://127.0.0.1:9099/metrics",
+      "duration": 0.060790838,
+      "executed": 1552506033,
+      "handlers": [],
+      "history": [
+        {
+          "executed": 1552505833,
+          "status": 0
+        },
+        {
+          "executed": 1552505843,
+          "status": 0
+        }
+      ],
+      "interval": 10,
+      "is_silenced": false,
+      "issued": 1552506033,
+      "last_ok": 1552506033,
+      "low_flap_threshold": 0,
+      "metadata": {
+        "name": "curl_timings",
+        "namespace": "default"
+      },
+      "occurrences": 1,
+      "occurrences_watermark": 1,
+      "output": "api_http_requests_total{service='example', region='us-west-1'} 42\napi_request_duration_seconds{service='example', region='us-west-1'} 0.8273645",
+      "output_metric_format": "graphite_plaintext",
+      "output_metric_handlers": [
+        "influx-db"
+      ],
+      "output_metric_tags": [
+         {
+            "name": "region",
+            "value": "{{ .labels.region }}"
+         }
+      ],
+      "proxy_entity_name": "",
+      "publish": true,
+      "round_robin": false,
+      "runtime_assets": [],
+      "state": "passing",
+      "status": 0,
+      "stdin": false,
+      "subdue": null,
+      "subscriptions": [
+        "app:example"
+      ],
+      "timeout": 0,
+      "total_state_change": 0,
+      "ttl": 0
+    },
+    "entity": {
+      "deregister": false,
+      "deregistration": {},
+      "entity_class": "agent",
+      "last_seen": 1552495139,
+      "metadata": {
+        "name": "i-424242",
+        "namespace": "default",
+        "labels": {
+           "region": "us-west-1"
+        }
+      },
+      "redact": [
+        "password",
+        "passwd",
+        "pass",
+        "api_key",
+        "api_token",
+        "access_key",
+        "secret_key",
+        "private_key",
+        "secret"
+      ],
+      "subscriptions": [
+        "app:example",
+        "entity:i-424242"
+      ],
+      "system": {
+        "arch": "amd64",
+        "hostname": "i-424242",
+        "network": {
+          "interfaces": [
+            {
+              "addresses": [
+                "127.0.0.1/8",
+                "::1/128"
+              ],
+              "name": "lo"
+            },
+            {
+              "addresses": [
+                "10.0.2.15/24",
+                "fe80::5a94:f67a:1bfc:a579/64"
+              ],
+              "mac": "08:00:27:8b:c9:3f",
+              "name": "eth0"
+            }
+          ]
+        },
+        "os": "linux",
+        "platform": "centos",
+        "platform_family": "rhel",
+        "platform_version": "7.5.1804",
+        "processes": null
+      },
+      "user": "agent"
+    },
+    "metrics": {
+      "handlers": [
+        "influxdb"
+      ],
+      "points": [
+        {
+          "name": "api_http_requests.total",
+          "tags": [
+            {
+              "name": "service",
+              "value": "example"
+            },
+            {
+              "name": "region",
+              "value": "us-west-1"
+            }
+          ],
+          "timestamp": 1552506033,
+          "value": 42.0
+        },
+        {
+           "name": "api_request_duration.seconds",
+           "tags": [
+             {
+               "name": "service",
+               "value": "example"
+             },
+             {
+               "name": "region",
+               "value": "us-west-1"
+             }
+           ],
+           "timestamp": 1552506033,
+           "value": 0.8273645
+        }
+      ]
+    },
+    "timestamp": 1552506033,
+    "id": "431a0085-96da-4521-863f-c38b480701e9",
+    "sequence": 1
+  }
+}
+```
+<details>
 
 ## EXERCISE: create an event using curl and the Sensu Events API
 

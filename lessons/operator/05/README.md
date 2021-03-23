@@ -183,7 +183,7 @@ A single Sensu Event payload may include one or more metric `points`, represente
 }
 ```
 
-<details>
+</details>
 
 ## EXERCISE: create an event using curl and the Sensu Events API
 

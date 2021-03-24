@@ -16,14 +16,24 @@
 
 1. **Clone this repository.**
 
+   ```shell
+   git clone https://github.com/sensu/sensu-go-workshop.git
+   cd sensu-go-workshop/
    ```
-   $ git clone git@github.com:sensu/sensu-go-workshop.git
-   $ cd sensu-go-workshop/
-   ```
+
+   _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
+
 2. **Docker Compose initialization.**
 
+   Deploy the workshop environment with the `docker-compose up` command!
+
    ```
-   $ sudo docker-compose up -d
+   sudo docker-compose up -d
+   ```
+
+   The output should look like this:
+
+   ```shell
    Creating network "workshop_default" with the default driver
    Creating volume "workshop_sensuctl_data" with local driver
    Creating volume "workshop_sensu_data" with local driver
@@ -39,28 +49,39 @@
 
    > **PROTIP:** To prefetch and/or prebuild the workshop container images (e.g. for offline use), please run the following commands:
    >
-   > ```
-   > $ sudo docker-compose pull && sudo docker-compose build
+   > ```shell
+   > sudo docker-compose pull && sudo docker-compose build
    > ```
 
    > _NOTE: the first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images, this process shouldn't take more than 2-3 minutes, depending on your system._
 
 3. **Verify your workshop installation.**
 
+   ```shell
+   sudo docker-compose ps
    ```
-   $ sudo docker-compose ps
-             Name                        Command                  State                             Ports
-   -----------------------------------------------------------------------------------------------------------------------------
-   workshop_configurator_1    generate_user_rbac               Exit 0
-   workshop_grafana_1         /run.sh                          Up (healthy)   0.0.0.0:3001->3000/tcp
-   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)   0.0.0.0:32830->3031/tcp, 0.0.0.0:32821->8125/udp
-   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)   0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp
-   workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
-   workshop_timescaledb_1     docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp
+
+   The output should indicate that all of the services are `Up (healthy)` or "completed" (`Exit 0`).
+
+   ```shell
+   Creating network "workshop_default" with the default driver
+   Creating volume "workshop_sensuctl_data" with local driver
+   Creating volume "workshop_sensu_data" with local driver
+   Creating volume "workshop_timescaledb_data" with local driver
+   Creating volume "workshop_grafana_data" with local driver
+   Creating volume "workshop_artifactory_data" with local driver
+   Creating workshop_vault_1         ... done
+   Creating workshop_grafana_1       ... done
+   Creating workshop_sensuctl_1      ... done
+   Creating workshop_sensu-backend_1 ... done
+   Creating workshop_artifactory_1   ... done
+   Creating workshop_timescaledb_1   ... done
+   Creating workshop_sensu-agent_1   ... done
+   Creating workshop_configurator_1  ... done
    ```
 
    > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if any containers have the status `Up` or `Up (health: starting)`, please wait a few seconds and retry the `sudo docker-compose ps` command.
-   > Otherise, if any containers have reached the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the sensu-backend container was slow to start) and re-running the `sudo docker-compose up -d` command will resolve the issue._
+   > If any containers have completed with the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the sensu-backend container was slow to start) and re-running the `sudo docker-compose up -d` command will resolve the issue._
 
 **NEXT:** if all of the containers show a `Up (healthy)` or `Exit 0` state, then you're ready to start the workshop!
 
@@ -68,16 +89,18 @@
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
-   Self-guided trainees may skip this step, as you should have already downloaded the workshop materials as part of the instructions in [SETUP.md][0-1].
-
    ```shell
-   git clone git@github.com:sensu/sensu-go-workshop.git
+   git clone https://github.com/sensu/sensu-go-workshop.git
    cd sensu-go-workshop/
    ```
+
+   _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
 
 1. **Modify the contents of the `.envrc` file.**
 
    Modify the contents of `.envrc` using the details provided by your instructor.
+   At minimum you will need to edit the `SENSU_BACKEND_HOST` property, and the `SENSU_NAMESPACE` property.
+   Unless otherwise instructed, your `SENSU_NAMESPACE` should be the same as the workshop username provded by your instructor.
 
    ```shell
    export SENSU_VERSION=6.2.5
@@ -107,12 +130,15 @@
 
 ### Instructor-led workshop setup (for instructors)
 
-1. **Clone this repository.**
+1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
+   ```shell
+   git clone https://github.com/sensu/sensu-go-workshop.git
+   cd sensu-go-workshop/
    ```
-   $ git clone git@github.com:sensu/sensu-go-workshop.git
-   $ cd sensu-go-workshop/
-   ```
+
+   _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
+
 1. **Customize the Docker Compose environment file (`.env`), as needed.**
 
    All of the workshop configuration variables have been consolidated into a single configuration file for your convenience.
@@ -268,6 +294,10 @@
 
 Please note the following configuration parameters:
 
+- `WORKSHOP_VERSION=0.2.0`
+
+  Informational use only (not used in the workshop).
+
 - `COMPOSE_PROJECT_NAME`
 
   The Docker resource prefix for all resources managed by Docker Compose.
@@ -275,6 +305,7 @@ Please note the following configuration parameters:
 - `COMPOSE_FILE`
 
   The Docker Compose template to use; defaults to `docker-compose-default.yaml`.
+  Change this value to deploy an alternate workshop environment (e.g. using a different reference architecture).
 
 - `SENSU_BACKEND_VERSION`
 
@@ -291,14 +322,125 @@ Please note the following configuration parameters:
   The Sensu Go cluster admin password.
   _NOTE: if you're a long-time Sensu Go user you may recall that the default cluster admin password was `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has been removed and must now be provided via the [`sensu-backend init` command][4]._
 
-- `SENSU_TIMESCALEDB_DSN`
+- `SENSU_INTERNAL_ENVIRONMENT`
+
+  Used to tag Sensu usage metrics as belonging to a workshop environment.
+  Leaving this set to `SENSU_INTERNAL_ENVIRONMENT=workshop` helps us (Team Sensu) improve the product and workshop/training materials by letting us evaluate workshop usage metrics separate from the otherwise anonymous usage metrics collected by Tessen.
+  Please see the [Tessen reference documentation](https://docs.sensu.io/sensu-go/latest/operations/monitor-sensu/tessen/) for more information.
+
+- `SENSU_WORKSHOP_ENV_SECRET` (secret)
+
+  An example environment variable.
+  Used for a workshop lesson on secrets management, especially useful in intructor-led workshops.
+  Trainees will be encouraged to discover the value of this secret by completing an exercise (i.e. a "treasure hunt" style exercise).
+
+- `SENSU_TIMESCALEDB_DSN` (secret)
 
   The TimescaleDB Postgres database Data Source Name (DSN).
+  This variable is used for configuring a Sensu Secret with the `env` provider.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_INFLUXDB_ADDR` (secret)
+
+  The Docker internal DNS for the InfluxDB server (only used when `COMPOSE_FILE=docker-compose-influxdb.yaml`).
+  This variable is used for configuring a Sensu Secret with the `env` provider.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_INFLUXDB_DB` (secret)
+
+  The InfluxDB database name (only used when `COMPOSE_FILE=docker-compose-influxdb.yaml`).
+  This variable is used for configuring a Sensu Secret with the `env` provider.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_INFLUXDB_USER` (secret)
+
+  The InfluxDB admin username (only used when `COMPOSE_FILE=docker-compose-influxdb.yaml`).
+  This variable is used for configuring a Sensu Secret with the `env` provider.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_INFLUXDB_PASSWORD` (secret)
+
+  The InfluxDB admin password (only used when `COMPOSE_FILE=docker-compose-influxdb.yaml`).
+  This variable is used for configuring a Sensu Secret with the `env` provider.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_AGENT_VERSION`
+
+  The Sensu Agent (`sensu-agent`) version to use.
+  This should be kept in sync with `SENSU_BACKEND_VERSION`.
+
+- `SENSU_BACKEND_URL`
+
+  The Docker internal DNS for the Sensu Backend websocket API (default: `ws://sensu-backend:8081`).
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_SUBSCRIPTIONS`
+
+  The default subscriptions used by Sensu Agents running in the Docker Compose environment (default: `linux,workshop,devel`).
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_NAMESPACE`
+
+  The Sensu namespace used by Sensu Agents running in the Docker Compose environment (default: `default`).
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+  This variable can be overriden when spawning additional agents; e.g.:
+
+  ```
+  sudo docker-compose run --rm -e "SENSU_NAMESPACE=us-west-1" sensu-agent
+  ```
+
+- `SENSU_API_HOST`
+
+  The default Sensu Agent API hostname.
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_API_PORT`
+
+  The default Sensu Agent API port.
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_STATSD_METRICS_HOST`
+
+  The default Sensu Agent StatsD API hostname.
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
+
+- `SENSU_STATSD_METRICS_PORT`
+
+  The default Sensu Agent StatsD API port.
+  This variable is used for configuring Sensu Agents in the workshop environment.
+  Modifying this value may break certain exercises, so proceed with caution when making changes.
 
 - `SENSU_CLI_VERSION`
 
   The Sensu CLI (`sensuctl`) version to use.
-  This should be kept in sync with `SENSU_BACKEND_VERSION` and `SENSU_AGENT_VERSION`.
+  This should be kept in sync with `SENSU_BACKEND_VERSION`.
+
+- `SENSU_BACKEND_URL`
+
+  The Docker internal DNS for the Sensu Backend HTTP API.
+  This variable is used for configuring `sensuctl` in the workshop environment, and for automating some of the workshop provisioning.
+  Modifying this value may break workshop setup and certain exercises, so proceed with caution when making changes.
+
+- `SENSU_USERNAME`
+
+  The Sensu cluster admin username.
+  The value should usually match `SENSU_CLUSTER_ADMIN_USERNAME`.
+  This variable is used for configuring `sensuctl` in the workshop environment, and for automating some of the workshop provisioning.
+  Modifying this value may break workshop setup and certain exercises, so proceed with caution when making changes.
+
+- `SENSU_PASSWORD`
+
+  The Sensu cluster admin password.
+  The value should usually match `SENSU_CLUSTER_ADMIN_PASSWORD`.
+  This variable is used for configuring `sensuctl` in the workshop environment, and for automating some of the workshop provisioning.
+  Modifying this value may break workshop setup and certain exercises, so proceed with caution when making changes.
 
 - `SENSU_CONFIG_DIR`
 
@@ -306,35 +448,34 @@ Please note the following configuration parameters:
   This environment variable is not yet supported by `sensuctl`, but may be in a future release.
   In the interim, setting this variable is useful in the context of custom `sensuctl` wrapper scripts (see `/scripts/sensuctl`) or for passing on the command line (e.g. `sensuctl --config-dir $SENSU_CONFIG_DIR`).
 
-- `SENSU_AGENT_VERSION`
+- `GRAFANA_VERSION`
 
-  The Sensu Agent version to use. This should be kept in sync with `SENSU_BACKEND_VERSION` and `SENSU_CLI_VERSION`.
+  The Grafana Docker image version to use in the workshop (default: `7.0.0`).
 
-- `SENSU_BACKEND_URL`
+- `GF_AUTH_BASIC_ENABLED`
 
-  The Sensu Backend DNS used by Sensu Agents running in the Docker Compose environment (default: `ws://sensu-backend:8081`).
-  This should not need to be changed unless you're modifying the Docker Compose template.
+  Enables Grafana basic auth.
+  See the [Grafana User Authentication documentation](https://grafana.com/docs/grafana/latest/auth/overview/#basic-authentication) for more information.
 
-- `SENSU_NAMESPACE`
+- `GF_SECURITY_ADMIN_USER`
 
-  The Sensu namespace used by Sensu Agents running in the Docker Compose environment (default: `default`).
-  This variable can be overriden when spawning additional agents; e.g.:
+  The default admin username.
+  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
 
-  ```
-  sudo docker-compose run --rm -e "SENSU_NAMESPACE=us-west-1" sensu-agent
-  ```
+- `GF_SECURITY_ADMIN_PASSWORD`
 
-- `SENSU_SUBSCRIPTIONS`
-
-  The default subscriptions used by Sensu Agents running in the Docker Compose environment (default: `linux,workshop,devel`).
+  The default admin password.
+  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
 
 - `PROM_PROMETHEUS_VERSION`
 
   The Prometheus Docker image version to use in the workshop environment (default: `v2.20.0`).
+  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
 
 - `PROM_PUSHGATEWAY_VERSION`
 
   The Prometheus Pushgateway Docker image version to use in the workshop environment (default: `v1.2.0`).
+  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
 
 - `TIMESCALEDB_VERSION`
 
@@ -350,9 +491,77 @@ Please note the following configuration parameters:
   If omitted, the default database will be `postgres`.
   If a database name is provided for a database that does not exist, it will be created.
 
-- `GRAFANA_VERSION`
+- `INFLUXDB_VERSION`
 
-  The Grafana Docker image version to use in the workshop (default: `7.0.0`).
+  ==TODO==
+
+- `INFLUXDB_VERSION`
+
+  ==TODO==
+
+- `INFLUXDB_DB`
+
+  ==TODO==
+
+- `INFLUXDB_ADMIN_USER`
+
+  ==TODO==
+
+- `INFLUXDB_ADMIN_PASSWORD`
+
+  ==TODO==
+
+- `VAULT_VERSION`
+
+  ==TODO==
+
+- `VAULT_DEV_ROOT_TOKEN_ID`
+
+  ==TODO==
+
+- `VAULT_TOKEN`
+
+  ==TODO==
+
+- `VAULT_DEV_LISTEN_ADDRESS`
+
+  ==TODO==
+
+- `VAULT_ADDR`
+
+  ==TODO==
+
+- `VAULT_SECRET_PATH_PREFIX`
+
+  ==TODO==
+
+- `ARTIFACTORY_VERSION`
+
+  ==TODO==
+
+- `JFROG_HOME`
+
+  ==TODO==
+
+- `ETCD_VERSION`
+
+  ==TODO==
+
+- `ETCD_HOST`
+
+  ==TODO==
+
+- `SENSU_ETCD_CLIENT_URLS`
+
+  ==TODO==
+
+- `POSTGRES_VERSION`
+
+  ==TODO==
+
+- `NGINX_VERSION`
+
+  ==TODO==
 
 ## Maintenance & Troubleshooting
 

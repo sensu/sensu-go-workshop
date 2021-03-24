@@ -310,7 +310,7 @@ $ sensuctl configure -n \
    Backend URL:
 
    - **Self guided users:** self-guided trainees who are running the workshop on their local workstation should use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
-   - **Instructor-led workshop users:** please use the Backend URL provided by your instructor.
+   - **Instructor-led workshop users:** please use the Backend URL, namespace, and username + password provided by your instructor.
 
    The `sensuctl configure` runs in interactive mode by default and will prompt you for the following settings:
 

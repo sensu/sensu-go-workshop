@@ -476,6 +476,12 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
+   Now reload the `.envrc` file into your environment:
+
+   ```shell
+   source .envrc
+   ```
+
    > **PROTIP:** if you like to automate things like this using shell scripts, you might already be thinking about how to parse the output of the `sensuctl api-key grant` command.
    > The following example should do the trick:
    >

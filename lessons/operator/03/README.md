@@ -304,7 +304,7 @@ $ sensuctl configure -n \
    username, password, namespace, and preferred output format.
 
    ```shell
-   sensuctl configure --interactive
+   sensuctl configure
    ```
 
    Backend URL:
@@ -312,7 +312,7 @@ $ sensuctl configure -n \
    - **Self guided users:** self-guided trainees who are running the workshop on their local workstation should use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
    - **Instructor-led workshop users:** please use the Backend URL provided by your instructor.
 
-   The `sensuctl configure --interactive` mode will prompt you for the following settings:
+   The `sensuctl configure` runs in interactive mode by default and will prompt you for the following settings:
 
    ```shell
    ? Authentication method: username/password

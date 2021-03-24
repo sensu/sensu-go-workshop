@@ -39,11 +39,14 @@
    Creating volume "workshop_sensu_data" with local driver
    Creating volume "workshop_timescaledb_data" with local driver
    Creating volume "workshop_grafana_data" with local driver
+   Creating volume "workshop_artifactory_data" with local driver
+   Creating workshop_vault_1         ... done
    Creating workshop_grafana_1       ... done
-   Creating workshop_sensu-agent_1   ... done
-   Creating workshop_timescaledb_1   ... done
    Creating workshop_sensuctl_1      ... done
    Creating workshop_sensu-backend_1 ... done
+   Creating workshop_artifactory_1   ... done
+   Creating workshop_timescaledb_1   ... done
+   Creating workshop_sensu-agent_1   ... done
    Creating workshop_configurator_1  ... done
    ```
 
@@ -169,33 +172,46 @@
 
 1. **Docker Compose initialization.**
 
+   ```shell
+   sudo docker-compose up -d
    ```
-   $ sudo docker-compose up -d
+
+   The output should look like this:
+
+   ```shell
    Creating network "workshop_default" with the default driver
    Creating volume "workshop_sensuctl_data" with local driver
    Creating volume "workshop_sensu_data" with local driver
    Creating volume "workshop_timescaledb_data" with local driver
    Creating volume "workshop_grafana_data" with local driver
+   Creating volume "workshop_artifactory_data" with local driver
+   Creating workshop_vault_1         ... done
    Creating workshop_grafana_1       ... done
-   Creating workshop_sensu-agent_1   ... done
-   Creating workshop_timescaledb_1   ... done
    Creating workshop_sensuctl_1      ... done
    Creating workshop_sensu-backend_1 ... done
+   Creating workshop_artifactory_1   ... done
+   Creating workshop_timescaledb_1   ... done
+   Creating workshop_sensu-agent_1   ... done
    Creating workshop_configurator_1  ... done
    ```
 
    > **PROTIP:** To prefetch and/or prebuild the workshop container images (e.g. for offline use), please run the following commands:
    >
-   > ```
-   > $ sudo docker-compose pull && sudo docker-compose build
+   > ```shell
+   > sudo docker-compose pull && sudo docker-compose build
    > ```
 
    > _NOTE: the first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images, this process shouldn't take more than 2-3 minutes, depending on your system._
 
 1. **Verify your workshop installation.**
 
+   ```shell
+   sudo docker-compose ps
    ```
-   $ sudo docker-compose ps
+
+   The output should look like this:
+
+   ```shell
              Name                        Command                  State                             Ports
    -----------------------------------------------------------------------------------------------------------------------------
    workshop_configurator_1    generate_user_rbac               Exit 0
@@ -242,7 +258,7 @@
 
    Use the workshop configurator Docker container to execute the user namespace seeding script, as follows:
 
-   ```
+   ```shell
    sudo docker-compose run --rm configurator seed_workshop_resources
    ```
 
@@ -578,41 +594,69 @@ To learn more about SSO for Sensu Go, please visit the [authentication provider 
 
 1. **Add more Sensu Agent containers.**
 
+   ```shell
+   sudo docker-compose up -d --scale sensu-agent=3
    ```
-   $ sudo docker-compose up -d --scale sensu-agent=3
+
+   The output should look like this:
+
+   ```shell
    workshop_sensu-backend_1 is up-to-date
-   Starting workshop_sensu-agent_1 ... done
-   Creating workshop_sensu-agent_2 ... done
-   Creating workshop_sensu-agent_3 ... done
-   workshop_timescaledb-server_1 is up-to-date
-   workshop_grafana-server_1 is up-to-date
+   workshop_vault_1 is up-to-date
+   Starting workshop_sensuctl_1 ...
+   workshop_timescaledb_1 is up-to-date
+   workshop_grafana_1 is up-to-date
+   Starting workshop_sensuctl_1     ... done
+   Starting workshop_sensu-agent_1  ... done
+   Starting workshop_configurator_1 ... done
+   Creating workshop_sensu-agent_2  ... done
+   Creating workshop_sensu-agent_3  ... done
    ```
 
 ### Reset the workshop environment
 
 1. **Stop all containers, remove all networks and volumes.**
 
+   ```shell
+   sudo docker-compose down -v
    ```
-   $ sudo docker-compose down -v
-   Stopping workshop_grafana-server_1 ... done
-   Stopping workshop_sensu-agent_1    ... done
-   Stopping workshop_sensu-backend_1  ... done
-   Removing workshop_grafana-server_1     ... done
-   Removing workshop_timescaledb-server_1 ... done
-   Removing workshop_sensu-agent_1        ... done
-   Removing workshop_sensu-backend_1      ... done
+
+   The output should look like this:
+
+   ```shell
+   Stopping workshop_sensu-agent_1   ... done
+   Stopping workshop_sensu-backend_1 ... done
+   Stopping workshop_timescaledb_1   ... done
+   Stopping workshop_artifactory_1   ... done
+   Stopping workshop_grafana_1       ... done
+   Stopping workshop_vault_1         ... done
+   Removing workshop_configurator_1  ... done
+   Removing workshop_sensu-agent_1   ... done
+   Removing workshop_sensu-backend_1 ... done
+   Removing workshop_timescaledb_1   ... done
+   Removing workshop_artifactory_1   ... done
+   Removing workshop_grafana_1       ... done
+   Removing workshop_vault_1         ... done
+   Removing workshop_sensuctl_1      ... done
    Removing network workshop_default
+   Removing volume workshop_sensuctl_data
    Removing volume workshop_sensu_data
    Removing volume workshop_timescaledb_data
    Removing volume workshop_grafana_data
+   Removing volume workshop_artifactory_data
    ```
 
 ### Inspect the contents of a Docker Volume
 
 1. **Inspect the Docker `volume` resource.**
 
+   ```shell
+   sudo docker volume inspect workshop_timescaledb_data
    ```
-   $ sudo docker volume inspect workshop_timescaledb_data
+
+   The output should look like this:
+
+   ```json
    [
      {
        "CreatedAt": "2020-07-22T10:24:59-07:00",
@@ -634,15 +678,15 @@ To learn more about SSO for Sensu Go, please visit the [authentication provider 
 
    If you have `jq` installed, the following commands may be useful:
 
-   ```
+   ```shell
    sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint
    "/var/lib/docker/volumes/workshop_timescaledb_data/_data"
    ```
 
    For example, to list the contents of a volume:
 
-   ```
-   $ sudo ls $(sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint)
+   ```shell
+   sudo ls $(sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint)
    ```
 
 

@@ -3,8 +3,8 @@
 - [Overview](#overview)
 - [Setup](#setup)
 - [Lessons](#lessons)
-  - [Operator Training](#operator-training)
-  - [Developer Training](#developer-training)
+  - [Operator Workshop](#operator-workshop)
+  - [Developer Workshop](#developer-workshop)
 - [Next Steps](#next-steps)
   - [Join the Sensu Community](#join-the-sensu-community)
   - [Contribute Sensu Community Projects on GitHub](#contribute-to-sensu-community-projects-on-github)
@@ -39,11 +39,12 @@ Once you have deployed a workshop environment, you may proceed with the followin
 - [Lesson 08: Introduction to Checks](/lessons/operator/08/README.md#readme)
 - [Lesson 09: Introduction to Check Hooks](/lessons/operator/09/README.md#readme)
 - [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme)
-- [Lesson 11: Introduction to Mutators](/lessons/operator/11/README.md#readme)
-- [Lesson 12: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/12/README.md#readme)
-- [Lesson 13: Introduction to Namespaces & RBAC](/lessons/operator/13/README.md#readme)
-- [Lesson 14: Introduction to Secrets Management](/lessons/operator/14/README.md#readme)
-- [Lesson 15: Advanced Topics](/lessons/operator/15/README.md#readme)
+- [Lesson 11: Introduction to Silencing & Scheduled Maintenance](/lessons/operator/11/README.md#readme)
+- [Lesson 12: Introduction to Mutators](/lessons/operator/12/README.md#readme)
+- [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)
+- [Lesson 14: Introduction to Namespaces & RBAC](/lessons/operator/14/README.md#readme)
+- [Lesson 15: Introduction to Secrets Management](/lessons/operator/15/README.md#readme)
+- [Lesson 16: Advanced Topics](/lessons/operator/16/README.md#readme)
 
 ### Developer Workshop
 

@@ -168,7 +168,7 @@ developer training (coming soon).==
 
 ## Next steps
 
-[Lesson 11: Introduction to Mutators](../11/README.md#readme)
+[Lesson 11: Introduction to Silencing & Scheduled Maintenance](../11/README.md#readme)
 
 
 

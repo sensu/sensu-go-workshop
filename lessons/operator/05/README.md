@@ -208,10 +208,10 @@ Events must reference an `entity` and contain one or both of the `metrics` and s
 
 Some common use cases for Sensu Events:
 
-- Reporting service health information (e.g. the result of a service check execution, including Nagios-style check scripts)
-- Collecting metrics using a service check or scraping a metrics API endpoint (e.g. Prometheus exporters)
-- Endpoint discovery (e.g. reporting the discovery of an endpoint, or additional data/metadata about a known entity)
-- Dead mans switches (e.g. emitting events<sup>*</sup> containing a TTL from a shell script, such as a backup script cron job)
+- **Reporting service health information** (e.g. the result of a service check execution, including Nagios-style check scripts)
+- **Collecting metrics** using a service check or scraping a metrics API endpoint (e.g. Prometheus exporters)
+- **Endpoint discovery** and liveness monitoring (e.g. reporting the discovery of an endpoint, or additional data/metadata about a known entity)
+- **Dead mans switches** (e.g. emitting events<sup>*</sup> containing a TTL from a shell script, such as a backup script cron job)
 
 _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction to Agents & Entities](/lessons/operator/07/README.md#readme), and check TTLs are covered in more detail in [Lesson 8: Introduction to Checks](/lessons/operator/08/README.md#readme)._
 
@@ -324,7 +324,7 @@ If so you're ready to move on to the next step!
 
 - [Sensu Events (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
 - [Sensu Events API (reference documentation)](https://docs.sensu.io/sensu-go/latest/api/events/)
-- [Sensu Agent Event API (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
+- [Sensu Agent Events API (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
 
 ## Next steps
 

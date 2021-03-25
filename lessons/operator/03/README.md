@@ -489,9 +489,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    > export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
    > ```
 
-
-   Verify that you have successfully set an environment variable with your API
-   key:
+   Verify that you have successfully set an environment variable with your API key:
 
    ```shell
    echo $SENSU_API_KEY

@@ -68,6 +68,8 @@ Mention the existence of non-agent entities, to be covered in lesson 12.==
 
 ==TODO: example use case, a check which produces multiple events...==
 
+### Dead mans switches
+
 ### StatsD API
 
 ### Platform detection

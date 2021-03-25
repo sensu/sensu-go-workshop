@@ -162,7 +162,7 @@ Let's modify our check from the previous exercise using some Tokens.
 
 1. Update the `ntp` check configuration template.
 
-   Modify `ntp.yaml` with the following contents:
+   Modify `ntp.yaml` with the following contents (adding `output_metric_format`, `output_metric_handlers`, and `output_metric_tags` fields):
 
    ```yaml
    ---
@@ -196,8 +196,8 @@ Let's modify our check from the previous exercise using some Tokens.
 
    _NOTE: this example uses a [YAML multiline "block scalar"](https://yaml-multiline.info) (`>-`) for improved readability of a longer check `command`._
 
-   Did you notice?
-   We're now making the NTP warning and critical thresholds configurable via entity labels!
+   These fields instruct Sensu what metric format to expect as output from the check, which handler(s) should be used to process the metrics, and what tags should be added to the metrics.
+   The metric formats Sensu can extract from check output as of this writing are: `nagios_perfdata`, `graphite_plaintext`, `influxdb_line`, `opentsdb_line`, and `prometheus_text` (StatsD metrics are also supported, but only via the Sensu Agent StatsD API).
 
 1. Update the Check using `sensuctl create -f`.
 

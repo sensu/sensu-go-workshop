@@ -29,22 +29,22 @@ Once you have deployed a workshop environment, you may proceed with the followin
 
 ### Operator Workshop
 
-- [Lesson 01: Introduction to the Observability Pipeline](/lessons/operator/01/README.md#readme)
-- [Lesson 02: Introduction to the Observability Data Model](/lessons/operator/02/README.md#readme)
+- [Lesson 01: Introduction to the Observability Pipeline](/lessons/operator/01/README.md#readme) (coming soon)
+- [Lesson 02: Introduction to the Observability Data Model](/lessons/operator/02/README.md#readme) (coming soon)
 - [Lesson 03: Introduction to Sensu Go](/lessons/operator/03/README.md#readme)
 - [Lesson 04: Introduction to Handlers & Handler Sets](/lessons/operator/04/README.md#readme)
 - [Lesson 05: Introduction to Events](/lessons/operator/05/README.md#readme)
 - [Lesson 06: Introduction to Filters](/lessons/operator/06/README.md#readme)
-- [Lesson 07: Introduction to Agents & Entities](/lessons/operator/07/README.md#readme)
-- [Lesson 08: Introduction to Checks](/lessons/operator/08/README.md#readme)
-- [Lesson 09: Introduction to Check Hooks](/lessons/operator/09/README.md#readme)
-- [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme)
-- [Lesson 11: Introduction to Silencing & Scheduled Maintenance](/lessons/operator/11/README.md#readme)
-- [Lesson 12: Introduction to Mutators](/lessons/operator/12/README.md#readme)
-- [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)
-- [Lesson 14: Introduction to Namespaces & RBAC](/lessons/operator/14/README.md#readme)
-- [Lesson 15: Introduction to Secrets Management](/lessons/operator/15/README.md#readme)
-- [Lesson 16: Advanced Topics](/lessons/operator/16/README.md#readme)
+- [Lesson 07: Introduction to Agents & Entities](/lessons/operator/07/README.md#readme) (in progress)
+- [Lesson 08: Introduction to Checks](/lessons/operator/08/README.md#readme) (in progress)
+- [Lesson 09: Introduction to Check Hooks](/lessons/operator/09/README.md#readme) (in progress)
+- [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme) (in progress)
+- [Lesson 11: Introduction to Silencing & Scheduled Maintenance](/lessons/operator/11/README.md#readme) (coming soon)
+- [Lesson 12: Introduction to Mutators](/lessons/operator/12/README.md#readme) (coming soon)
+- [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme) (coming soon)
+- [Lesson 14: Introduction to Namespaces & RBAC](/lessons/operator/14/README.md#readme) (coming soon)
+- [Lesson 15: Introduction to Secrets Management](/lessons/operator/15/README.md#readme) (coming soon)
+- [Lesson 16: Advanced Topics](/lessons/operator/16/README.md#readme) (coming soon)
 
 ### Developer Workshop
 

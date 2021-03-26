@@ -1,4 +1,12 @@
 [
-  {"username": "user@company.com","password": "workshop"},
-  {"username": "trainee","password": "workshop"}
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"},
+  {"username": "trainee@company.com","password": "workshop"}
 ]

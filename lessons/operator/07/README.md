@@ -147,7 +147,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --deregister true
    ```
 
-   _NOTE: for help configuring `${SENSU_BACKEND_URL}` please consult [SETUP.md](/docs/SETUP.md)._
+   _NOTE: for help configuring `${SENSU_BACKEND_URL}` please consult [SETUP.md](/SETUP.md)._
 
    Verify that your agent is running and connected to the Sensu Backend by consulting `sensuctl` (e.g. `sensuctl entity list`) or the Sensu web app.
 

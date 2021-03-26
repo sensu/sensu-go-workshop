@@ -20,7 +20,7 @@
         "os": "Workshop",
         "platform": "Sensu Go",
         "platform_family": "Training",
-        "platform_version": "1.0",
+        "platform_version": "6.2.5",
         "arch": "arm",
         "hostname": "learn.sensu.io",
         "network": {
@@ -65,5 +65,5 @@
       "output": "Hello, workshop world."
     },
     "metrics": {}
-  }  
+  }
 }

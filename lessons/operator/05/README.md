@@ -341,7 +341,7 @@ If you need help creating an API Key for Sensu Go, please refer to the [Lesson 3
 ### `curl`
 
 This `curl` commands included in this lesson should generate output that starts with `HTTP/1.1 200 OK`, `HTTP/1.1 201 Created`, or `HTTP/1.1 202 Accepted`.
-If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/docs/SETUP.md), and/or ask your instructor for help.
+If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/SETUP.md), and/or ask your instructor for help.
 
 ### Slack
 

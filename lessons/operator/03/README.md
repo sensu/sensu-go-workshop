@@ -33,7 +33,7 @@ The Sensu web app homepage is a dashboard that provides a high level overview of
 The dashboard includes a summary of active incidents, a breakdown of incidents by severity, information about entities under management, and a high level overview of the namespaces (tenants).
 This dashboard complies with Sensu RBAC, so individual users will see summary information relevant to their access.
 
-![The Sensu dashboard](/docs/img/lessons/operator/03-01-dashboard.png)
+![The Sensu dashboard](03-01-dashboard.png)
 
 _**Figure 1:** the Sensu dashboard._
 
@@ -42,11 +42,11 @@ _**Figure 1:** the Sensu dashboard._
 Beyond the overview dashboard, most Sensu data is accessed on a per-namespace basis.
 To select or switch namespaces, press the "Select Namespace" option from the sidebar, or press the `Control + k` keyboard shortcut from anywhere in the Sensu web app.
 
-![The namespace switcher modal](/docs/img/lessons/operator/03-02-namespace-switcher.png)
+![The namespace switcher modal](03-02-namespace-switcher.png)
 
 _**Figure 2:** the namespace switcher._
 
-![The "Select Namespace" option in the navigation sidebar](/docs/img/lessons/operator/03-03-select-namespace.png)
+![The "Select Namespace" option in the navigation sidebar](03-03-select-namespace.png)
 
 _**Figure 3:** the "Select Namespace" option in the navigation sidebar._
 
@@ -57,14 +57,14 @@ A filter is applied to this view by default to show only events with a "non-pass
 The event list view provides a number of options for filtering and sorting the list by event status, related entities, and more.
 Select one or more events in the event list view to take bulk actions like resolving or silencing the event(s).
 
-![The event list view](/docs/img/lessons/operator/03-04-event-list-view.png)
+![The event list view](03-04-event-list-view.png)
 
 _**Figure 4:** the event list view.
 Note the default filter applied here (`event.check.state != 0`)._
 
 Selecting an event from the event list view will take you to the event detail view, which provides information about the event including the status, timeline, output, number of occurrences, event metadata (labels and annotations), related check configuration (if the event was produced by a service check), and the associated entity details.
 
-![The event detail view](/docs/img/lessons/operator/03-05-event-detail-view.png)
+![The event detail view](03-05-event-detail-view.png)
 
 _**Figure 5:** the event detail view._
 
@@ -73,13 +73,13 @@ _**Figure 5:** the event detail view._
 The second most popular view in the Sensu web app is the entity list view, which provides realtime inventory information of endpoints under management by Sensu (for a given namespace).
 Select one or more events in the event list view to take bulk actions like resolving or silencing the event(s).
 
-![The entity list view](/docs/img/lessons/operator/03-06-entity-list-view.png)
+![The entity list view](03-06-entity-list-view.png)
 
 _**Figure 6:** the entity list view._
 
 Selecting an entity from the entity list view will take you to the entity detail view, which provides information about all associated events, system properties (e.g. operating system details and network interfaces), and entity metadata (labels and annotations).
 
-![The entity detail view](/docs/img/lessons/operator/03-07-entity-detail-view.png)
+![The entity detail view](03-07-entity-detail-view.png)
 
 _**Figure 7:** the entity detail view.
 Note that the "Events" tab is selected by default._
@@ -89,13 +89,13 @@ Note that the "Events" tab is selected by default._
 Users can use the Sensu web app to silence individual events (for a single entity), all events produced by a specific check (across multiple entities), or all events for a specific entity.
 Silencing may be applied from various different locations in the Sensu web app, with prompts to configure the silencing rules (which check and/or entity should be silenced), schedule (e.g. to begin immediately, or create a "scheduled maintenance" window), and reason.
 
-![The new silencing entry modal](/docs/img/lessons/operator/03-08-new-silencing-entry.png)
+![The new silencing entry modal](03-08-new-silencing-entry.png)
 
 _**Figure 8:** the "new silencing entry" prompt._
 
 The Silences list view provides access to all active silence entries.
 
-![The silenced list view](/docs/img/lessons/operator/03-09-silenced-list-view.png)
+![The silenced list view](03-09-silenced-list-view.png)
 
 _**Figure 9:** the silenced list view._
 
@@ -105,21 +105,21 @@ The Sensu web app also provides access to the core monitoring configuration, inc
 The configuration views may be accessed from the navigation sidebar.
 Each of the configuration resources provides list + detail views, as well as the ability to create and/or edit configuration resources (e.g. modify check or handler configuration), assuming the user has the appropriate RBAC permissions.
 
-![The configuration navigation](/docs/img/lessons/operator/03-10-configuration-navigation.png)
+![The configuration navigation](03-10-configuration-navigation.png)
 
 _**Figure 10:** monitoring configuration views are accessible via the navigation sidebar._
 
-![The check list view](/docs/img/lessons/operator/03-11-check-list-view.png)
+![The check list view](03-11-check-list-view.png)
 
 _**Figure 11:** the check list view.
 A similar view is available for Filters, Mutators, and Handlers._
 
-![The check detail view](/docs/img/lessons/operator/03-12-check-detail-view.png)
+![The check detail view](03-12-check-detail-view.png)
 
 _**Figure 12:** the check detail view.
 A similar view is available for Filters, Mutators, and Handlers._
 
-![The check edit view](/docs/img/lessons/operator/03-13-check-edit-view.png)
+![The check edit view](03-13-check-edit-view.png)
 
 _**Figure 13:** the check edit view.
 A similar editor is available for Filters, Mutators, and Handlers._
@@ -133,7 +133,7 @@ A similar editor is available for Filters, Mutators, and Handlers._
 
    ![](/docs/img/login.png)
 
-   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/docs/SETUP.md) before proceeding._
+   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/SETUP.md) before proceeding._
 
 **NEXT:** if you were able to login you're ready to move on to the next step.
 

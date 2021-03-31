@@ -26,24 +26,31 @@ As such, a true monitoring as code solution goes beyond simply automating instal
 Monitoring as code should provide code-based management for every component of the monitoring and observability stack:
 
 - **Instrumentation**
+
   Automated installation of plugins and exporters.
 
 - **Scheduling**
+
   Centralized management of real-time data collection.
 
 - **Automated Diagnosis**
+
   Orchestration of codified diagnosis; e.g. what additional context may be needed in the event that an anomaly is detected (i.e. automation of the assessment an operator would perform to triage an incident).
 
 - **Evaluation & Detection**
+
   Correlation and deduplication of observability data.
 
 - **Notification**
+
   Alerts & incident management.
 
 - **Processing & Analysis**
+
   Metric and event storage and analysis.
 
 - **Automated Remediation**
+
   Orchestration of codified remediation actions – not just forwarding raw events to a correlation engine.
 
 The key difference between traditional monitoring workflows and monitoring as code can be distilled down to a single concept: what we do with monitoring and observability data is even more important than how we collect it.

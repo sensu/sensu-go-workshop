@@ -1,8 +1,8 @@
 # Lesson 1: Introduction to Monitoring as Code
 
 - [What is Monitoring as Code?](#what-is-monitoring-as-code)
-- [What is Observability?](#what-is-observability)
 - [What is an Observability Pipeline?](#what-is-an-observability-pipeline)
+- [Why Sensu?](#why-sensu)
 - [Use cases](#use-cases)
 - [Architecture](#architecture)
 - [Learn more](#learn-more)
@@ -56,16 +56,6 @@ Monitoring as code should provide code-based management for every component of t
 The key difference between traditional monitoring workflows and monitoring as code can be distilled down to a single concept: what we do with monitoring and observability data is even more important than how we collect it.
 
 To learn more, please check out our [monitoring as code whitepaper](https://sensu.io/resources/whitepaper/monitoring-as-code-with-sensu).
-
-## What is Observability?
-
-Observability is set of practices that include traditional monitoring (i.e. observability is a superset of monitoring).
-The term originated in the discipline of control systems engineering, where it is defined as a measurement of how well a system's internal states could be inferred from its external outputs.
-A system is observable if its current state can be determined in a finite time period using only the outputs of the system.
-Observability is achieved by collecting and analyzing events, logs, metrics, and trace data from the systems we operate.
-
-> _NOTE: Defining the terms "monitoring" and "observability" are non-goals for this workshop.
-> However, a lot has been written on this topic and some of our favorite opinions on the matter are linked in the ["Learn more"](#learn-more) section, below._
 
 ## What is an Observability Pipeline?
 

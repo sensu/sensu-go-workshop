@@ -212,7 +212,7 @@ For more information on configuration overrides via check and entity annotations
        --username SensuGo
        --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
      runtime_assets:
-     - sensu/sensu-slack-handler:1.3.2
+     - sensu/sensu-slack-handler:1.4.0
      timeout: 10
      filters: []
      secrets:

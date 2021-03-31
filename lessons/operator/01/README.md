@@ -1,4 +1,4 @@
-# Lesson 1: Introduction to Observability Pipelines
+# Lesson 1: Introduction to Monitoring as Code
 
 - [What is Monitoring as Code?](#what-is-monitoring-as-code)
 - [What is Observability?](#what-is-observability)

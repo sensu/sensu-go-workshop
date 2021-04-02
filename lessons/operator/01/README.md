@@ -131,6 +131,7 @@ Sensu's observability pipeline
 - [What is Observability? (sumologic.com)](https://www.sumologic.com/glossary/observability/)
 - [Monitoring and Observability (by Cindy Sridharan)](https://copyconstruct.medium.com/monitoring-and-observability-8417d1952e1c)
 - [Sensu Observability Pipeline (user documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/)
+- [The Observability Pipeline (bravenewgeek.com)](https://bravenewgeek.com/the-observability-pipeline/)
 
 ## Next steps
 

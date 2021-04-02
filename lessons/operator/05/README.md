@@ -247,7 +247,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
    ```
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -258,7 +258,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
       Entity         Check                     Output                   Status   Silenced             Timestamp                             UUID
     ──────────────── ──────────── ─────────────────────────────────────── ──────── ────────── ─────────────────────────────── ──────────────────────────────────────
      learn.sensu.io   helloworld   Hello, workshop world.                       1   false      2021-03-09 22:44:28 -0800 PST   8f0dfc70-8730-4b62-8f16-e4d8673f311f
-     server-01        my-app       ERROR: failed to connect to database.        2   false      2021-03-10 15:58:25 -0800 PST   0784e60b-96b1-4226-a151-13a645abdf67
+     i-424242        my-app       ERROR: failed to connect to database.        2   false      2021-03-10 15:58:25 -0800 PST   0784e60b-96b1-4226-a151-13a645abdf67
    ```
 
    But what about the handler we configured in [Lesson 4](/lessons/04/README.md#readme)?
@@ -302,7 +302,7 @@ Let's create an event that will be processed using the handler we configured in 
    ```
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -313,7 +313,7 @@ Let's create an event that will be processed using the handler we configured in 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"server-01"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 

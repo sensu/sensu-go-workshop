@@ -21,38 +21,211 @@
 
 ## Overview
 
-==TODO: Sensu Agents are observability agents/daemons... Entities are API resources that represent an agent, or other resource (e.g. server, compute instance, container/pod, network device, API endpoint, application/service, or function).==
+The Sensu Agent is a lightweight observability client that runs on your infrastructure.
+Sensu Agents are represented in the Sensu API as [Sensu Entities](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/).
+The primary function of the Sensu Agent is to generate events (observability data) for processing in the Sensu observability pipeline.
+
+Sensu Entities are API resources that represent anything from a server, compute instance, container/pod, connected device (IoT gateways and devices), network device, application, or even a function.
+Valid Sensu Entities must have an `entity_class`, the most common of which are "agent" and "proxy" – a generic entity class designation for any resource that is not actively under management by a Sensu Agent.
 
 ## Agent Configuration
 
+The Sensu Agent is distributed as a single statically compiled binary (`sensu-agent`), typically installed via installer packages or Docker containers.
+All Sensu configuration is loaded at `sensu-agent` start time, so the agent must be restarted to update the configuration.
+The Sensu Agent can be configured via command flags (e.g. `sensu-agent start --backend-url`), a config file (see below for example), or environment variables (e.g. `SENSU_BACKEND_URL`).
+
+<details>
+<summary><strong>Example <pre>sensu-agent start --help</pre> configuration flags:</strong></summary>
+
+```shell
+start the sensu agent
+
+Usage:
+  sensu-agent start [flags]
+
+Flags:
+      --agent-managed-entity                  manage this entity via the agent
+      --allow-list string                     path to agent execution allow list configuration file
+      --annotations stringToString            entity annotations map (default [])
+      --api-host string                       address to bind the Sensu client HTTP API to (default "127.0.0.1")
+      --api-port int                          port the Sensu client HTTP API listens on (default 3031)
+      --assets-burst-limit int                asset fetch burst limit (default 100)
+      --assets-rate-limit float               maximum number of assets fetched per second
+      --backend-handshake-timeout int         number of seconds the agent should wait when negotiating a new WebSocket connection (default 15)
+      --backend-heartbeat-interval int        interval at which the agent should send heartbeats to the backend (default 30)
+      --backend-heartbeat-timeout int         number of seconds the agent should wait for a response to a hearbeat (default 45)
+      --backend-url strings                   ws/wss URL of Sensu backend server (to specify multiple backends use this flag multiple times) (default [ws://127.0.0.1:8081])
+      --cache-dir string                      path to store cached data (default "/var/cache/sensu/sensu-agent")
+      --cert-file string                      TLS certificate in PEM format
+  -c, --config-file string                    path to sensu-agent config file
+      --deregister                            ephemeral agent
+      --deregistration-handler string         deregistration handler that should process the entity deregistration event.
+      --detect-cloud-provider                 enable cloud provider detection mechanisms
+      --disable-assets                        disable check assets on this agent
+      --disable-api                           disable the Agent HTTP API
+      --disable-sockets                       disable the Agent TCP and UDP event sockets
+      --discover-processes                    indicates whether process discovery should be enabled
+      --events-burst-limit                    /events api burst limit
+      --events-rate-limit                     maximum number of events transmitted to the backend through the /events api
+  -h, --help                                  help for start
+      --insecure-skip-tls-verify              skip ssl verification
+      --keepalive-critical-timeout uint32     number of seconds until agent is considered dead by backend to create a critical event (default 0)
+      --keepalive-handlers string             comma-delimited list of keepalive handlers for this entity. This flag can also be invoked multiple times
+      --keepalive-interval uint32             number of seconds to send between keepalive events (default 20)
+      --keepalive-warning-timeout uint32      number of seconds until agent is considered dead by backend to create a warning event (default 120)
+      --key-file string                       TLS certificate key in PEM format
+      --labels stringToString                 entity labels map (default [])
+      --log-level string                      logging level [panic, fatal, error, warn, info, debug] (default "info")
+      --name string                           agent name (defaults to hostname) (default "my-hostname")
+      --namespace string                      agent namespace (default "default")
+      --password string                       agent password (default "P@ssw0rd!")
+      --redact string                         comma-delimited customized list of fields to redact
+      --require-fips                          indicates whether fips support should be required in openssl
+      --require-openssl                       indicates whether openssl should be required instead of go's built-in crypto
+      --socket-host string                    address to bind the Sensu client socket to (default "127.0.0.1")
+      --socket-port int                       port the Sensu client socket listens on (default 3030)
+      --statsd-disable                        disables the statsd listener and metrics server
+      --statsd-event-handlers strings         comma-delimited list of event handlers for statsd metrics
+      --statsd-flush-interval int             number of seconds between statsd flush (default 10)
+      --statsd-metrics-host string            address used for the statsd metrics server (default "127.0.0.1")
+      --statsd-metrics-port int               port used for the statsd metrics server (default 8125)
+      --subscriptions string                  comma-delimited list of agent subscriptions
+      --trusted-ca-file string                tls certificate authority
+      --user string                           agent user (default "agent")
+```
+
+</details>
+
+<details>
+<summary><strong>Example <pre>agent.yaml</pre> file:</strong></summary>
+
+```yaml
+---
+# Sensu agent configuration
+
+##
+# agent overview
+##
+#name: "hostname"
+#namespace: "default"
+#subscriptions:
+#  - example
+#labels:
+#  example_key: "example value"
+#annotations:
+#  example/key: "example value"
+
+##
+# agent configuration
+##
+#backend-url:
+#  - "ws://127.0.0.1:8081"
+#cache-dir: "/var/cache/sensu/sensu-agent"
+#config-file: "/etc/sensu/agent.yml"
+#log-level: "warn" # available log levels: panic, fatal, error, warn, info, debug
+
+##
+# api configuration
+##
+#api-host: "127.0.0.1"
+#api-port: 3031
+#disable-api: false
+#events-burst-limit: 10
+#events-rate-limit: 10.0
+
+##
+# authentication configuration
+##
+#user: "agent"
+#password: "P@ssw0rd!"
+
+##
+# monitoring configuration
+##
+#deregister: false
+#deregistration-handler: "example_handler"
+#keepalive-timeout: 120
+#keepalive-interval: 20
+
+##
+# security configuration
+##
+#insecure-skip-tls-verify: false
+#redact:
+#  - password
+#  - passwd
+#  - pass
+#  - api_key
+#  - api_token
+#  - access_key
+#  - secret_key
+#  - private_key
+#  - secret
+#trusted-ca-file: "/path/to/trusted-certificate-authorities.pem"
+
+##
+# socket configuration
+##
+#disable-sockets: false
+#socket-host: "127.0.0.1"
+#socket-port: 3030
+
+##
+# statsd configuration
+##
+#statsd-disable: false
+#statsd-event-handlers:
+#  - example_handler
+#statsd-flush-interval: 10
+#statsd-metrics-host: "127.0.0.1"
+#statsd-metrics-port: 8125
+```
+
+</details>
+
+### Communication
+
+Sensu Agents connect to Sensu Backends over a persistent [WebSocket](https://en.m.wikipedia.org/wiki/WebSocket) (`ws`) or encrypted WebSocket Secure (`wss`) connection.
+For optimal network throughput, agents will attempt to negotiate the use of [Protobuf serialization](https://en.m.wikipedia.org/wiki/Protocol_Buffers) when communicating with a Sensu backend that supports it. This communication is via clear text by default.
+
+### Authentication
+
+Agent authentication is required connect to Sensu Backends.
+The Sensu Agent supports [basic authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#username-and-password-authentication) (username/password) or [mutual transport layer security (mTLS) certificate authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#mtls-authentication).
+
 ## Keepalives
+
+Sensu uses a heartbeat mechanism called "keepalives" to monitor Sensu Agent connectivity.
+Under the covers, a `keepalive` is effectively just another Sensu Event that the Sensu Agent publishes once every `--keepalive-interval` configured seconds.
+The `keepalive` event contains the current Sensu Agent configuration and entity properties.
+If a Sensu Agent fails to report a `keepalive` event within the `--keepalive-warning-timeout` or `--keepalive-critical-timeout` configured thresholds, a warning or critical event is produced on behalf of the Agent.
+
+Keepalive monitoring can be disabled using the `--deregister true` flag, which prompts the Sensu backend to remove Sensu Agent entities that have stopped generating `keepalive` events.
 
 ## Subscriptions
 
+Sensu uses the [publish/subscribe model of communication](https://en.wikipedia.org/wiki/Publish–subscribe_pattern).
+The publish/subscribe model is powerful in ephemeral or elastic infrastructures, where endpoint identifiers are unpredictable and break traditional host-based monitoring configuration.
+Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus.
+
+Sensu backends "publish" requests for observability data and agents who are subscribed to the corresponding topics receive the published request, perform the corresponding monitoring job, and send observability data to the event pipeline.
+
 ## Agent Entities
 
-In Sensu, every event must be associated with an [Entity][1-3].
-An Entity represents **anything** that needs to be monitored, such as a physical or virtual "server", cloud compute instance, container (or "pod" of containers), application, function, IoT device, or network switch (or pretty much anything else you can imagine).
-
-If you look at your Sensu entity list you'll note that you already have at least one entity (including one named "server-01").
+If you look at your Sensu entity list you'll note that you already have at least one entity (including one named "i-424242").
 Sensu automatically created this entity when we published our first event data to the pipeline.
 
-> _NOTE: to find the Sensu entity list, run the `sensuctl entity list` or `sensuctl entity info server-01` command(s), or select the "Entities" view in the sidebar of the Sensu web app.
+> _NOTE: to find the Sensu entity list, run the `sensuctl entity list` or `sensuctl entity info i-424242` command(s), or select the "Entities" view in the sidebar of the Sensu web app.
 > Self-guided trainees should find this view at: http://127.0.0.1:3000/c/~/n/default/entities._
 
-> **PROTIP:** the default output format of the `sensuctl` CLI is a "tabular" style output, intended for display in your terminal.
-> For machine-parsable output, try using the `--output` flag.
-> The available output formats are `tabular` (default), `yaml`, `json`, and `wrapped-json`.
-> Give it a try with the entity list or entity info commands; for example:
->
-> ```shell
-> $ sensuctl entity list --format json
-> ```
+==TODO==
+
+## Entity specification
 
 ==TODO: overview of entity metadata and system facts.
 Mention the existence of non-agent entities, to be covered in lesson 12.==
 
-## Entity Management
+## Entity management
 
 ==TODO: agent-managed entities (traditional), and backend-managed entities (cloud-native).==
 
@@ -69,6 +242,8 @@ Mention the existence of non-agent entities, to be covered in lesson 12.==
 ==TODO: example use case, a check which produces multiple events...==
 
 ### Dead mans switches
+
+==TODO: generate a dead mans switch using the Agent API...==
 
 ### StatsD API
 

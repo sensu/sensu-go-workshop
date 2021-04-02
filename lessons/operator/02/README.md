@@ -28,6 +28,9 @@ Observability is achieved by collecting and analyzing events, logs, metrics, and
 
 ## Learn more
 
-## Next steps 
+
+- [Monitoring versus Observability (The New Stack)](https://thenewstack.io/monitoring-vs-observability-whats-the-difference/)
+
+## Next steps
 
 [Lesson 3: Introduction to Sensu Go](../03/README.md#readme)

@@ -113,20 +113,21 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    Let's configure a filter template to so that it only processes the first occurrence of an incident, and then again only once every hour.
 
+   Copy the following contents to a file named `filter-repeated.yaml`:
+
    ```yaml
    ---
    type: EventFilter
    api_version: core/v2
    metadata:
      name: filter-repeated
-     namespace: default
    spec:
      action: allow
      expressions:
      - event.check.occurrences == 1 || event.check.occurrences % (3600 / event.check.interval) == 0
    ```
 
-   _NOTE: for more information on this filter expression (specifically including the modulus operator calculation), please visit the [sensu/catalog project on GitHub](https://github.com/sensu/catalog/blob/main/shared/filters/filter-repeated-hourly.yaml)._
+   _NOTE: for more information on this filter expression – specifically including the modulo operator (`%`) or "remainder" calculation – please visit the [sensu/catalog project on GitHub](https://github.com/sensu/catalog/blob/main/shared/filters/filter-repeated-hourly.yaml)._
 
 1. Create the "fitler-repeated" filter using `sensuctl`.
 

@@ -11,7 +11,7 @@ FROM vault:${VAULT_VERSION} AS vault
 RUN vault version
 
 # Build the workshop workstation image
-FROM alpine:latest 
+FROM alpine:latest AS workshop
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/
 COPY --from=vault /bin/vault /usr/local/bin/vault

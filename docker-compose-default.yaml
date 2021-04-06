@@ -55,6 +55,7 @@ services:
     - SENSU_BACKEND_URL
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS
+    - SENSU_AGENT_PASSWORD
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
@@ -69,6 +70,7 @@ services:
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
       --statsd-event-handlers timescaledb
+      --password ${SENSU_AGENT_PASSWORD:-"P@ssw0rd!"}
 
   # TimescaleDB
   #
@@ -187,7 +189,7 @@ services:
   # See: ./scripts/
   configurator:
     build:
-      context: docker/workshop/
+      context: ./
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
@@ -245,7 +247,7 @@ services:
   sensuctl:
     # container_name: sensuctl
     build:
-      context: docker/workshop/
+      context: ./
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION

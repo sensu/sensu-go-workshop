@@ -106,7 +106,7 @@
    Unless otherwise instructed, your `SENSU_NAMESPACE` should be the same as the workshop username provded by your instructor.
 
    ```shell
-   export SENSU_VERSION=6.2.5
+   export SENSU_VERSION=6.2.7
    export SENSU_PLATFORM=linux
    export SENSU_ARCH=amd64
    export SENSU_BACKEND_HOST=127.0.0.1

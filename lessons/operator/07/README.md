@@ -509,9 +509,8 @@ Let's stop our agent and modify its configuration:
    SENSU_SUBSCRIPTIONS="workshop" \
    sudo -E -u _sensu sensu-agent start \
    --config-file /etc/sensu/agent.yaml \
-   --name workshop \
-   --namespace ${SENSU_NAMESPACE} \
    --cache-dir /opt/sensu/sensu-agent/cache \
+   --name workshop \
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
    ```

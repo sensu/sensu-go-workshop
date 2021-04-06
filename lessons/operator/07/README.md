@@ -505,8 +505,6 @@ Let's stop our agent and modify its configuration:
    **Mac users:**
 
    ```shell
-   SENSU_NAMESPACE=default \
-   SENSU_SUBSCRIPTIONS="workshop" \
    sudo -E -u _sensu sensu-agent start \
    --config-file /etc/sensu/agent.yaml \
    --cache-dir /opt/sensu/sensu-agent/cache \

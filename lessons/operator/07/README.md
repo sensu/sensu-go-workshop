@@ -502,17 +502,18 @@ Let's stop our agent and modify its configuration:
 
    Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent:
 
+   **Mac users:**
+
    ```shell
    SENSU_NAMESPACE=default \
-   SENSU_SUBSCRIPTIONS="linux workshop" \
-   sudo -E -u sensu sensu-agent start \
-   --config-file /etc/sensu/agent.yaml
-   ```
-
-   To start the agent using systemd, run the following command:
-
-   ```shell
-   sudo systemctl start sensu-agent
+   SENSU_SUBSCRIPTIONS="workshop" \
+   sudo -E -u _sensu sensu-agent start \
+   --config-file /etc/sensu/agent.yaml \
+   --name workshop \
+   --namespace ${SENSU_NAMESPACE} \
+   --cache-dir /opt/sensu/sensu-agent/cache \
+   --user ${SENSU_USER} \
+   --password ${SENSU_PASSWORD}
    ```
 
    _PROTIP: when managing the Sensu Agent process using systemd, additional environment variables may be set in `/etc/default/sensu-agent`._

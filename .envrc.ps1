@@ -1,7 +1,5 @@
 ${Env:SENSU_VERSION}="6.2.7"
 ${Env:SENSU_BUILD}="4449"
-${Env:SENSU_PLATFORM}="linux"
-${Env:SENSU_ARCH}="amd64"
 ${Env:SENSU_BACKEND_HOST}="127.0.0.1"
 ${Env:SENSU_NAMESPACE}="default"
 ${Env:SENSU_USER}="sensu"

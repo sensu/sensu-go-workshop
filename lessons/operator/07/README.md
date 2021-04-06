@@ -431,7 +431,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    **Windows users (Powershell):**
 
    ```powershell
-   sensu-agent.exe start `
+   sensu-agent start `
    --name workshop `
    --backend-url ${Env:SENSU_BACKEND_URL} `
    --namespace ${Env:SENSU_NAMESPACE} `

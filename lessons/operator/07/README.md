@@ -365,7 +365,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    export SENSU_BACKEND_URL=${SENSU_BACKEND_URL:-"ws://127.0.0.1:8081"}
    export SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
    export SENSU_USER=${SENSU_USER:-"sensu"}
-   export SENSU_PASSWORD=${SENSU_AGENT_PASSWORD:-"sensu"}
+   export SENSU_PASSWORD=${SENSU_PASSWORD:-"sensu"}
    ```
 
    **Windows users (Powershell):**

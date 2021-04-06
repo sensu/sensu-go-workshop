@@ -3,6 +3,8 @@
 - [Certain `sensuctl` commands produce authorization errors](#certain-sensuctl-commands-produce-authorization-errors)
 - [Using the `sensuctl` container as a sandboxed workstation](#using-the-sensuctl-container-as-a-sandboxed-workstation)
 - [Copy files into running containers](#copy-files-into-running-containers)
+- [Delete trainee namespaces](#delete-trainee-namespaces)
+- [Unable to execute Powershell scripts on a Windows workstation](#unable-to-execute-powershell-scripts-on-a-windows-workstation)
 
 ## Certain `sensuctl` commands produce authorization errors
 
@@ -60,12 +62,58 @@ This container has a volume mount of the contents of your local `sensu-go-worksh
 In some cases it may be useful for troubleshooting and/or one-off customization of the workshop environment to copy files into a running container.
 In a Docker environment this can be accomplished via the `docker cp` command, which is very similar to how you might use `scp` in a traditional virtualization environment.
 
-```
-$ sudo docker cp example.json workshop_sensu-backend_1:/tmp/example.json
+```shell
+sudo docker cp example.json workshop_sensu-backend_1:/tmp/example.json
 ```
 
 The `docker cp` utility can also be used to _extract_ files from a running container.
 
+```shell
+sudo docker cp workshop_sensu-backend_1:/tmp/example.json example.json
 ```
-$ sudo docker cp workshop_sensu-backend_1:/tmp/example.json example.json
+
+## Delete Trainee namespaces
+
+In some cases it may be useful to delete and recreate a trainee namespace (e.g. if a trainee user account was created on accident).
+
+```shell
+TRAINEE_NAMESPACE=trainee
+sensuctl dump entities,events,assets,checks,filters,handlers,secrets/v1.Secret --namespace ${TRAINEE_NAMESPACE} | sensuctl delete
 ```
+
+## Unable to execute Powershell scripts on a Windows workstation
+
+In some cases users may encounter errors like `"File <filename.ps1> cannot be loaded because running scripts is disabled on this system."`. 
+This error is either the result of the default [Powershell Execution Policy](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies), or a restriction placed on employee workstations by an employer. 
+PowerShell's execution policy is a safety feature that controls the conditions under which PowerShell loads configuration files and runs scripts.
+In some cases this can be easily resolved via the following steps: 
+
+1. Check the Powershell Execution Policy: 
+
+   ```powershell
+   Get-ExecutionPolicy -List
+   ```
+
+   If the output looks like this (the default for Windows workstations), it may be possible to fix:
+
+   ```powershell
+           Scope ExecutionPolicy
+           ----- ---------------
+   MachinePolicy       Undefined
+      UserPolicy       Undefined
+         Process       Undefined
+     CurrentUser       Undefined
+    LocalMachine       Undefined
+   ```
+
+1. Update the Powershell Execution Policy: 
+
+   To modify the execution policy, open Powershell with the "Run as Administrator" option and run the following commands:
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine
+   ```
+
+If a user is unable to modify the execution policy for their workstation, they should still be able to execute the commands contained in the Powershell script file directly via their terminal.
+
+Reference: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies

@@ -33,11 +33,17 @@ Valid Sensu Entities must have an `entity_class`, the most common of which are "
 The Sensu Agent is distributed as a single statically compiled binary (`sensu-agent`), typically installed via installer packages or Docker containers.
 All Sensu configuration is loaded at `sensu-agent` start time, so the agent must be restarted to update the configuration.
 The Sensu Agent can be configured via command flags (e.g. `sensu-agent start --backend-url`), a config file (see below for example), or environment variables (e.g. `SENSU_BACKEND_URL`).
+If configuration values are set in multiple places, the `sensu-agent` will apply configuration in the following order:
+
+1. Configuration flags (highest)
+2. Environment variables
+3. Configuration files
+4. Default values, if any (lowest)
 
 <details>
 <summary><strong>Example <pre>sensu-agent start --help</pre> configuration flags:</strong></summary>
 
-```shell
+```
 start the sensu agent
 
 Usage:
@@ -96,8 +102,10 @@ Flags:
 
 </details>
 
+All of the `sensu-agent` command flags (except `--config-file`) can be set via the Sensu Agent configuration file using the same flag name (sans the `--`).
+
 <details>
-<summary><strong>Example <pre>agent.yaml</pre> file:</strong></summary>
+<summary><strong>Example <pre>agent.yml</pre> file:</strong></summary>
 
 ```yaml
 ---
@@ -182,6 +190,24 @@ Flags:
 ```
 
 </details>
+
+To rename a configuration flag you wish to specify as an environment variable, prepend `SENSU_`, convert dashes to underscores, and capitalize all letters.
+For example, the environment variable for the flag `--api-host` is `SENSU_API_HOST`.
+
+<details>
+<summary><strong>Example configuration environment variables:</strong></summary>
+
+```
+export SENSU_BACKEND_URL="ws://sensu-backend-1:8081 ws://sensu-backend-2:8081 ws://sensu-backend-3:8081"
+export SENSU_NAMESPACE="default"
+export SENSU_SUBSCRIPTIONS="linux nginx postgres"
+export SENSU_USER="agent"
+export SENSU_PASSWORD="topsecret"
+export SENSU_TRUSTED_CA_FILE="/path/to/ca.pem"
+```
+
+</details>
+
 
 ### Communication
 
@@ -296,33 +322,131 @@ The Sensu Agent is available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, Ma
 This exercise will focus on a simplified install for Linux systems, but it will not go into as much detail as the official documentation.
 The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides detailed instructions for installing & operating Sensu Agents on a variety of systems.
 
-1. Download & install the latest Sensu Agent Linux or MacOS binary archive.
+1. Decide where to deploy your Sensu Agent.
 
-   **For RHEL/CentOS systems:**
+   In general, Sensu Agents can be deployed almost anywhere you can imagine – from bare metal servers to cloud compute instances to containers and more.
+   In fact, Sensu's publish/subscribe architecture makes it easy to traverse complex network topologies including VPNs, NATs, and even "air-gapped" environments as often found in the enterprise.
+   As long as a Sensu agent can reach a Sensu backend websocket API – directly or via one or more proxies – everything should "just work".
+
+   When the Sensu backend is installed in a centralized location (e.g. in close proximity to other IT management infrastructure), this will generally provide the most flexibility.
+   Conversely, if you are running the workshop on your laptop (e.g. using `docker-compose`) then the best place to install an agent is likely also on your laptop.
+   As such, for the purposes of the remaining exercises in this workshop, we recommend installing Sensu Agents as follows:
+
+   - **Self guided users:** the Sensu Agent should be installed on your local workstation.
+   - **Instructor-led workshop users:** the Sensu Agent may be installed on your local workstation (recommended), or on another system that can reach the shared `${SENSU_BACKEND_URL}`.
+
+1. Verify environment variables.
+
+   If you're installing the Sensu Agent on a system other than the workstation where you've been following along with the rest of this workshop you'll need to set a few environment variables.
+
+   To verify if the required environment variables are already set, run the following command:
+
+   **Linux and Mac users:**
 
    ```shell
-   curl -LO https://sensu.io/yum-install.sh | sudo bash
-   sudo yum install -y sensu-go-agent
+   env | grep SENSU
    ```
 
-   **For Ubuntu/Debian systems:**
+   **Windows users (Powershell):**
+
+   ```powershell
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   Do you see the expected values for `SENSU_BACKEND_URL` and `SENSU_NAMESPACE`?
+   If so, you're ready to move on to the next step!
+
+   If not, run the following commands to set the environment variables:
+
+   **Mac and Linux users:**
+
+   ```
+   export SENSU_VERSION=${SENSU_VERSION:-"6.2.7"}
+   export SENSU_BACKEND_URL=${SENSU_BACKEND_URL:-"ws://127.0.0.1:8081"}
+   export SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
+   export SENSU_USER=${SENSU_USER:-"sensu"}
+   export SENSU_PASSWORD=${SENSU_AGENT_PASSWORD:-"sensu"}
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   ${Env:SENSU_VERSION}="6.2.7"
+   ${Env:SENSU_BUILD}="4449"
+   ${Env:SENSU_BACKEND_URL}="ws://127.0.0.1:8081"
+   ${Env:SENSU_NAMESPACE}="default"
+   ${Env:SENSU_USER}="sensu"
+   ${Env:SENSU_PASSWORD}="sensu"
+   ```
+
+   Instructor-led workshop users will need to replace the `SENSU_BACKEND_URL` IP address (or hostname), `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORZD` with the values provided by their instructor.
+
+1. Download & install the latest Sensu Agent for MacOS, Windows, or Linux.
+
+   **Mac users:**
 
    ```shell
-   curl -LO https://sensu.io/apt-install.sh | sudo bash
-   sudo apt-get install -y sensu-go-agent
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
+   tar -xzf sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz sensu-agent
+   rm sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
+   sudo mkdir -p /usr/local/bin/
+   sudo mv sensu-agent /usr/local/bin/sensu-agent
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-WebRequest `
+     -Uri "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${Env:SENSU_VERSION}/sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" `
+     -OutFile "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
+   msiexec.exe /i "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" /qr
+   rm "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
+   ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"
+   ```
+
+   **Linux users:**
+
+   ```shell
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz && \
+   tar -xzf sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz -C /usr/bin/ && \
+   rm sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz
    ```
 
 1. Start the Sensu Agent.
+
+   **Mac users:**
+
+   ```shell
+   sudo -E -u _sensu sensu-agent start \
+   --name workshop \
+   --backend-url ${SENSU_BACKEND_URL} \
+   --namespace ${SENSU_NAMESPACE} \
+   --subscriptions macos,workshop \
+   --deregister true \
+   --cache-dir /opt/sensu/sensu-agent/cache
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   sensu-agent.exe start `
+   --name workshop `
+   --backend-url ${Env:SENSU_BACKEND_URL} `
+   --namespace ${Env:SENSU_NAMESPACE} `
+   --subscriptions windows,workshop `
+   --deregister true
+   ```
+
+   **Linux users:**
 
    ```shell
    sudo -E -u sensu sensu-agent start \
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
+   --namespace ${SENSU_NAMESPACE} \
    --subscriptions linux,workshop \
    --deregister true
    ```
-
-   _NOTE: for help configuring `${SENSU_BACKEND_URL}` please consult [SETUP.md](/SETUP.md)._
 
    Verify that your agent is running and connected to the Sensu Backend by consulting `sensuctl` (e.g. `sensuctl entity list`) or the Sensu web app.
 
@@ -429,7 +553,9 @@ sudo chown -R sensu:sensu /var/cache/sensu
 
 This should resolve any outstanding permissions errors.
 
-### Unknown user `sensu` when starting Sensu Agent
+### Unknown user `sensu` or `_sensu` when starting Sensu Agent
+
+**Linux users:**
 
 If you installed the Sensu Agent from a Linux binary archive (e.g. `.tar.gz` or `.zip` file) instead of using installer packages, you may encounter "unknown user" errors when running the `sensu-agent`.
 The follow commands can be used on Linux systems to create the `sensu` group and user (these are the same commands used by the `.rpm` and `.deb` installer packages):
@@ -438,3 +564,44 @@ The follow commands can be used on Linux systems to create the `sensu` group and
 sudo groupadd -r sensu
 sudo useradd -r -g sensu -d /opt/sensu -s /bin/false -c "Sensu Go" sensu
 ```
+
+**MacOS users:**
+
+MacOS installer packages are not yet available for Sensu Go, but Mac users are encouraged to run the `sensu-agent` using a MacOS service account (e.g. `_sensu`).
+To create a `_sensu` service account for MacOS, please run the following commands:
+
+```shell
+sudo dscl . -create /Groups/_sensu gid 7678
+sudo dscl . -create /Groups/_sensu RealName "Sensu Go service group"
+sudo dscl . -create /Groups/_sensu passwd "*"
+sudo dscl . -create /Users/_sensu
+sudo dscl . -create /Users/_sensu uid 7678
+sudo dscl . -create /Users/_sensu gid 7678
+sudo dscl . -create /Users/_sensu NFSHomeDirectory /opt/sensu
+sudo dscl . -create /Users/_sensu UserShell /bin/bash
+sudo dscl . -create /Users/_sensu RealName "Sensu Go service account"
+sudo dscl . -create /Users/_sensu passwd "*"
+sudo mkdir -p /opt/sensu
+sudo chown -R _sensu:_sensu /opt/sensu
+```
+
+To delete the `_sensu` service account and remove the service account home directory, run the following commands:
+
+```shell
+sudo dscl . -delete /Groups/_sensu
+sudo dscl . -delete /Users/_sensu
+sudo rm -rf /opt/sensu
+```
+
+If you would prefer not to install a service account on your workstation, you may run the `sensu-agent` as root (e.g. remove the `-u _sensu` from `sudo sensu-agent start`), or set the `--cache-dir` to a writable location (e.g. `--cache-dir .sensu`).
+
+### Encountering "command not found" errors when running `sensu-agent` on MacOS
+
+Fresh MacOS installations may need to add `/usr/local/bin` to the system `$PATH`.
+To temporarily modify `$PATH` in your current shell, use the following command:
+
+```shell
+export PATH=/usr/local/bin:$PATH
+```
+
+For more information on managing system `$PATH`, please consult the `path_helper` utilty (via `man path_helper`).

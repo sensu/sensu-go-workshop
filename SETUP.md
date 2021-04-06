@@ -99,30 +99,60 @@
 
    _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
 
-1. **Modify the contents of the `.envrc` file.**
+1. **Modify the contents of the `.envrc` or `.envrc.ps1` file.**
 
    Modify the contents of `.envrc` using the details provided by your instructor.
-   At minimum you will need to edit the `SENSU_BACKEND_HOST` property, and the `SENSU_NAMESPACE` property.
+   At minimum you will need to edit the `SENSU_BACKEND_HOST`, `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORD` property.
    Unless otherwise instructed, your `SENSU_NAMESPACE` should be the same as the workshop username provded by your instructor.
+
+   **Mac and Linux users (`.envrc`):**
 
    ```shell
    export SENSU_VERSION=6.2.7
+   export SENSU_BUILD=4449
    export SENSU_PLATFORM=linux
    export SENSU_ARCH=amd64
    export SENSU_BACKEND_HOST=127.0.0.1
    export SENSU_NAMESPACE=default
+   export SENSU_USER=sensu
+   export SENSU_PASSWORD=sensu
    export SENSU_BACKEND_URL=ws://${SENSU_BACKEND_HOST}:8081
    export SENSU_API_URL=http://${SENSU_BACKEND_HOST}:8080
    # export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   ${Env:SENSU_VERSION}="6.2.7"
+   ${Env:SENSU_BUILD}="4449"
+   ${Env:SENSU_PLATFORM}="linux"
+   ${Env:SENSU_ARCH}="amd64"
+   ${Env:SENSU_BACKEND_HOST}="127.0.0.1"
+   ${Env:SENSU_NAMESPACE}="default"
+   ${Env:SENSU_USER}="sensu"
+   ${Env:SENSU_PASSWORD}="sensu"
+   ${Env:SENSU_BACKEND_URL}="ws://${Env:SENSU_BACKEND_HOST}:8081"
+   ${Env:SENSU_API_URL}="http://${Env:SENSU_BACKEND_HOST}:8080"
+   # ${Env:SENSU_API_KEY}="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
    ```
 
    _NOTE: don't worry about setting `SENSU_API_KEY` for now - we'll cover that in [Lesson 3](/lessons/operator/03/README.md#readme)._
 
 1. **Configure environment variables.**
 
+   **Mac and Linux users:**
+
    ```shell
    source .envrc
    env | grep SENSU
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
 
    > _NOTE: self-guided users should see the username `sensu`.

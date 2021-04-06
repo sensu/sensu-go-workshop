@@ -284,17 +284,33 @@ $ sensuctl configure -n \
 
 1. Download and install `sensuctl`.
 
-   Mac users:
+   **Mac users:**
 
    ```shell
-   SENSU_CLI_VERSION=${SENSU_CLI_VERSION:-"6.2.5"}
-   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_CLI_VERSION}/sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz"
-   sudo tar -xzf "sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
-   rm sensu-go_${SENSU_CLI_VERSION}_darwin_amd64.tar.gz
+   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz"
+   sudo tar -xzf "sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
+   rm sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
    ```
 
-   > _NOTE: Windows and Linux users can find [installation instructions](#) in the Sensu [user documentation](#).
-   > The complete list of Sensu downloads is available at https://sensu.io/downloads._
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-WebRequest `
+     -Uri "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${Env:SENSU_VERSION}/sensu-go_${Env:SENSU_VERSION}_windows_amd64.zip" `
+     -OutFile "${Env:UserProfile}\sensu-go_${Env:SENSU_VERSION}_windows_amd64.zip"
+   Expand-Archive `
+     -LiteralPath "${Env:UserProfile}\sensu-go_${Env:SENSU_VERSION}_windows_amd64.zip" `
+     -DestinationPath "${Env:UserProfile}\Sensu\bin"
+   ${Env:Path} += ";${Env:UserProfile}\Sensu\bin"
+   ```
+
+   **Linux users:**
+
+   ```shell
+   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" && \
+   tar -xzf "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" -C /usr/local/bin/ && \
+   rm "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz"
+   ```
 
 1. Configure `sensuctl`.
 

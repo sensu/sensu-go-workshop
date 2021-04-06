@@ -421,7 +421,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
-   --subscriptions macos,workshop \
+   --subscriptions system/macos,workshop \
    --deregister true \
    --cache-dir /opt/sensu/sensu-agent/cache \
    --user ${SENSU_USER} \
@@ -435,7 +435,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --name workshop `
    --backend-url ${Env:SENSU_BACKEND_URL} `
    --namespace ${Env:SENSU_NAMESPACE} `
-   --subscriptions windows,workshop `
+   --subscriptions system/windows,workshop `
    --deregister true `
    --user ${Env:SENSU_USER} `
    --password ${Env:SENSU_PASSWORD}
@@ -448,7 +448,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
-   --subscriptions linux,workshop \
+   --subscriptions system/linux,workshop \
    --deregister true \
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
@@ -469,8 +469,6 @@ Let's stop our agent and modify its configuration:
 
    If you started your agent in the previous exercise using the `sensu-agent start` command, you can stop the agent by pressing `Control-C` in your terminal.
 
-   If you started your agent in the previous exercise using systemd, you can stop the agent by running the `sudo systemctl stop sensu-agent` command.
-
 1. Configure Sensu Agent.
 
    The Sensu Agent supports configuration via **command flags** (e.g. `--backend-url`), a **configuration file** (e.g. `/etc/sensu/agent.yml`), or **environment variables** (e.g. `SENSU_SUBSCRIPTIONS`).
@@ -479,9 +477,15 @@ Let's stop our agent and modify its configuration:
    At minimum, the Sensu Agent requires a Sensu backend URL (a websocket API to connect to), and one or more subscriptions (observability topics the agent will subscribe to).
    We'll also add some agent metadata in the form of labels & annotations.
 
-   Let's start by adding the following contents to `/etc/sensu/agent.yaml`:
+   Let's start by creating an `agent.yaml` configuration file in one of the following recommended locations:
 
-   ```
+   - **Mac users:** `/opt/sensu/agent.yaml`
+   - **Windows users:** `${Env:UserProfile}\Sensu\agent.yaml`
+   - **Linux users:** `/etc/sensu/agent.yaml` 
+
+   Now let's copy the following contents into the `agent.yaml` file:
+
+   ```yaml
    ---
    backend_url: ws://127.0.0.1:8080
    name: workshop
@@ -493,26 +497,49 @@ Let's stop our agent and modify its configuration:
    deregister: true
    ```
 
-   > _PROTIP: every `sensu-agent` configuration flag (e.g. `--backend-url ws://127.0.0.1:8081`) has a corresponding field in the agent config file (e.g. `backend-url: [ws://127.0.0.1:8081]`) as well as a corresponding environment variable (e.g. `SENSU_BACKEND_URL="ws://127.0.0.1:8081"`).
-   Please visit the [Sensu Agent reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#configuration-via-environment-variables) to learn more about configuration via environment variables._
+   Make sure to save the contents of the file before moving on to the next step.
 
 1. Start/Restart the Sensu Agent.
 
-   For the purposes of our workshop there are two ways to run the Sensu Agent – using a process manager like systemd, or directly from the command line (with no process management).
-
-   Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent:
+   Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent. 
 
    **Mac users:**
 
    ```shell
+   SENSU_SUBSCRIPTIONS="system/macos workshop" \
    sudo -E -u _sensu sensu-agent start \
-   --config-file /etc/sensu/agent.yaml \
+   --config-file /opt/sensu/agent.yaml \
    --cache-dir /opt/sensu/sensu-agent/cache \
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
    ```
 
-   _PROTIP: when managing the Sensu Agent process using systemd, additional environment variables may be set in `/etc/default/sensu-agent`._
+   **Windows users (Powershell):**
+
+   ```powershell
+   ${Env:SENSU_SUBSCRIPTIONS}="system/windows workshop" `
+   sensu-agent start `
+   --config-file "${Env:UserProfile}\Sensu\agent.yaml" `
+   --user ${Env:SENSU_USER} `
+   --password ${Env:SENSU_PASSWORD}
+   ```
+
+   **Linux users:**
+
+   ```shell
+   SENSU_SUBSCRIPTIONS="system/linux workshop" \
+   sudo -E -u sensu sensu-agent start \
+   --config-file "/etc/sensu/agent.yaml" \
+   --user ${SENSU_USER} \
+   --password ${SENSU_PASSWORD}
+   ```
+
+   Notice that we have moved the `--name`, `--backend-url`, and `--deregister` configuration settings into the `agent.yaml` config file, and we are now explicitly setting the `SENSU_SUBSCRIPTIONS` environment variable in place of `--subscriptions`... but how/where is `--namespace` being set? 
+   The Sensu Agent is reading the value of `SENSU_NAMESPACE` from the environment variable, without the need for explicitly setting the variable with the `sensu-agent start` command. 
+
+   In the previous exercise we provided all of the configuration via `sensu-agent start` command flags. 
+   In this exercise we've moved some configuration to a config file, and other configuration to environment variables.
+   Understanding how to configure Sensu using all three methods – config flags, config file, and environment variables – is very useful in heterogeneus environments (e.g. mix of servers, compute instances, and containers) where a configuration method that is easier to manage in one context might not be as easy in another context. 
 
 ## Learn more
 

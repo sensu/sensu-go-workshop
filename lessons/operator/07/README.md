@@ -423,7 +423,9 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --namespace ${SENSU_NAMESPACE} \
    --subscriptions macos,workshop \
    --deregister true \
-   --cache-dir /opt/sensu/sensu-agent/cache
+   --cache-dir /opt/sensu/sensu-agent/cache \
+   --user ${SENSU_USER} \
+   --password ${SENSU_PASSWORD}
    ```
 
    **Windows users (Powershell):**
@@ -434,7 +436,9 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --backend-url ${Env:SENSU_BACKEND_URL} `
    --namespace ${Env:SENSU_NAMESPACE} `
    --subscriptions windows,workshop `
-   --deregister true
+   --deregister true `
+   --user ${Env:SENSU_USER} `
+   --password ${Env:SENSU_PASSWORD}
    ```
 
    **Linux users:**
@@ -445,7 +449,9 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
    --subscriptions linux,workshop \
-   --deregister true
+   --deregister true \
+   --user ${SENSU_USER} \
+   --password ${SENSU_PASSWORD}
    ```
 
    Verify that your agent is running and connected to the Sensu Backend by consulting `sensuctl` (e.g. `sensuctl entity list`) or the Sensu web app.

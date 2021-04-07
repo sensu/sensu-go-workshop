@@ -332,7 +332,7 @@ There are two types of entity management in Sensu Go 6.x:
 
 - **Agent-managed entities (traditional).**
 
-  All entity properties are managed via the sensu-agent (via command flags, config file, or environment variables).
+  All entity properties are managed via `sensu-agent` configuration (command flags, config file, or environment variables).
   Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
   To enable agent-management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
 

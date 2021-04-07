@@ -20,7 +20,7 @@
         "os": "Workshop",
         "platform": "Sensu Go",
         "platform_family": "Training",
-        "platform_version": "6.2.5",
+        "platform_version": "6.2.7",
         "arch": "arm",
         "hostname": "learn.sensu.io",
         "network": {

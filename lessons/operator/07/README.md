@@ -330,11 +330,15 @@ There are two types of entity management in Sensu Go 6.x:
   Certain entity properties can be modified in real-time via the API, CLI, or web app.
   Agent entities are API-managed by default in Sensu Go 6.x (API-management was not available for agent entities in Sensu Go 5.x).
 
+  [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-backend)
+
 - **Agent-managed entities (traditional).**
 
   All entity properties are managed via `sensu-agent` configuration (command flags, config file, or environment variables).
   Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
   To enable agent-management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
+
+  [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-agent)
 
 **NOTE:** all agent entities are _created_ using the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
 

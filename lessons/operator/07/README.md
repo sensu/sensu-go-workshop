@@ -191,7 +191,8 @@ All of the `sensu-agent` command flags (except `--config-file`) can be set via t
 
 </details>
 
-To rename a configuration flag you wish to specify as an environment variable, prepend `SENSU_`, convert dashes to underscores, and capitalize all letters.
+Every sensu-agent configuration flag (e.g. `--backend-url=ws://127.0.0.1:8081`) also has a corresponding environment variable (e.g. `SENSU_BACKEND_URL="ws://127.0.0.1:8081"`). 
+All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding flag in capitalized letters and underscores (`_`) instead of dashes (`-`).
 For example, the environment variable for the flag `--api-host` is `SENSU_API_HOST`.
 
 <details>

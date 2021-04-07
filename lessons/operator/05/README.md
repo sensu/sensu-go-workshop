@@ -258,7 +258,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
       Entity         Check                     Output                   Status   Silenced             Timestamp                             UUID
     ──────────────── ──────────── ─────────────────────────────────────── ──────── ────────── ─────────────────────────────── ──────────────────────────────────────
      learn.sensu.io   helloworld   Hello, workshop world.                       1   false      2021-03-09 22:44:28 -0800 PST   8f0dfc70-8730-4b62-8f16-e4d8673f311f
-     i-424242        my-app       ERROR: failed to connect to database.        2   false      2021-03-10 15:58:25 -0800 PST   0784e60b-96b1-4226-a151-13a645abdf67
+     i-424242         my-app       ERROR: failed to connect to database.        2   false      2021-03-10 15:58:25 -0800 PST   0784e60b-96b1-4226-a151-13a645abdf67
    ```
 
    But what about the handler we configured in [Lesson 4](/lessons/04/README.md#readme)?

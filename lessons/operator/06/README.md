@@ -4,9 +4,9 @@
 - [Use Cases](#use-cases)
 - [Filter execution environment & built-in helper functions](#filter-execution-environment--built-in-helper-functions)
 - [Filter plugins](#filter-plugins)
-- [EXERCISE: using built-in event filters](#exercise-using-built-in-event-filters)
-- [EXERCISE: create a custom event filter](#exercise-create-a-custom-event-filter)
-- [EXERCISE: using custom event filters](#exercise-using-custom-event-filters)
+- [EXERCISE 1: using built-in event filters](#exercise-1-using-built-in-event-filters)
+- [EXERCISE 2: create a custom event filter](#exercise-2-create-a-custom-event-filter)
+- [EXERCISE 3: using custom event filters](#exercise-3-using-custom-event-filters)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
@@ -47,11 +47,11 @@ Sensu includes built-in event helper functions and event filters to help you cus
 
 TODO (coming soon).
 
-## EXERCISE: using built-in event filters
+## EXERCISE 1: using built-in event filters
 
 Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme).
 
-1. Modify a handler configuration template to use a built-in filter.
+1. **Modify a handler configuration template to use a built-in filter.**
 
    Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `slack.yaml`), and replace the `filters: []` line with the following:
 
@@ -60,7 +60,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    - is_incident
    ```
 
-1. Update the handler using `sensuctl create -f`.
+1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
    sensuctl create -f slack.yaml
@@ -72,12 +72,14 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    sensuctl handler info slack --format yaml
    ```
 
-1. Test the filter.
+1. **Test the filter.**
 
    The `is_incident` filter will prevent processing of healthy (`"status": 0`) events, unless they are resolving an incident.
    Let's send some events to see this behavior in action.
 
    The following event will be filtered:
+
+   **Mac and Linux users:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -86,7 +88,20 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+   ```
+
    The following event will be processed:
+
+   **Mac and Linux users:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -95,15 +110,26 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+   ```
+
    Try running these commands multiple times in different combinations and observing the behavior.
    The first occurrence of a `"status": 0` event following an active incident is treated as a "resolution" event, and will be processed; but subsequent occurrences of the `"status": 0` event will be filtered.
    Every occurrence of the `"status": 1` event will be processed, but we wouldn't typically want that to happen (because "alert fatigue"), so let's move on to the next exercise to learn how to modify that behavior.
 
 **NEXT:** If you have have applied the built-in `is_incident` filter and observed it working as described above, then you're ready to move on to the next exercise.
 
-## EXERCISE: create a custom event filter
+## EXERCISE 2: create a custom event filter
 
-1. Configure a filter to reduce alert fatigue.
+1. **Configure a filter to reduce alert fatigue.**
 
    The Sensu observability pipeline uses a series of event counters that are quite effective for managing alert frequency.
    These counters include the `occurrences` counter, and the `occurrences_watermark` counter.
@@ -129,7 +155,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    _NOTE: for more information on this filter expression – specifically including the modulo operator (`%`) or "remainder" calculation – please visit the [sensu/catalog project on GitHub](https://github.com/sensu/catalog/blob/main/shared/filters/filter-repeated-hourly.yaml)._
 
-1. Create the "fitler-repeated" filter using `sensuctl`.
+1. **Create the "fitler-repeated" filter using `sensuctl`.**
 
    ```shell
    sensuctl create -f filter-repeated.yaml
@@ -145,9 +171,9 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 **NEXT:** If you see your `filter-repeated` filter, you're ready to move on to the next exercise.
 
-## EXERCISE: using custom event filters
+## EXERCISE 3: using custom event filters
 
-1. Modify a handler configuration template to use a custom filter.
+1. **Modify a handler configuration template to use a custom filter.**
 
    Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `slack.yaml`), and update the `filters` field with the following:
 
@@ -157,7 +183,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    - filter-repeated
    ```
 
-1. Update the handler using `sensuctl create -f`.
+1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
    sensuctl create -f slack.yaml
@@ -169,29 +195,58 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    sensuctl handler info slack --format yaml
    ```
 
-1. Test the filter.
+1. **Test the filter.**
 
    The `filter-repeated` filter will prevent repeat processing of events (only allowing repeat processing once per hour).
    Let's send some events to see this behavior in action.
 
    The following event will be _processed_ (the first occurrence of a critical severity event):
 
+   **Mac and Linux users:**
+
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
         -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
    The following event will be _filtered_ (the second occurrence of a critical severity event):
 
+   **Mac and Linux users:**
+
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
         -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+   ```
+
    The following event will be _processed_ (the first occurrence of a recovery event):
+
+   **Mac and Linux users:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -200,13 +255,37 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+   ```
+
    The following event will be _filtered_ (a repeat occurrence of a healthy event):
+
+   **Mac and Linux users:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
         -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
    Try running these commands multiple times in different combinations and observing the behavior.

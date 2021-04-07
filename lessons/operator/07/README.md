@@ -336,7 +336,7 @@ There are two types of entity management in Sensu Go 6.x:
   Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
   To enable agent-management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
 
-> **NOTE:** all agent entities are created based on the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
+**NOTE:** all agent entities are _created_ using the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
 
 ## Advanced topics
 

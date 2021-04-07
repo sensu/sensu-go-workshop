@@ -191,7 +191,7 @@ All of the `sensu-agent` command flags (except `--config-file`) can be set via t
 
 </details>
 
-Every sensu-agent configuration flag (e.g. `--backend-url=ws://127.0.0.1:8081`) also has a corresponding environment variable (e.g. `SENSU_BACKEND_URL="ws://127.0.0.1:8081"`). 
+Every `sensu-agent` configuration flag (e.g. `--backend-url=ws://127.0.0.1:8081`) also has a corresponding environment variable (e.g. `SENSU_BACKEND_URL="ws://127.0.0.1:8081"`).
 All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding flag in capitalized letters and underscores (`_`) instead of dashes (`-`).
 For example, the environment variable for the flag `--api-host` is `SENSU_API_HOST`.
 
@@ -231,30 +231,112 @@ Keepalive monitoring can be disabled using the `--deregister true` flag, which p
 ## Subscriptions
 
 Sensu uses the [publish/subscribe model of communication](https://en.wikipedia.org/wiki/Publish–subscribe_pattern).
-Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus. 
+Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus.
 Sensu backends "publish" requests for observability data and agents who are subscribed to the corresponding topics receive the published request, perform the corresponding monitoring job, and sending the corresponding event data to the observability pipeline.
 
 The publish/subscribe model is powerful in ephemeral or elastic infrastructures, where endpoint identifiers are unpredictable and break traditional host-based monitoring configuration.
 Instead of configuring monitoring on a per-host basis, Sensu follows a service-based monitoring configuration model where monitors are configured per service topic (e.g. "postgres"), and agents deployed on hosts running the corresponding services simply subscribe to those same topics.
 
+## Entity specification
+
+Sensu Entities are structured like other Sensu API resources, with the same common top-level fields/objects (i.e. `type`, `api_version`, `metadata`, `spec`).
+The Sensu Entity `spec` object contains the following fields:
+
+<details>
+<summary><strong>Sensu Entity <pre>spec</pre> properties:</strong></summary>
+
+```json
+{
+  "entity_class": "agent",
+  "system": {
+    "hostname": "server-01",
+    "os": "linux",
+    "platform": "alpine",
+    "platform_family": "alpine",
+    "platform_version": "3.12.6",
+    "network": {
+      "interfaces": [
+        {
+          "name": "lo",
+          "addresses": [
+            "127.0.0.1/8"
+          ]
+        },
+        {
+          "name": "eth0",
+          "mac": "02:42:ac:13:00:07",
+          "addresses": [
+            "172.19.0.7/16"
+          ]
+        }
+      ]
+    },
+    "arch": "amd64",
+    "libc_type": "musl",
+    "vm_system": "docker",
+    "vm_role": "guest",
+    "cloud_provider": "EC2"
+  },
+  "subscriptions": [
+    "system/linux",
+    "workshop",
+    "devel",
+    "entity:server-01"
+  ],
+  "last_seen": 1617835646,
+  "deregister": true,
+  "deregistration": {},
+  "user": "agent",
+  "redact": [
+    "password",
+    "passwd",
+    "pass",
+    "api_key",
+    "api_token",
+    "access_key",
+    "secret_key",
+    "private_key",
+    "secret"
+  ],
+  "sensu_agent_version": "6.2.7"
+}
+```
+
+</details>
+
+The only required entity `spec` property is `entity_class` – all other properties are optional.
+
+> _NOTE: Sensu Entities that are not associated with a running Sensu Agent are generally referred to as "proxy entities" and will have an `entity_class` of "proxy".
+> For more information about proxy entities and how they are managed by Sensu, please see [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
+
 ## Agent Entities
 
 If you look at your Sensu entity list you'll note that you already have at least one entity (including one named "i-424242").
-Sensu automatically created this entity when we published our first event data to the pipeline.
+Sensu automatically created this entity when we published our first event data to the pipeline, but it isn't associated with a running agent, so its agent class is set to "proxy".
 
-> _NOTE: to find the Sensu entity list, run the `sensuctl entity list` or `sensuctl entity info i-424242` command(s), or select the "Entities" view in the sidebar of the Sensu web app.
-> Self-guided trainees should find this view at: http://127.0.0.1:3000/c/~/n/default/entities._
-
-==TODO==
-
-## Entity specification
-
-==TODO: overview of entity metadata and system facts.
-Mention the existence of non-agent entities, to be covered in lesson 12.==
+```shell
+$ sensuctl entity list
+     ID      Class   OS   Subscriptions   Last Seen
+ ────────── ─────── ──── ─────────────── ───────────
+  i-424242   proxy                        N/A
+```
 
 ## Entity management
 
-==TODO: agent-managed entities (traditional), and backend-managed entities (cloud-native).==
+There are two types of entity management in Sensu Go 6.x:
+
+- **API-managed entities (cloud-native).**
+
+  Certain entity properties can be modified in real-time via the API, CLI, or web app.
+  Agent entities are API-managed by default in Sensu Go 6.x (API-management was not available for agent entities in Sensu Go 5.x).
+
+- **Agent-managed entities (traditional).**
+
+  All entity properties are managed via the sensu-agent (via command flags, config file, or environment variables).
+  Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
+  To enable agent-management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
+
+> **NOTE:** all agent entities are created based on the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
 
 ## Advanced topics
 
@@ -482,7 +564,7 @@ Let's stop our agent and modify its configuration:
 
    - **Mac users:** `/opt/sensu/agent.yaml`
    - **Windows users:** `${Env:UserProfile}\Sensu\agent.yaml`
-   - **Linux users:** `/etc/sensu/agent.yaml` 
+   - **Linux users:** `/etc/sensu/agent.yaml`
 
    Now let's copy the following contents into the `agent.yaml` file:
 
@@ -502,7 +584,7 @@ Let's stop our agent and modify its configuration:
 
 1. Start/Restart the Sensu Agent.
 
-   Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent. 
+   Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent.
 
    **Mac users:**
 
@@ -535,12 +617,12 @@ Let's stop our agent and modify its configuration:
    --password ${SENSU_PASSWORD}
    ```
 
-   Notice that we have moved the `--name`, `--backend-url`, and `--deregister` configuration settings into the `agent.yaml` config file, and we are now explicitly setting the `SENSU_SUBSCRIPTIONS` environment variable in place of `--subscriptions`... but how/where is `--namespace` being set? 
-   The Sensu Agent is reading the value of `SENSU_NAMESPACE` from the environment variable, without the need for explicitly setting the variable with the `sensu-agent start` command. 
+   Notice that we have moved the `--name`, `--backend-url`, and `--deregister` configuration settings into the `agent.yaml` config file, and we are now explicitly setting the `SENSU_SUBSCRIPTIONS` environment variable in place of `--subscriptions`... but how/where is `--namespace` being set?
+   The Sensu Agent is reading the value of `SENSU_NAMESPACE` from the environment variable, without the need for explicitly setting the variable with the `sensu-agent start` command.
 
-   In the previous exercise we provided all of the configuration via `sensu-agent start` command flags. 
+   In the previous exercise we provided all of the configuration via `sensu-agent start` command flags.
    In this exercise we've moved some configuration to a config file, and other configuration to environment variables.
-   Understanding how to configure Sensu using all three methods – config flags, config file, and environment variables – is very useful in heterogeneus environments (e.g. mix of servers, compute instances, and containers) where a configuration method that is easier to manage in one context might not be as easy in another context. 
+   Understanding how to configure Sensu using all three methods – config flags, config file, and environment variables – is very useful in heterogeneus environments (e.g. mix of servers, compute instances, and containers) where a configuration method that is easier to manage in one context might not be as easy in another context.
 
 ## Learn more
 

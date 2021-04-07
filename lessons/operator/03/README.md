@@ -7,19 +7,19 @@
   - [Entity list & entity detail views](#entity-list--entity-detail-views)
   - [Silencing](#silencing)
   - [Configuration](#configuration)
-- [EXERCISE: log in to the Sensu web app](#exercise-log-in-to-the-sensu-web-app)
+- [EXERCISE 1: log in to the Sensu web app](#exercise-1-log-in-to-the-sensu-web-app)
 - [Command Line Interface (CLI)](#command-line-interface--cli)
   - [API client](#api-client)
   - [Configuration management](#configuration-management)
   - [Inventory](#inventory)
   - [Output formats](#output-formats)
   - [Interactive and non-interactive modes](#interactive-and-non-interactive-modes)
-- [EXERCISE: install and configure `sensuctl`](#exercise-install-and-configure-sensuctl)
-- [EXERCISE: use the `sensuctl --help` command](#exercise-use-the-sensuctl---help-command)
-- [EXERCISE: inspect an event in JSON format](#exercise-inspect-an-event-in-json-format)
-- [EXERCISE: explore Sensu resources using `sensuctl`](#exercise-explore-sensu-resources-using-sensuctl)
-- [EXERCISE: create an API Key for personal use](#exercise-create-an-api-key-for-personal-use)
-- [EXERCISE: export Sensu resources using `sensuctl dump`](#exercise-export-sensu-resources-using-sensuctl-dump)
+- [EXERCISE 2: install and configure `sensuctl`](#exercise-2-install-and-configure-sensuctl)
+- [EXERCISE 3: use the `sensuctl --help` command](#exercise-3-use-the-sensuctl---help-command)
+- [EXERCISE 4: inspect an event in JSON format](#exercise-4-inspect-an-event-in-json-format)
+- [EXERCISE 5: explore Sensu resources using `sensuctl`](#exercise-5-explore-sensu-resources-using-sensuctl)
+- [EXERCISE 6: create an API Key for personal use](#exercise-6-create-an-api-key-for-personal-use)
+- [EXERCISE 7: export Sensu resources using `sensuctl dump`](#exercise-7-export-sensu-resources-using-sensuctl-dump)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
@@ -124,9 +124,9 @@ A similar view is available for Filters, Mutators, and Handlers._
 _**Figure 13:** the check edit view.
 A similar editor is available for Filters, Mutators, and Handlers._
 
-## EXERCISE: log in to the Sensu web app
+## EXERCISE 1: log in to the Sensu web app
 
-1. Log in to the Sensu web app.
+1. **Log in to the Sensu web app.**
 
    - **Self guided users:** please visit http://127.0.0.1:3000 and login with the default workshop admin username (`sensu`) and password (`sensu`).
    - **Instructor-led workshop users:** please visit the URL provided by your instructor and login using the username and password provided by your instructor.
@@ -280,9 +280,9 @@ $ sensuctl configure -n \
   --format json
 ```
 
-## EXERCISE: install and configure `sensuctl`
+## EXERCISE 3-2: install and configure `sensuctl`
 
-1. Download and install `sensuctl`.
+1. **Download and install `sensuctl`.**
 
    **Mac users:**
 
@@ -312,7 +312,7 @@ $ sensuctl configure -n \
    rm "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz"
    ```
 
-1. Configure `sensuctl`.
+1. **Configure `sensuctl`.**
 
    Configure the Sensu CLI to connect to your backend by running the `sensuctl
    configure` command.
@@ -339,7 +339,7 @@ $ sensuctl configure -n \
    ? Password: *****
    ```
 
-1. Verify your `sensuctl` configuration.
+1. **Verify your `sensuctl` configuration.**
 
    If you do not receive an error message after entering your username and password you should have a successfully configured CLI.
    To confirm, let's run a `sensuctl` command to verify that we are successfully connected to the cluster:
@@ -359,25 +359,25 @@ $ sensuctl configure -n \
 
 **NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
 
-## EXERCISE: use the `sensuctl --help` command
+## EXERCISE 3: use the `sensuctl --help` command
 
 Sensuctl includes a `--help` flag for getting help with every command and subcommand.
 
 Try running some of the following commands:
 
-1. See all available `sensuctl` commands and global flags:
+1. **See all available `sensuctl` commands and global flags:**
 
    ```
    sensuctl --help
    ```
 
-1. See all of the available subcommands and flags for the `sensuctl check` command:
+1. **See all of the available subcommands and flags for the `sensuctl check` command:**
 
    ```
    sensuctl check --help
    ```
 
-1. See all of the available flags for the `sensuctl check create` subcommand:
+1. **See all of the available flags for the `sensuctl check create` subcommand:**
 
    ```
    sensuctl check create --help
@@ -387,9 +387,9 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
 **NEXT:** after you've tried a few `--help` commands you're ready to move on to the next step.
 
-## EXERCISE: inspect an event in JSON format
+## EXERCISE 4: inspect an event in JSON format
 
-1. Use the `sensuctl event info` command to get information about an event.
+1. **Use the `sensuctl event info` command to get information about an event.**
 
    ```
    sensuctl event info learn.sensu.io helloworld
@@ -412,7 +412,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    UUID:      7d0721c8-d203-4e80-a399-05070a914b20
    ```
 
-1. View event information in JSON format.
+1. **View event information in JSON format.**
 
    To modify the output format on a per-command basis use the `--format` flag:
 
@@ -424,9 +424,9 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
 **NEXT:** If `sensuctl` output a JSON formatted event, you're ready to move on to the next step.
 
-## EXERCISE: explore Sensu resources using `sensuctl`
+## EXERCISE 5: explore Sensu resources using `sensuctl`
 
-1. Use the `sensuctl namespace list` command to get a list of namespaces.
+1. **Use the `sensuctl namespace list` command to get a list of namespaces.**
 
    ```shell
    sensuctl namespace list
@@ -434,7 +434,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
    _NOTE: the output of this command is filtered based on RBAC, so different users may see different results._
 
-1. Use the `sensuctl event list` command to get a list of events.
+1. **Use the `sensuctl event list` command to get a list of events.**
 
    ```shell
    sensuctl event list
@@ -442,7 +442,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
    _NOTE (for trainees in instructor-led workshops): try adding `--namespace default` to get a list of events from the `default` namespace._
 
-1. Use the `sensuctl entity list` command to get a list of nodes under management.
+1. **Use the `sensuctl entity list` command to get a list of nodes under management.**
 
    ```shell
    sensuctl entity list
@@ -450,21 +450,21 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
    _NOTE: try adding `--format json` or `--format yaml` to view the list in JSON or YAML format._
 
-1. Get information about a specific entity using the `sensuctl entity info` command
+1. **Get information about a specific entity using the `sensuctl entity info` command.**
 
    ```shell
    sensuctl entity info learn.sensu.io
    ```
 
-1. Try exploring some other resources.
+1. **Try exploring some other resources.**
 
    _NOTE: don't forget to use `--help`; for example, `sensuctl --help` will output a list of "management commands" which are effectively API resources that are accessible via `sensuctl`._
 
 **NEXT:** when you're done exploring `sensuctl` resource list and info commands, you're ready to move on to the next step.
 
-## EXERCISE: create an API Key for personal use
+## EXERCISE 6: create an API Key for personal use
 
-1. Use the `sensuctl api-key grant` command to create an API Key.
+1. **Use the `sensuctl api-key grant` command to create an API Key.**
 
    ```shell
    sensuctl api-key grant sensu
@@ -479,7 +479,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-1. Save the API Key user in a future exercise.
+1. **Save the API Key user in a future exercise.**
 
    For the purposes of this workshop, we want to capture this API key (the
    `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) for use in a future exercise.
@@ -514,25 +514,25 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
 **NEXT:** If you see your API key, you're ready to move on to the next step!
 
-## EXERCISE: export Sensu resources using `sensuctl dump`
+## EXERCISE 7: export Sensu resources using `sensuctl dump`
 
 The `sensuctl dump` command is a built-in solution for exporting & importing Sensu API resources.
 You can use `sensuctl dump` to output Sensu configuration resources to STDOUT (i.e. for viewing in the terminal), or to a file.
 The `sensuctl dump` command has a wide range of use cases from simple backup and restore, to inspecting configuration resources, scripting maintenance tasks (e.g. bulk deletion of entities), and more.
 
-1. Export all resources.
+1. **Export all resources.**
 
    ```shell
    sensuctl dump all
    ```
 
-1. Export resources for a single namespace.
+1. **Export resources for a single namespace.**
 
    ```shell
    sensuctl dump all --namespace default
    ```
 
-1. Export specific resources, by type.
+1. **Export specific resources, by type.**
 
    ```shell
    sensuctl dump checks,handlers
@@ -542,7 +542,7 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 
    _NOTE: at this stage in the workshop this command may not generate any output (becase we haven't created any checks or handlers yet)._
 
-1. Get a complete list of resource types supported by `sensuctl dump`.
+1. **Get a complete list of resource types supported by `sensuctl dump`.**
 
    ```shell
    sensuctl describe-type all --format yaml

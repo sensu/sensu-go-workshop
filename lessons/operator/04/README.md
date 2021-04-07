@@ -8,8 +8,8 @@
 - [Advanced topics](#advanced-topics)
   - [Handler templating](#handler-templating)
   - [Configuration overrides](#configuration-overrides)
-- [EXERCISE: configure an alert handler](#exercise-configure-an-alert-handler)
-- [EXERCISE: configure a metrics handler](#exercise-configure-a-metrics-handler)
+- [EXERCISE 1: configure an alert handler](#exercise-1-configure-an-alert-handler)
+- [EXERCISE 2: configure a metrics handler](#exercise-2-configure-a-metrics-handler)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
@@ -190,9 +190,9 @@ spec:
 
 For more information on configuration overrides via check and entity annotations, please consult the corresponding handler documentation (examples: [Slack](https://bonsai.sensu.io/assets/sensu/sensu-slack-handler#annotations), [Pagerduty](https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler#argument-annotations), and [ServiceNow](https://bonsai.sensu.io/assets/sensu/sensu-servicenow-handler#annotations)).
 
-## EXERCISE: configure an alert handler
+## EXERCISE 1: configure an alert handler
 
-1. Configure a Sensu Event Handler for sending alerts via Slack.
+1. **Configure a Sensu Event Handler for sending alerts via Slack.**
 
    Copy and paste the following contents to a file named `slack.yaml`:
 
@@ -222,7 +222,7 @@ For more information on configuration overrides via check and entity annotations
        secret: slack_channel
    ```
 
-1. Create the Handler using the `sensuctl create -f` command.
+1. **Create the Handler using the `sensuctl create -f` command.**
 
    ```
    sensuctl create -f slack.yaml
@@ -245,9 +245,9 @@ For more information on configuration overrides via check and entity annotations
 **NEXT:** Do you see the `slack` handler in the output?
 If so, you're ready to proceed to the next step!
 
-## EXERCISE: configure a metrics handler
+## EXERCISE 2: configure a metrics handler
 
-1. Configure a Sensu Event Handler for sending metrics to a time-series database.
+1. **Configure a Sensu Event Handler for sending metrics to a time-series database.**
 
    Copy and paste the following contents to a file named `influxdb.yaml`:
 
@@ -275,7 +275,7 @@ If so, you're ready to proceed to the next step!
      mutator: ""
    ```
 
-1. Create the Handler using the `sensuctl create -f` command.
+1. **Create the Handler using the `sensuctl create -f` command.**
 
    ```shell
    sensuctl create -f influxdb.yaml

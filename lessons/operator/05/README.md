@@ -3,8 +3,8 @@
 - [Overview](#overview)
 - [Events are observations](#events-are-observations)
 - [Use cases](#use-cases)
-- [EXERCISE: create an event using curl and the Sensu Events API](#exercise-create-an-event-using-curl-and-the-Sensu-Events-API-no-op)
-- [EXERCISE: create an event that triggers an alert](#exercise-create-an-event-that-triggers-an-alert)
+- [EXERCISE 1: create an event using curl and the Sensu Events API](#exercise-1-create-an-event-using-curl-and-the-Sensu-Events-API-no-op)
+- [EXERCISE 2: create an event that triggers an alert](#exercise-2-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 - [Troubleshooting](#troubleshooting)
@@ -266,55 +266,87 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
 **NEXT:** Let's move on to the next exercise to see how event handling works in practice.
 
-## EXERCISE: create an event that triggers an alert
+## EXERCISE 1: create an event that triggers an alert
 
 Sensu matches incoming events with the corresponding event pipelines using an event attribute called `handlers` (e.g. `handlers:["slack","pagerduty"]`).
 Let's create an event that will be processed using the handler we configured in [Lesson 4](/lessons/04/README.md#readme).
 
-1. Configure environment variables
+1. **Configure environment variables.**
 
-   Verify the contents of `.envrc` to ensure that `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY` are set to the correct values, then run the following command:
-
-   ```
-   source .envrc
-   ```
+   Verify the contents of `.envrc` or `.envrc.ps1` to ensure that `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY` are set to the correct values, then run the following commands:
 
    - **Self-guided workshop users:** use the default values for `SENSU_API_URL` (`http://127.0.0.1:8080`) and `SENSU_NAMESPACE` (`default`).
    - **Instructor-led workshop users:** use the values provided by your instructor for `SENSU_API_URL` and `SENSU_NAMESPACE`.
 
-   To verify that your environment is correctly configured, please run the following command:
+   **Mac and Linux users (`.envrc`):**
 
-   ```
+   ```shell
+   source .envrc
    env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
 
    The output should include the expected values for `SENSU_API_URL`,`SENSU_NAMESPACE`, and `SENSU_API_KEY`.
 
-   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE: create an API Key for personal use](/lessons/operator/03/README.md#exercise-create-an-api-key-for-personal-use)._
+   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
-1. Create an event using `curl` and the Sensu Events API
+1. **Create an event using `curl` and the Sensu Events API.**
 
    Do you notice anything different about the contents of the event in the next step?
    There's an additional property called `handlers: ["slack"]` that provides instructions on which pipeline(s) Sensu should use to process the event (in this case, the Slack handler we configured in Lesson 4).
    If the `handlers` property is omitted from an event, Sensu will simply store the event and no additional processing will be performed.
    Run the following command to create an event that will be processed using our Slack handler.
 
-   ```
-   curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
-        "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   **Mac and Linux users:**
+
+   ```shell
+   curl \
+     -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+     "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-1. Create a resolution event using `curl` and the Sensu Events API
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+   ```
+
+1. **Create a resolution event using `curl` and the Sensu Events API.**
 
    Let's send one more event to indicate that our imaginary app is now restored to a functional state:
 
+   **Mac and Linux users:**
+
    ```shell
-   curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
-        "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   curl \
+     -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+     "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
 **NEXT:** Did Sensu create messages in Slack?

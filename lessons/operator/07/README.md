@@ -243,7 +243,7 @@ Sensu Entities are structured like other Sensu API resources, with the same comm
 The Sensu Entity `spec` object contains the following fields:
 
 <details>
-<summary><strong>Sensu Entity <pre>spec</pre> properties:</strong></summary>
+<summary><strong>Sensu Entity <code>spec</code> properties:</strong></summary>
 
 ```json
 {

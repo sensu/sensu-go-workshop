@@ -209,7 +209,6 @@ export SENSU_TRUSTED_CA_FILE="/path/to/ca.pem"
 
 </details>
 
-
 ### Communication
 
 Sensu Agents connect to Sensu Backends over a persistent [WebSocket](https://en.m.wikipedia.org/wiki/WebSocket) (`ws`) or encrypted WebSocket Secure (`wss`) connection.
@@ -232,10 +231,11 @@ Keepalive monitoring can be disabled using the `--deregister true` flag, which p
 ## Subscriptions
 
 Sensu uses the [publish/subscribe model of communication](https://en.wikipedia.org/wiki/Publish–subscribe_pattern).
-The publish/subscribe model is powerful in ephemeral or elastic infrastructures, where endpoint identifiers are unpredictable and break traditional host-based monitoring configuration.
-Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus.
+Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus. 
+Sensu backends "publish" requests for observability data and agents who are subscribed to the corresponding topics receive the published request, perform the corresponding monitoring job, and sending the corresponding event data to the observability pipeline.
 
-Sensu backends "publish" requests for observability data and agents who are subscribed to the corresponding topics receive the published request, perform the corresponding monitoring job, and send observability data to the event pipeline.
+The publish/subscribe model is powerful in ephemeral or elastic infrastructures, where endpoint identifiers are unpredictable and break traditional host-based monitoring configuration.
+Instead of configuring monitoring on a per-host basis, Sensu follows a service-based monitoring configuration model where monitors are configured per service topic (e.g. "postgres"), and agents deployed on hosts running the corresponding services simply subscribe to those same topics.
 
 ## Agent Entities
 

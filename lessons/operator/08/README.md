@@ -320,12 +320,12 @@ Let's modify our check from the previous exercise using some Tokens.
 
 ## Learn more
 
-- [[Documentation] "Sensu Checks Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/)
 - [[Documentation] "Schedule observability data collection" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/)
+- [[Documentation] "Sensu Checks Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/)
+- [[Documentation] "Sensu Tokens Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/tokens/)
 - [[Documentation] "Guide: Monitor server resources with Sensu Checks" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/monitor-server-resources/)
 - [[Documentation] "Guide: Collect service metrics with Sensu Checks" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/collect-metrics-with-checks/)
 - [[Documentation] "Guide: Collect Prometheus metrics with Sensu" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/prometheus-metrics/)
-- [[Documentation] "Sensu Tokens Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/tokens/)
 - [[Blog Post] "Self-service monitoring checks in Sensu Go" (sensu.io)](https://sensu.io/blog/self-service-monitoring-checks-in-sensu-go)
 - [[Blog Post] "The story of Nagios plugin support in Sensu (or, why service checks are so amazing)" (sensu.io)](https://sensu.io/blog/the-story-of-nagios-plugin-support-in-sensu)
 - [[Blog Post] "Check output metric extraction with InfluxDB & Grafana" (sensu.io)](https://sensu.io/blog/check-output-metric-extraction-with-influxdb-grafana)

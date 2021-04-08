@@ -53,10 +53,7 @@ Sensu Events also have an identifier (`id`) that is used to trace event processi
 
 ```json
 {
-  "metadata": {
-    "labels": {},
-    "annotations": {}
-  },
+  "metadata": {},
   "entity": {},
   "check": {},
   "metrics": {},

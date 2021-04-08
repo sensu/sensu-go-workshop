@@ -30,7 +30,7 @@ Once you have deployed a workshop environment, you may proceed with the followin
 ### Operator Workshop
 
 - [Lesson 01: Introduction to Monitoring as Code](/lessons/operator/01/README.md#readme)
-- [Lesson 02: Introduction to the Observability Data Model](/lessons/operator/02/README.md#readme) (in progress)
+- [Lesson 02: Introduction to the Observability Data Model](/lessons/operator/02/README.md#readme)
 - [Lesson 03: Introduction to Sensu Go](/lessons/operator/03/README.md#readme)
 - [Lesson 04: Introduction to Handlers & Handler Sets](/lessons/operator/04/README.md#readme)
 - [Lesson 05: Introduction to Events](/lessons/operator/05/README.md#readme)

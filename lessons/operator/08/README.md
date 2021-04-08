@@ -10,7 +10,7 @@
 - [Check templates](#check-templates)
 - [Advanced Topics](#advanced-topics)
   - [TTLs (Dead Man Switches)](#ttls-dead-man-switches)
-  - [Proxy requests (pollers)](#proxy-requests-pollers)
+  - [Proxy checks (pollers)](#proxy-requests-pollers)
   - [Execution environment & environment variables](#execution-environment--environment-variables)
 - [EXERCISE: configure a check](#exercise-configure-a-check)
 - [EXERCISE: modify a check configuration using tokens](#exercise-modify-a-check-using-tokens)
@@ -71,7 +71,7 @@ Check scheduling is configured using the following attributes:
 
 The Sensu check scheduler can orchestrate monitoring jobs for entities that are not actively managed by a Sensu agent.
 These monitoring jobs are called "proxy checks", or checks that target a proxy entity.
-Proxy checks are discussed in greater detail in [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
+Proxy checks are discussed in greater detail in [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme).
 
 At a high level, a proxy check is a Sensu check with `proxy_requests`, which are effectively query parameters Sensu will use to look for matching entities that should be targeted by the check.
 Proxy requests are published to the configured subscription(s) once per matching entity.

@@ -16,15 +16,34 @@
 - [EXERCISE: modify a check configuration using tokens](#exercise-modify-a-check-using-tokens)
 - [Learn more](#learn-more)
 
-
 ## Overview
 
-==TODO: service checks are "monitoring jobs".
-Popularized by Nagios...
-Simple specification...
-Extensibility (any programming language in the world)...==
+Sensu Checks are monitoring jobs that are managed by the Sensu platform (control plane) and executed by Sensu Agents.
+A Sensu Check is a modern take on the traditional "service check" &ndash; a task (check) performed by the monitoring platform to determine the status of a system or service.
+
+Although service checks were originally popularized by Nagios, they continue to fill a critical role in the modern era of cloud computing.
+Sensu orchestrates service checks in a similar manner as cloud-native platforms like Kubernetes and Prometheus which use "Jobs" as a central concept for scheduling and running tasks.
+Where Prometheus jobs are limited to HTTP GET requests (for good reason), a Sensu monitoring job ("check") provides a significantly more flexible tool.
+
+A valid service check must satisfy the following requirements:
+
+1. Communicate status via exit status codes
+1. Emit service status information and telemetry data via STDOUT
+
+That's the entire specification (more or less)!
+Service checks have provided sustained value thanks to this incredibly simple specification, providing tremendous extensibility.
+In fact, service checks can be written in any programming language in the world (including simple Bash and MS DOS scripts).
 
 ## Scheduling
+
+The Sensu backend handles the scheduling of all monitoring jobs (checks).
+Check scheduling is configured using the following attributes:
+
+- **`publish`:** enables or disables scheduling
+- **`interval` or `cron`:** the actual schedule upon which check requests will be published to the corresponding subscriptions
+- **`subscriptions`:** the subscriptions to publish check requests to
+- **`round_robin`:** limits check scheduling to one execution per request (useful for configuring pollers when there are multiple agent members in a given subscription)
+- **`timeout`:** instructs the agent to terminate check execution after the configured number of seconds
 
 ## Subscriptions
 
@@ -48,9 +67,63 @@ Extensibility (any programming language in the world)...==
 
 ### TTLs (Dead Man Switches)
 
-### Proxy Requests (Pollers)
+### Proxy Checks (Pollers)
 
-==TODO: reference lesson 12...==
+The Sensu check scheduler can orchestrate monitoring jobs for entities that are not actively managed by a Sensu agent.
+These monitoring jobs are called "proxy checks", or checks that target a proxy entity.
+Proxy checks are discussed in greater detail in [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
+
+At a high level, a proxy check is a Sensu check with `proxy_requests`, which are effectively query parameters Sensu will use to look for matching entities that should be targeted by the check.
+Proxy requests are published to the configured subscription(s) once per matching entity.
+In the following example, we would expect Sensu to find two (2) entities with `entity_class == "proxy"` and a `proxy_type` label set to "website"; for each matching entity, the Sensu backend will first replace the configured tokens using the corresponding entity attributes (i.e. one request to execute the command `nslookup sensu.io`, and one request to execute the command `nslookup google.com`).
+To avoid redundant processing, we recommend using the `round_robin` attribute with proxy checks.
+
+
+```yaml
+---
+type: CheckConfig
+api_version: core/v2
+metadata:
+  name: proxy-nslookup
+spec:
+  command: >-
+    nslookup {{ .annotations.proxy_host }}
+  runtime_assets: []
+  publish: true
+  subscriptions:
+  - workshop
+  interval: 30
+  timeout: 10
+  round_robin: true
+  proxy_requests:
+    entity_attributes:
+      - entity.entity_class == "proxy"
+      - entity.labels.proxy_type == "website"
+
+---
+type: Entity
+api_version: core/v2
+metadata:
+  name: proxy-a
+  labels:
+    proxy_type: website
+  annotations:
+    proxy_host: sensu.io
+spec:
+  entity_class: proxy
+
+---
+type: Entity
+api_version: core/v2
+metadata:
+  name: proxy-b
+  labels:
+    proxy_type: website
+  annotations:
+    proxy_host: google.com
+spec:
+  entity_class: proxy
+```
 
 ### Execution environment & environment variables
 
@@ -101,8 +174,8 @@ Extensibility (any programming language in the world)...==
    Example output:
 
    ```shell
-     Name                       Command                       Interval   Cron   Timeout   TTL                                            Subscriptions                                             Handlers              Assets              Hooks   Publish?   Stdin?   Metric Format   Metric Handlers  
-    ────── ───────────────────────────────────────────────── ────────── ────── ───────── ───── ────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────────────────────────────── ─────── ────────── ─────────────────────── ───────────────── 
+     Name                       Command                       Interval   Cron   Timeout   TTL                                            Subscriptions                                             Handlers              Assets              Hooks   Publish?   Stdin?   Metric Format   Metric Handlers
+    ────── ───────────────────────────────────────────────── ────────── ────── ───────── ───── ────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────────────────────────────── ─────── ────────── ─────────────────────── ─────────────────
      disk   check-disk-usage --warning 80.0 --critical 90.0         30               10     0   system/macos,system/macos/disk,system/windows,system/windows/disk,system/linux,system/linux/disk              sensu/check-disk-usage:0.4.2           true       false
    ```
 
@@ -163,7 +236,7 @@ Let's modify our check from the previous exercise using some Tokens.
    Verify that the Check was successfully created using the `sensuctl check list` command:
 
    ```shell
-   sensuctl check list
+   sensuctl check info disk --format yaml
    ```
 
 ## EXERCISE: collecting metrics with Sensu Checks
@@ -172,37 +245,7 @@ Let's modify our check from the previous exercise using some Tokens.
 
    Modify `disk.yaml` with the following contents (adding `output_metric_format`, `output_metric_handlers`, and `output_metric_tags` fields):
 
-   ```yaml
-   ---
-   type: CheckConfig
-   api_version: core/v2
-   metadata:
-     name: ntp
-   spec:
-     command: >-
-       check_ntp_time -H time.google.com
-       --warn {{ .annotations.ntp_warn_threshold | default "0.5" }}
-       --critical {{ .annotations.ntp_crit_threshold | default "1.0" }}
-     runtime_assets:
-     - sensu/monitoring-plugins:2.6.0
-     publish: true
-     subscriptions:
-     - linux
-     - system/linux
-     interval: 30
-     timeout: 10
-     check_hooks: []
-     output_metric_format: nagios_perfdata
-     output_metric_handlers:
-     - metrics
-     output_metric_tags:
-     - name: entity
-       value: "{{ .name }}"
-     - name: namespace
-       value: "{{ .namespace }}"
-   ```
-
-   _NOTE: this example uses a [YAML multiline "block scalar"](https://yaml-multiline.info) (`>-`) for improved readability of a longer check `command`._
+   ==TODO==
 
    These fields instruct Sensu what metric format to expect as output from the check, which handler(s) should be used to process the metrics, and what tags should be added to the metrics.
    The metric formats Sensu can extract from check output as of this writing are: `nagios_perfdata`, `graphite_plaintext`, `influxdb_line`, `opentsdb_line`, and `prometheus_text` (StatsD metrics are also supported, but only via the Sensu Agent StatsD API).
@@ -216,7 +259,7 @@ Let's modify our check from the previous exercise using some Tokens.
    Verify that the Check was successfully created using the `sensuctl check list` command:
 
    ```shell
-   sensuctl check list
+   sensuctl check info disk --format yaml
    ```
 
 

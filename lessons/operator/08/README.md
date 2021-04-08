@@ -48,7 +48,7 @@ spec:
     value: "{{ .labels.region | default 'unknown' }}"
 ```
 
-</summary>
+</details>
 
 
 Although service checks were originally popularized by Nagios, they continue to fill a critical role in the modern era of cloud computing.

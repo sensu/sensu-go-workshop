@@ -42,7 +42,7 @@ If configuration values are set in multiple places, the `sensu-agent` will apply
 4. Default values, if any (lowest)
 
 <details>
-<summary><strong>Example <pre>sensu-agent start --help</pre> configuration flags:</strong></summary>
+<summary><strong>Example <code>sensu-agent start --help</code> configuration flags:</strong></summary>
 
 ```
 start the sensu agent
@@ -106,7 +106,7 @@ Flags:
 All of the `sensu-agent` command flags (except `--config-file`) can be set via the Sensu Agent configuration file using the same flag name (sans the `--`).
 
 <details>
-<summary><strong>Example <pre>agent.yml</pre> file:</strong></summary>
+<summary><strong>Example <code>agent.yml</code> file:</strong></summary>
 
 ```yaml
 ---

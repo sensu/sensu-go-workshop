@@ -41,4 +41,6 @@
 
 ## Next steps
 
+[Share your feedback on Lesson 14](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2014%20Feedback)
+
 [Lesson 15: Introduction to Secrets Management](../15/README.md#readme)

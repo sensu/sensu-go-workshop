@@ -300,4 +300,6 @@ If so, you're ready to move on to the next step!
 
 ## Next steps
 
+[Share your feedback on Lesson 04](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2004%20Feedback)
+
 [Lesson 5: Introduction to Events](../05/README.md#readme)

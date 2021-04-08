@@ -108,4 +108,6 @@ spec:
 
 ## Next steps
 
+[Share your feedback on Lesson 09](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2009%20Feedback)
+
 [Lesson 10: Introduction to Assets](../10/README.md#readme)

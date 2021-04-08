@@ -304,4 +304,6 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 ## Next steps
 
+[Share your feedback on Lesson 06](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2006%20Feedback)
+
 [Lesson 7: Introduction to Agents & Entities](../07/README.md#readme)

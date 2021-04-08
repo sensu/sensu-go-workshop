@@ -668,6 +668,8 @@ Let's stop our agent and modify its configuration:
 
 ## Next steps
 
+[Share your feedback on Lesson 07](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2007%20Feedback)
+
 [Lesson 8: Introduction to Checks](../08/README.md#readme)
 
 -----

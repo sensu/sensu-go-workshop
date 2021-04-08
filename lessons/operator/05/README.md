@@ -360,6 +360,8 @@ If so you're ready to move on to the next step!
 
 ## Next steps
 
+[Share your feedback on Lesson 05](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2005%20Feedback)
+
 [Lesson 6: Introduction to Filters](../06/README.md#readme)
 
 -----

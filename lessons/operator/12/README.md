@@ -27,4 +27,6 @@
 
 ## Next steps
 
+[Share your feedback on Lesson 12](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2012%20Feedback)
+
 [Lesson 13: Introduction to Proxy Entities & Proxy Checks](../13/README.md#readme)

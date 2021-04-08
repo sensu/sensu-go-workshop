@@ -3,14 +3,14 @@
 - [Overview](#overview)
 - [Scheduling](#scheduling)
 - [Subscriptions](#subscriptions)
+- [Check templates](#check-templates)
 - [Metrics collection](#metrics-collection)
   - [Output Metric Extraction](#output-metric-extraction)
   - [Output Metric Handlers](#output-metric-handlers)
   - [Output Metric Tags](#output-metric-tags)
-- [Check templates](#check-templates)
 - [Advanced Topics](#advanced-topics)
   - [TTLs (Dead Man Switches)](#ttls-dead-man-switches)
-  - [Proxy checks (pollers)](#proxy-requests-pollers)
+  - [Proxy checks (pollers)](#proxy-checks-pollers)
   - [Execution environment & environment variables](#execution-environment--environment-variables)
 - [EXERCISE: configure a check](#exercise-configure-a-check)
 - [EXERCISE: modify a check configuration using tokens](#exercise-modify-a-check-using-tokens)
@@ -84,6 +84,25 @@ Because subscriptions are [loosely coupled](https://en.wikipedia.org/wiki/Loose_
 This works especially well in ephemeral or elastic infrastructures where host-based monitoring configuration is ineffective.
 Instead of configuring monitoring on a per-host basis, monitoring configuration can be predefined following a service-based model (e.g. with one subscription per service, such as "postgres"), and agents on ephemeral compute instances simply register with a Sensu backend, subscribe to to the relevant monitoring "topics" and begin reporting observability data.
 
+## Check templates
+
+Monitoring jobs (checks) can be templated using placeholders called "Sensu Tokens" which are replaced with entity information before the job is executed.
+Token substitution is performed by the Sensu Agent<sup>1</sup>, during which all tokens are replaced with the corresponding entity data prior to check execution.
+Sensu Tokens are available for Checks, Hooks (see [Lesson 9: Introduction to Check Hooks](/lessons/operator/09/README.md#readme)), and Assets (see [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme)).
+
+Sensu Tokens are reference to entity attributes and metadata, wrapped in double curly braces (`{{  }}`).
+Default values can also be provided as fallback values for [unmatched tokens](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/tokens/#unmatched-tokens).
+Sensu Tokens can be used to configure dynamic monitoring jobs (e.g. enabling node-based configuration overrides for things like alerting threshold, etc).
+
+**Examples:**
+
+- **`{{ .name }}`:** replaced by the target entity name
+- **`{{ .labels.url }}`:** replaced by the target entity "url" label
+- **`{{ .labels.disk_warning | default "85%" }}`:** replaced by the target entity "disk_warning" label; if the label is not set then the default/fallback value of `85%` will be used
+
+<sup>1: Token substution is performed by the Sensu Agent for standard checks only.
+Token substitution is performed by the Sensu Backend for [proxy checks](#proxy-checks-pollers).</sup>
+
 ## Metrics collection
 
 One popular use case for monitoring jobs (checks) is to collect various system and service metrics (e.g. cpu, memory, or disk utilization; or api response times).
@@ -113,11 +132,26 @@ If an event containing metrics is configured with one or more `output_metric_han
 
 ### Output Metric Tags
 
-==TODO: enrich PerfData metrics with `output_metric_tags` and check tokens!==
+Metrics extracted with `output_metrics_format` can also be enriched using `output_metric_tags`.
+Metric sources vary in verbosity &ndash; some metric format don't support tags (e.g. Nagios Performance Data), and some metric collection implementations simply don't provide much contextual data.
+In either case, Sensu's `output_metric_tags` are great for enriching collected metrics using entity data/metadata.
+Sensu breathes new life into legacy monitoring plugins or other metric sources that generate the raw data you care about, but lack tags or other context to make sense of the data; simply configure `output_metric_tags` and Sensu will add the corresponding tag data to the resulting metrics/measurements.
 
-## Check Templates
+**Example:**
 
-==TODO: templating "monitoring jobs" with tokens...==
+```yaml
+output_metric_tags:
+- name: application
+  value: "my-app"
+- name: entity
+  value: "{{ .name }}"
+- name: region
+  value: "{{ .labels.region | default 'unknown' }}"
+- name: store_id
+  value: "store/{{ .labels.store_id | default 'none' }}"
+```
+
+Metric tag values can be provided as strings, or [Sensu Tokens](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/tokens/) which can be used for generating dynamic tag values.
 
 ## Advanced Topics
 

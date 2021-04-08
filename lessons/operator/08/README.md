@@ -51,7 +51,7 @@ spec:
 </details>
 
 
-Although service checks were originally popularized by Nagios, they continue to fill a critical role in the modern era of cloud computing.
+Although service checks were originally popularized by Nagios (circa 1999-2002), they continue to fill a critical role in the modern era of cloud computing.
 Sensu orchestrates service checks in a similar manner as cloud-native platforms like Kubernetes and Prometheus which use "Jobs" as a central concept for scheduling and running tasks.
 Where Prometheus jobs are limited to HTTP GET requests (for good reason), a Sensu monitoring job ("check") provides a significantly more flexible tool.
 

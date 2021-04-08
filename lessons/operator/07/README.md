@@ -8,7 +8,7 @@
 - [Entity management](#entity-management)
 - [Advanced topics](#advanced-topics)
   - [Proxy Entities](#proxy-entities)
-  - [Entity Registration and Deregistration](#entity-registration-and-deregistration)
+  - [Entity Lifecycle Hooks](#entity-lifecycle-hooks)
   - [Agent Events API & event socket](#agent-events-api--event-socket)
   - [StatsD API](#statsd-api)
   - [Platform detection](#platform-detection)
@@ -352,9 +352,9 @@ Proxy entities have an `entity_class` of "proxy" and can be used to represent an
 
 > _NOTE: For more information about proxy entities and how they are managed by Sensu, please see [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
 
-### Entity Registration and Deregistration
+### Entity Lifecycle Hooks
 
-==TODO==
+==TODO: entity registration and deregistration handlers...==
 
 ### Events API & event socket
 
@@ -382,9 +382,13 @@ A failed backup job will result in a TTL event without the need for any if/then/
 
 #### Examples
 
+**Bash**
+
 ```shell
 curl -XPOST -H 'Content-Type: application/json' -d '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' 127.0.0.1:3031/events
 ```
+
+**Powershell**
 
 ```powershell
 Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"

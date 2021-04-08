@@ -8,7 +8,8 @@
 - [Entity management](#entity-management)
 - [Advanced topics](#advanced-topics)
   - [Proxy Entities](#proxy-entities)
-  - [Events API & event socket](#events-api--event-socket)
+  - [Entity Registration and Deregistration](#entity-registration-and-deregistration)
+  - [Agent Events API & event socket](#agent-events-api--event-socket)
   - [StatsD API](#statsd-api)
   - [Platform detection](#platform-detection)
   - [Command allow list](#command-allow-list)
@@ -328,7 +329,7 @@ There are two types of entity management in Sensu Go 6.x:
 - **API-managed entities (cloud-native).**
 
   Certain entity properties can be modified in real-time via the API, CLI, or web app.
-  Agent entities are API-managed by default in Sensu Go 6.x (API-management was not available for agent entities in Sensu Go 5.x).
+  Agent entities are API-managed by default in Sensu Go 6.x (API management was not available for agent entities in Sensu Go 5.x).
 
   [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-backend)
 
@@ -336,33 +337,70 @@ There are two types of entity management in Sensu Go 6.x:
 
   All entity properties are managed via `sensu-agent` configuration (command flags, config file, or environment variables).
   Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
-  To enable agent-management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
+  To enable agent management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
 
   [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-agent)
 
-**NOTE:** all agent entities are _created_ using the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
+**NOTE:** All agent entities are _created_ using the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
 
 ## Advanced topics
 
 ### Proxy Entities
 
-==TODO: refer to lesson 12 for more information.==
+A "proxy entity" is any Sensu entity resource that is not actively under management by a Sensu Agent.
+Proxy entities have an `entity_class` of "proxy" and can be used to represent any resource under management by Sensu, though proxy entities are generally used to represent resources where we can't run an agent (e.g.  certain IoT/connected devices, or network devices), or resources that may emit observability data directly to Sensu without the need for an agent (e.g. applications or serverless functions).
 
-### Deregistration
+> _NOTE: For more information about proxy entities and how they are managed by Sensu, please see [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
+
+### Entity Registration and Deregistration
+
+==TODO==
 
 ### Events API & event socket
 
-==TODO: example use case, a check which produces multiple events...==
+The Sensu Agent Events API provides an HTTP POST endpoint for publishing observabilty data to the Sensu Observability Pipeline.
+While similar to the Sensu backend Events API, the Sensu Agent Events API differs in a few ways:
+
+- Only accepts HTTP POST requests (i.e. it is a write-only API endpoint)
+- Authentication is not supported (authentication is managed via the Sensu Agent)
+- Accepts event payloads without an `entity` object (all events are automatically associated with the agent entity)
+
+The agent places events created via the `/events POST` endpoint into a durable queue stored on disk.
+In case of a loss of connection with the backend or agent shutdown, the agent preserves queued event data.
+When the connection is reestablished, the agent sends the queued events to the backend.
+
+To learn more about the Agent Events API, please visit the [Sensu Agent reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api).
 
 ### Dead mans switches
 
-==TODO: generate a dead mans switch using the Agent API...==
+The Sensu Agent Events API makes it easy to implement dead mans switches with as little as one line of `bash` or Powershell (see below for examples).
+The Sensu Event specification supports an `event.check.ttl` attribute which can be set to instruct the Sensu platform to expect subsequent event updates; if another event is not received within the configured TTL interval, Sensu generates a TTL event with a status like "Last check execution was 120 seconds ago" and processes the event using the configured handlers.
+
+Dead mans switches are useful for monitoring jobs like nighly backup jobs (e.g. a bash script scheduled via a cron job).
+A simple one-liner at the end of the backup script can be used to report on the backup status (e.g. `"Backup completed successfully. Backup data is available at <backup location URI>.`) with a ~25 hour TTL to account for long running backup jobs.
+A failed backup job will result in a TTL event without the need for any if/then/else conditional logic in the script (i.e. no need to also send an event if the script fails) – the mere absence of an "OK" event is all that is needed.
+
+#### Examples
+
+```shell
+curl -XPOST -H 'Content-Type: application/json' -d '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' 127.0.0.1:3031/events
+```
+
+```powershell
+Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
+```
 
 ### StatsD API
 
+==TODO==
+
 ### Platform detection
 
+==TODO==
+
 ### Command allow list
+
+==TODO==
 
 ## EXERCISE: register a proxy entity
 
@@ -371,6 +409,8 @@ There are two types of entity management in Sensu Go 6.x:
    In Sensu, any entity that does not under active management by a Sensu Agent is considered a "proxy" entity.
    Let's create a proxy entity as a precursor to installing our first agent so we can better understand the association between the agent (a software component) and its entity (a Sensu API resource).
 
+   **Mac and Linux users:**
+
    ```shell
    curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
@@ -378,23 +418,15 @@ There are two types of entity management in Sensu Go 6.x:
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/entities/i-424242"
    ```
 
-   Alternatively, here's an easier to read version of the same command, with the addition of some entity metadata (labels).
+   **Windows users (Powershell):**
 
-   ```shell
-   curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
-       -H "Content-Type: application/json" \
-       -d "{
-            \"metadata\": {
-              \"name\": \"i-424242\",
-              \"namespace\": \"${SENSU_NAMESPACE:-default}\",
-              \"labels\": {
-                \"region\": \"us-west-1\",
-                \"environment\": \"workshop\"
-              }
-            },
-            \"entity_class\": \"proxy\"
-          }" \
-       "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/entities/i-424242"
+   ```powershell
+   Invoke-RestMethod `
+     -Method PUT `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body "{`"entity_class`": `"proxy`", `"metadata`":{`"name`":`"i-424242`",`"namespace`":`"${Env:SENSU_NAMESPACE}`"}}" `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/entities/i-424242"
    ```
 
    Do you see a new entity in Sensu?

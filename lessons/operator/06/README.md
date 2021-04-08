@@ -296,11 +296,18 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 ## Learn more
 
-- [Event Filters overview (documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/)
-- [Event Filters (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/)
-- [Sensu Query Expressions (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/sensu-query-expressions/)
-- [Reduce alert fatigue with event filters (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/reduce-alert-fatigue/)
-- [Route alerts with event filters (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/route-alerts/)
+- [[Documentation] "Event Filters Overview" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/)
+- [[Documentation] "Event Filters Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/)
+- [[Documentation] "Sensu Query Expressions Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/sensu-query-expressions/)
+- [[Documentation] "Guide: Reduce alert fatigue with event filters" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/reduce-alert-fatigue/)
+- [[Documentation] "Guide: Route alerts with event filters" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/route-alerts/)
+- [[Blog Post] "Filters: valves for the Sensu Observability Pipeline" (sensu.io)](https://sensu.io/blog/filters-valves-for-the-sensu-monitoring-event-pipeline)
+- [[Whitepaper] "Alert fatigue: avoidance and course correction" (sensu.io)](https://sensu.io/resources/whitepaper/alert-fatigue-guide)
+- [[Blog Post] "Alert fatigue, part 1: avoidance and course correction" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-1-avoidance-and-course-correction)
+- [[Blog Post] "Alert fatigue, part 2: alert reduction with Sensu filters & token substitution" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-2-alert-reduction-with-sensu-filters-token-substitution)
+- [[Blog Post] "Alert fatigue, part 3: automating triage & remediation with check hooks & handlers" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-3-automating-triage-remediation-with-checks-hooks-handlers)
+- [[Blog Post] "Alert fatigue, part 4: alert consolidation" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-4-alert-consolidation)
+- [[Blog Post] "Alert fatigue, part 5: fine-tuning & silencing" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-5-fine-tuning-silencing)
 
 ## Next steps
 

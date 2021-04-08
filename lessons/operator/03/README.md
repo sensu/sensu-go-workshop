@@ -560,11 +560,12 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 
 ## Learn more
 
-- [Sensu CLI (reference documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/)
-- [Create and manage resources with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
-- [Backup and recover resources with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/back-up-recover/)
-- [Filter responses with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/filter-responses/)
-- [Set environment variables with `sensuctl` (documentation)](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
+- [[Documentation] "Sensu CLI" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/)
+- [[Documentation] "Create and manage resources with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
+- [[Documentation] "Backup and recover resources with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/back-up-recover/)
+- [[Documentation] "Filter responses with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/filter-responses/)
+- [[Documentation] "Set environment variables with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
+- [[Blog Post] "A Primer on Sensu Dashboards" (sensu.io)](https://sensu.io/blog/a-primer-on-sensu-dashboards-eb0940293a)
 
 ## Next steps
 

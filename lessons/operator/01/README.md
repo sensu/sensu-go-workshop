@@ -126,14 +126,12 @@ Sensu's observability pipeline
 
 ## Learn more
 
-- [[Whitepaper] Monitoring as code with the Sensu Observability Pipeline](https://sensu.io/resources/whitepaper/monitoring-as-code-with-sensu)
-- [[Blog Post] Monitoring as Code: What It Is and Why You Need It](https://sensu.io/blog/monitoring-as-code-what-it-is-and-why-you-need-it)
-- [[Documentation] What is Observability? (sumologic.com)](https://www.sumologic.com/glossary/observability/)
-- [[Blog Post] Monitoring and Observability (by Cindy Sridharan)](https://copyconstruct.medium.com/monitoring-and-observability-8417d1952e1c)
-- [[Documentation] Sensu Observability Pipeline](https://docs.sensu.io/sensu-go/latest/observability-pipeline/)
-- [[Blog Post] The Observability Pipeline (bravenewgeek.com)](https://bravenewgeek.com/the-observability-pipeline/)
-- [[Blog Post] Observability Pipelines: Why you need one, and why you should stop rolling your own](https://sensu.io/blog/observability-pipelines-why-you-need-one-and-why-you-should-stop-rolling-your-own)
-- [[Blog Post] Monitoring as code with Sensu Go and SensuFlow](https://sensu.io/blog/monitoring-as-code-with-sensu-flow)
+- [[Whitepaper] "Monitoring as code with the Sensu Observability Pipeline" (sensu.io)](https://sensu.io/resources/whitepaper/monitoring-as-code-with-sensu)
+- [[Blog Post] "Monitoring as Code: What It Is and Why You Need It" (sensu.io)](https://sensu.io/blog/monitoring-as-code-what-it-is-and-why-you-need-it)
+- [[Documentation] "Sensu Observability Pipeline" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/)
+- [[Blog Post] "The Observability Pipeline" (bravenewgeek.com)](https://bravenewgeek.com/the-observability-pipeline/)
+- [[Blog Post] "Observability Pipelines: Why you need one, and why you should stop rolling your own" (sensu.io)](https://sensu.io/blog/observability-pipelines-why-you-need-one-and-why-you-should-stop-rolling-your-own)
+- [[Blog Post] "Monitoring as code with Sensu Go and SensuFlow" (sensu.io)](https://sensu.io/blog/monitoring-as-code-with-sensu-flow)
 
 ## Next steps
 

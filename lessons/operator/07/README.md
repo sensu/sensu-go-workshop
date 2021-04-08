@@ -408,7 +408,7 @@ Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{
 
 ## EXERCISE: register a proxy entity
 
-1. Create a proxy Entity using the Sensu Entities API.
+1. **Create a proxy Entity using the Sensu Entities API.**
 
    In Sensu, any entity that does not under active management by a Sensu Agent is considered a "proxy" entity.
    Let's create a proxy entity as a precursor to installing our first agent so we can better understand the association between the agent (a software component) and its entity (a Sensu API resource).
@@ -442,23 +442,10 @@ Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{
 ## EXERCISE: install and start your first agent
 
 The Sensu Agent is available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, MacOS, and FreeBSD.
-This exercise will focus on a simplified install for Linux systems, but it will not go into as much detail as the official documentation.
-The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides detailed instructions for installing & operating Sensu Agents on a variety of systems.
+This exercise will focus on a simplified install for running a Sensu agent on your local workstation, but it will not go into as much detail as the official documentation.
+The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides detailed instructions for installing & operating Sensu Agents.
 
-1. Decide where to deploy your Sensu Agent.
-
-   In general, Sensu Agents can be deployed almost anywhere you can imagine – from bare metal servers to cloud compute instances to containers and more.
-   In fact, Sensu's publish/subscribe architecture makes it easy to traverse complex network topologies including VPNs, NATs, and even "air-gapped" environments as often found in the enterprise.
-   As long as a Sensu agent can reach a Sensu backend websocket API – directly or via one or more proxies – everything should "just work".
-
-   When the Sensu backend is installed in a centralized location (e.g. in close proximity to other IT management infrastructure), this will generally provide the most flexibility.
-   Conversely, if you are running the workshop on your laptop (e.g. using `docker-compose`) then the best place to install an agent is likely also on your laptop.
-   As such, for the purposes of the remaining exercises in this workshop, we recommend installing Sensu Agents as follows:
-
-   - **Self guided users:** the Sensu Agent should be installed on your local workstation.
-   - **Instructor-led workshop users:** the Sensu Agent may be installed on your local workstation (recommended), or on another system that can reach the shared `${SENSU_BACKEND_URL}`.
-
-1. Verify environment variables.
+1. **Verify environment variables.**
 
    If you're installing the Sensu Agent on a system other than the workstation where you've been following along with the rest of this workshop you'll need to set a few environment variables.
 
@@ -504,7 +491,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
 
    Instructor-led workshop users will need to replace the `SENSU_BACKEND_URL` IP address (or hostname), `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORZD` with the values provided by their instructor.
 
-1. Download & install the latest Sensu Agent for MacOS, Windows, or Linux.
+1. **Download & install the latest Sensu Agent for MacOS, Windows, or Linux.**
 
    **Mac users:**
 
@@ -535,7 +522,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    rm sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz
    ```
 
-1. Start the Sensu Agent.
+1. **Start the Sensu Agent.**
 
    **Mac users:**
 
@@ -588,11 +575,11 @@ As a result, some Sensu Agent configuration parameters are used to manage the be
 
 Let's stop our agent and modify its configuration:
 
-1. Stop the Sensu Agent.
+1. **Stop the Sensu Agent.**
 
    If you started your agent in the previous exercise using the `sensu-agent start` command, you can stop the agent by pressing `Control-C` in your terminal.
 
-1. Configure Sensu Agent.
+1. **Configure Sensu Agent.**
 
    The Sensu Agent supports configuration via **command flags** (e.g. `--backend-url`), a **configuration file** (e.g. `/etc/sensu/agent.yml`), or **environment variables** (e.g. `SENSU_SUBSCRIPTIONS`).
    For training purposes we will use a mix of all three, however in practice you may find that just one method is best suited for your environment (e.g. on Kubernetes or other container-based environments it may be easiest to manage all configuration via environment variables).
@@ -622,7 +609,7 @@ Let's stop our agent and modify its configuration:
 
    Make sure to save the contents of the file before moving on to the next step.
 
-1. Start/Restart the Sensu Agent.
+1. **Start/Restart the Sensu Agent.**
 
    Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent.
 
@@ -665,6 +652,13 @@ Let's stop our agent and modify its configuration:
    Understanding how to configure Sensu using all three methods – config flags, config file, and environment variables – is very useful in heterogeneus environments (e.g. mix of servers, compute instances, and containers) where a configuration method that is easier to manage in one context might not be as easy in another context.
 
 ## Learn more
+
+- [[Documentation] "Sensu Agent Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/)
+- [[Documentation] "Sensu Entity Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/)
+- [[Documentation] "Sensu Architecture" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/deployment-architecture/)
+- [[Documentation] "Install Sensu Agents" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents)
+- [[Documentation] "Configure Sensu Agent mTLS Authentication" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/secure-sensu/#configure-sensu-agent-mtls-authentication)
+- [[Documentation] "Sensu Subscriptions Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/subscriptions/)
 
 ## Next steps
 

@@ -292,11 +292,12 @@ If so, you're ready to move on to the next step!
 
 ## Learn more
 
-- [Sensu Handlers (overview)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/)
-- [Sensu Handlers (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/)
-- [Send Pagerduty alerts with Sensu (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-pagerduty-alerts/)
-- [Send Slack alerts with Sensu (guide)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-slack-alerts/)
-- [Supported Handler Integrations (documentation)](https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/)
+- [[Documentation] "Sensu Handlers Overview" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/)
+- [[Documentation] "Sensu Handlers Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/)
+- [[Documentation] "Guide: Send Pagerduty alerts with Sensu" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-pagerduty-alerts/)
+- [[Documentation] "Guide: Send Slack alerts with Sensu" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/send-slack-alerts/)
+- [[Documentation] "Supported Handler Integrations" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/)
+- [[Blog Post] "Reducing alert fatigue with GoAlert, Target’s on-call scheduling and notification platform" (sensu.io)](https://sensu.io/blog/reducing-alert-fatigue-with-goalert)
 
 ## Next steps
 

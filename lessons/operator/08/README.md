@@ -185,7 +185,7 @@ spec:
 
 ## EXERCISE: configure a check
 
-1. Configure a Sensu Check for monitoring system clock drift.
+1. **Configure a Sensu Check for monitoring system clock drift.**
 
    Copy and paste the following contents to a file named `disk.yaml`:
 
@@ -215,7 +215,7 @@ spec:
    Notice the values of `subscriptions` and `interval` – these will instruct the Sensu platform to schedule (or "publish") monitoring jobs every 30 seconds on any agent with the `system/macos`, `system/windows`, or `system/linux` subscriptions.
    Agents opt-in (or "subscribe") to monitoring jobs by their corresponding `subscriptions` configuration.
 
-1. Create the Check using the `sensuctl create -f` command.
+1. **Create the Check using the `sensuctl create -f` command.**
 
    ```shell
    sensuctl create -f disk.yaml
@@ -308,7 +308,7 @@ Let's modify our check from the previous exercise using some Tokens.
 
 1. **Update the Check using `sensuctl create -f`.**
 
-   ```
+   ```shell
    sensuctl create -f disk.yaml
    ```
 
@@ -319,6 +319,17 @@ Let's modify our check from the previous exercise using some Tokens.
    ```
 
 ## Learn more
+
+- [[Documentation] "Sensu Checks Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/)
+- [[Documentation] "Schedule observability data collection" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/)
+- [[Documentation] "Guide: Monitor server resources with Sensu Checks" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/monitor-server-resources/)
+- [[Documentation] "Guide: Collect service metrics with Sensu Checks" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/collect-metrics-with-checks/)
+- [[Documentation] "Guide: Collect Prometheus metrics with Sensu" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/prometheus-metrics/)
+- [[Documentation] "Sensu Tokens Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/tokens/)
+- [[Blog Post] "Self-service monitoring checks in Sensu Go" (sensu.io)](https://sensu.io/blog/self-service-monitoring-checks-in-sensu-go)
+- [[Blog Post] "The story of Nagios plugin support in Sensu (or, why service checks are so amazing)" (sensu.io)](https://sensu.io/blog/the-story-of-nagios-plugin-support-in-sensu)
+- [[Blog Post] "Check output metric extraction with InfluxDB & Grafana" (sensu.io)](https://sensu.io/blog/check-output-metric-extraction-with-influxdb-grafana)
+- [[Blog Post] "How to collect Prometheus metrics and store them anywhere (with Sensu!)" (sensu.io)](https://sensu.io/blog/how-to-collect-prometheus-metrics-and-store-them-anywhere-with-sensu)
 
 ## Next steps
 

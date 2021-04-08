@@ -242,7 +242,10 @@ Labels and annotations are identical in format &ndash; they are represented as 
 
 ## Learn more
 
-- [Monitoring versus Observability (The New Stack)](https://thenewstack.io/monitoring-vs-observability-whats-the-difference/)
+- [[Documentation] "Sensu Events Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
+- [[Documentation] "What is Observability?" (sumologic.com)](https://www.sumologic.com/glossary/observability/)
+- [[Blog Post] "Monitoring and Observability", by Cindy Sridharan (copyconstruct.medium.com)](https://copyconstruct.medium.com/monitoring-and-observability-8417d1952e1c)
+- [[Blog Post] "Monitoring versus Observability" (thenewstack.io)](https://thenewstack.io/monitoring-vs-observability-whats-the-difference/)
 
 ## Next steps
 

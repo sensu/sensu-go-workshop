@@ -354,9 +354,10 @@ If so you're ready to move on to the next step!
 
 ## Learn more
 
-- [Sensu Events (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
-- [Sensu Events API (reference documentation)](https://docs.sensu.io/sensu-go/latest/api/events/)
-- [Sensu Agent Events API (reference documentation)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
+- [[Documentation] "Sensu Events Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
+- [[Documentation] "Sensu Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/api/events/)
+- [[Documentation] "Sensu Agent Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
+- [[Blog Post] "Filling gaps in Kubernetes observability with the Sensu Kubernetes Events integration" (sensu.io)](https://sensu.io/blog/filling-gaps-in-kubernetes-observability-with-the-sensu-kubernetes-events-integration)
 
 ## Next steps
 

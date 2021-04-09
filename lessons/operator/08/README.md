@@ -12,8 +12,10 @@
   - [TTLs (Dead Man Switches)](#ttls-dead-man-switches)
   - [Proxy checks (pollers)](#proxy-checks-pollers)
   - [Execution environment & environment variables](#execution-environment--environment-variables)
-- [EXERCISE: configure a check](#exercise-configure-a-check)
-- [EXERCISE: modify a check configuration using tokens](#exercise-modify-a-check-using-tokens)
+- [EXERCISE 1: configure a check](#exercise-1-configure-a-check)
+- [EXERCISE 2: modify a check configuration using tokens](#exercise-2-modify-a-check-using-tokens)
+- [EXERCISE 3: collecting metrics with Sensu Checks](#exercise-3-collecting-metrics-with-sensu-checks)
+- [Next steps](#next-steps)
 - [Learn more](#learn-more)
 
 ## Overview
@@ -49,7 +51,6 @@ spec:
 ```
 
 </details>
-
 
 Although service checks were originally popularized by Nagios (circa 1999-2002), they continue to fill a critical role in the modern era of cloud computing.
 Sensu orchestrates service checks in a similar manner as cloud-native platforms like Kubernetes and Prometheus which use "Jobs" as a central concept for scheduling and running tasks.
@@ -133,7 +134,7 @@ If an event containing metrics is configured with one or more `output_metric_han
 ### Output Metric Tags
 
 Metrics extracted with `output_metrics_format` can also be enriched using `output_metric_tags`.
-Metric sources vary in verbosity &ndash; some metric format don't support tags (e.g. Nagios Performance Data), and some metric collection implementations simply don't provide much contextual data.
+Metric sources vary in verbosity &ndash; some metric formats don't support tags (e.g. Nagios Performance Data), and even those that do can be implemented in ways that simply don't provide enough contextual data.
 In either case, Sensu's `output_metric_tags` are great for enriching collected metrics using entity data/metadata.
 Sensu breathes new life into legacy monitoring plugins or other metric sources that generate the raw data you care about, but lack tags or other context to make sense of the data; simply configure `output_metric_tags` and Sensu will add the corresponding tag data to the resulting metrics/measurements.
 
@@ -167,7 +168,6 @@ At a high level, a proxy check is a Sensu check with `proxy_requests`, which are
 Proxy requests are published to the configured subscription(s) once per matching entity.
 In the following example, we would expect Sensu to find two (2) entities with `entity_class == "proxy"` and a `proxy_type` label set to "website"; for each matching entity, the Sensu backend will first replace the configured tokens using the corresponding entity attributes (i.e. one request to execute the command `nslookup sensu.io`, and one request to execute the command `nslookup google.com`).
 To avoid redundant processing, we recommend using the `round_robin` attribute with proxy checks.
-
 
 ```yaml
 ---
@@ -217,7 +217,7 @@ spec:
 
 ### Execution environment & environment variables
 
-## EXERCISE: configure a check
+## EXERCISE 1: configure a check
 
 1. **Configure a Sensu Check for monitoring system clock drift.**
 
@@ -272,7 +272,7 @@ spec:
 **NEXT:** do you see the `disk` check in the output?
 If so, you're ready to move on to the next exercise!
 
-## EXERCISE: modify check configuration using tokens
+## EXERCISE 2: modify check configuration using tokens
 
 Sensu's service-oriented configuration model (as opposed to traditional host-based models) makes monitoring configuration easier to manage at scale.
 A single check definition can be used to collect monitoring data from hundreds or thousands of endpoints!
@@ -329,7 +329,7 @@ Let's modify our check from the previous exercise using some Tokens.
    sensuctl check info disk --format yaml
    ```
 
-## EXERCISE: collecting metrics with Sensu Checks
+## EXERCISE 3: collecting metrics with Sensu Checks
 
 1. **Update the `disk` check configuration template.**
 

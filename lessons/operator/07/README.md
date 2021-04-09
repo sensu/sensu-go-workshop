@@ -13,9 +13,9 @@
   - [StatsD API](#statsd-api)
   - [Platform detection](#platform-detection)
   - [Command allow list](#command-allow-list)
-- [EXERCISE: register a proxy entity](#exercise-register-a-proxy-entity)
-- [EXERCISE: install and start your first agent](#exercise-install-and-start-your-first-agent)
-- [EXERCISE: customize agent and entity configuration](#exercise-customize-agent-and-entity-configuration)
+- [EXERCISE 1: register a proxy entity](#exercise-1-register-a-proxy-entity)
+- [EXERCISE 2: install and start your first agent](#exercise-2-install-and-start-your-first-agent)
+- [EXERCISE 3: customize agent and entity configuration](#exercise-3-customize-agent-and-entity-configuration)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 - [Troubleshooting](#troubleshooting)
@@ -406,7 +406,7 @@ Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{
 
 ==TODO==
 
-## EXERCISE: register a proxy entity
+## EXERCISE 1: register a proxy entity
 
 1. **Create a proxy Entity using the Sensu Entities API.**
 
@@ -439,7 +439,7 @@ Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{
 
 **NEXT:** If you see the example proxy entity in Sensu, you're ready to move on to the next exercise.
 
-## EXERCISE: install and start your first agent
+## EXERCISE 2: install and start your first agent
 
 The Sensu Agent is available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, MacOS, and FreeBSD.
 This exercise will focus on a simplified install for running a Sensu agent on your local workstation, but it will not go into as much detail as the official documentation.
@@ -568,7 +568,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
 
 **NEXT:** If your Sensu Agent has successfully connected to your backend, you're ready to move on to the next exercise.
 
-## EXERCISE: customize agent and entity configuration
+## EXERCISE 3: customize agent and entity configuration
 
 Sensu Agents are represented in the Sensu API as Sensu Entities.
 As a result, some Sensu Agent configuration parameters are used to manage the behavior of the agent (e.g. TLS certificates, authentication, subscriptions, etc), while others are used to configure the corresponding Sensu Entity (e.g. metadata properties like labels and annotations).
@@ -690,9 +690,17 @@ sensu-agent
 
 ### The sensu-agent reports various "permission denied" errors
 
-If you have run the `sensu-agent` as the `root` user, or other user with elevated privileges, and then attempt to start the `sensu-agent` process via systemd or other service management, you may encounter various "permission denied" errors.
+If you have run the `sensu-agent` as the `root` user, or other user with elevated privileges, and then attempt to start the `sensu-agent` process via service management or using a service account, you may encounter various "permission denied" errors.
 The officially supported Sensu Agent installation packages (e.g. `.rpm` and `.deb` packages) will install and run all Sensu services as the `sensu` user (i.e. not `root`).
 To ensure that the `sensu` users owns all of the files needed to run the Sensu Agent, run the following commands:
+
+**Mac users:**
+
+```
+sudo chown -R _sensu:_sensu /opt/sensu
+```
+
+**Linux users:**
 
 ```shell
 sudo chown -R sensu:sensu /etc/sensu
@@ -703,16 +711,6 @@ sudo chown -R sensu:sensu /var/cache/sensu
 This should resolve any outstanding permissions errors.
 
 ### Unknown user `sensu` or `_sensu` when starting Sensu Agent
-
-**Linux users:**
-
-If you installed the Sensu Agent from a Linux binary archive (e.g. `.tar.gz` or `.zip` file) instead of using installer packages, you may encounter "unknown user" errors when running the `sensu-agent`.
-The follow commands can be used on Linux systems to create the `sensu` group and user (these are the same commands used by the `.rpm` and `.deb` installer packages):
-
-```shell
-sudo groupadd -r sensu
-sudo useradd -r -g sensu -d /opt/sensu -s /bin/false -c "Sensu Go" sensu
-```
 
 **MacOS users:**
 
@@ -740,6 +738,16 @@ To delete the `_sensu` service account and remove the service account home direc
 sudo dscl . -delete /Groups/_sensu
 sudo dscl . -delete /Users/_sensu
 sudo rm -rf /opt/sensu
+```
+
+**Linux users:**
+
+If you installed the Sensu Agent from a Linux binary archive (e.g. `.tar.gz` or `.zip` file) instead of using installer packages, you may encounter "unknown user" errors when running the `sensu-agent`.
+The follow commands can be used on Linux systems to create the `sensu` group and user (these are the same commands used by the `.rpm` and `.deb` installer packages):
+
+```shell
+sudo groupadd -r sensu
+sudo useradd -r -g sensu -d /opt/sensu -s /bin/false -c "Sensu Go" sensu
 ```
 
 If you would prefer not to install a service account on your workstation, you may run the `sensu-agent` as root (e.g. remove the `-u _sensu` from `sudo sensu-agent start`), or set the `--cache-dir` to a writable location (e.g. `--cache-dir .sensu`).

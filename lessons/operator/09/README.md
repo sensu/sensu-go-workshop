@@ -3,8 +3,10 @@
 - [Overview](#overview)
 - [Use cases](#use-cases)
 - [Advanced topics](#advanced-topics)
-- [EXERCISE: configure a check hook](#exercise-configure-a-check-hook)
+- [EXERCISE 1: configure a check hook](#exercise-1-configure-a-check-hook)
 - [Learn more](#learn-more)
+- [Next steps](#next-steps)
+
 
 ## Overview
 
@@ -86,59 +88,68 @@ Sensu Go Check Hooks are first-class API resources, which offers several benefit
 
 ## EXERCISE: configure a check hook
 
-1. Configure a Hook to evaluate the process tree.
+1. **Configure a Hook to evaluate the process tree.**
 
-   Copy the following contents to a file named `ntp-hooks.yaml`
+   Copy the following contents to a file named `ps.yaml`
 
    ```yaml
    ---
    type: HookConfig
    api_version: core/v2
    metadata:
-     name: ntp-config
+     name: process-table
    spec:
-     command: cat /etc/ntp.conf
-     timeout: 30
+     command: ps -aux
+     timeout: 10
      stdin: false
      runtime_assets: []
    ---
    type: HookConfig
    api_version: core/v2
    metadata:
-     name: ntp-peer-verification
+     name: process-table-windows
    spec:
-     command: ntpq -d
-     timeout: 30
+     command: tasklist /svc
+     timeout: 10
      stdin: false
      runtime_assets: []
    ```
 
-1. Create the Hook using `sensuctl create -f`.
+1. **Create the Hook using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f ntp-config.yaml
+   sensuctl create -f ps.yaml
    ```
 
    Verify that the hook was created:
 
    ```
-   sensuctl hook list
+   sensuctl hook info process-table --format yaml
    ```
 
-1. Update the check configuration template to use the new Hook(s).
+1. **Update the check configuration template to use the new Hook(s).**
 
-   Let's modify the check template we created in [Lesson 8](/lessons/operator/08/README.md#readme) (e.g. `ntp.yaml`), and replace the `check_hooks: []` line with the following:
+   Let's modify the check template we created in [Lesson 8](/lessons/operator/08/README.md#readme) (e.g. `disk.yaml`), and replace the `check_hooks: []` line with the following:
+
+   **Mac and Linux users:**
 
    ```yaml
    check_hooks:
    - non-zero:
-     - ntp-config
-     - ntp-peer-verification
+     - process-table
+   ```
+
+   **Windows users:**
+
+   ```yaml
+   check_hooks:
+   - non-zero:
+     - process-table-windows
    ```
 
    In practice you may find it appropriate to bundle certain check hooks alongside the corresponding checks (e.g. add the check hook configuration to the check template file).
 
-1. Update the check using `sensuctl create -f`.
+1. **Update the check using `sensuctl create -f`.**
 
    ```shell
    sensuctl create -f ntp.yaml

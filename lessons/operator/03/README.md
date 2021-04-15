@@ -142,7 +142,7 @@ A similar editor is available for Filters, Mutators, and Handlers._
 ### API client
 
 Sensu's monitoring as code solution is possible thanks to a robust set of APIs.
-The Sensu web app and CLI are effectly just API clients that streamline access to these APIs.
+The Sensu web app and CLI are effectively just API clients that streamline access to these APIs.
 Sensuctl is available for Linux, macOS, and Windows.
 Because all access to the Sensu APIs requires authentication, the Sensu CLI (`sensuctl`) must be configured with a username and password before you can use it.
 

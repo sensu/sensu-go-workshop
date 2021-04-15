@@ -196,7 +196,7 @@ For more information on configuration overrides via check and entity annotations
 
    Copy and paste the following contents to a file named `slack.yaml`:
 
-   ```
+   ```yaml
    ---
    type: Handler
    api_version: core/v2
@@ -224,19 +224,19 @@ For more information on configuration overrides via check and entity annotations
 
 1. **Create the Handler using the `sensuctl create -f` command.**
 
-   ```
+   ```shell
    sensuctl create -f slack.yaml
    ```
 
    Verify that your Handler was successfully created using the `sensuctl handler list` command:
 
-   ```
+   ```shell
    sensuctl handler list
    ```
 
    Example output:
 
-   ```
+   ```shell
      Name    Type   Timeout     Filters     Mutator            Execute            Environment Variables               Assets
     ─────── ────── ───────── ───────────── ───────── ─────────────────────────── ─────────────────────── ─────────────────────────────────
      slack   pipe        10   is_incident             RUN:  sensu-slack-handler                           sensu/sensu-slack-handler:1.4.0
@@ -251,7 +251,7 @@ If so, you're ready to proceed to the next step!
 
    Copy and paste the following contents to a file named `influxdb.yaml`:
 
-   ```
+   ```yaml
    type: Handler
    api_version: core/v2
    metadata:

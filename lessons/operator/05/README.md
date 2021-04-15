@@ -220,24 +220,30 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 >
 > _NOTE: entities and proxy entities are covered in more detail in [Lesson 7: introduction to Agents & Entities](/lessons/operator/07/README.md#readme) and [Lesson 12: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/12/README.md#readme)._
 
-## EXERCISE: create an event using curl and the Sensu Events API
+## EXERCISE 1: create an event using curl and the Sensu Events API
 
 1. Configure environment variables
 
-   Verify the contents of `.envrc` to ensure that `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY` are set to the correct values, then run the following command:
-
-   ```
-   source .envrc
-   ```
+   Verify the contents of `.envrc` or `.envrc.ps1` to ensure that `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY` are set to the correct values, then run the following commands:
 
    - **Self-guided workshop users:** use the default values for `SENSU_API_URL` (`http://127.0.0.1:8080`) and `SENSU_NAMESPACE` (`default`).
    - **Instructor-led workshop users:** use the values provided by your instructor for `SENSU_API_URL` and `SENSU_NAMESPACE`.
 
-   To verify that your environment is correctly configured, please run the following command:
+   **Mac and Linux users (`.envrc`):**
 
-   ```
+   ```shell
+   source .envrc
    env | grep SENSU
    ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
    Do you see the expected values for `SENSU_API_URL`,`SENSU_NAMESPACE`, and `SENSU_API_KEY`?
    If so, you're ready to move on to the next step!

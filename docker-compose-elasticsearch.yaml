@@ -1,13 +1,12 @@
 ---
 version: "3.3"
 services:
-  # Sensu Backend 
+  # Sensu Backend
   #
-  # Includes embedded database, API, event processor, and web UI). 
-  # 
+  # Includes embedded database, API, event processor, and web UI).
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
-    container_name: sensu-backend
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
     labels:
     - io.sensu.role=sensu-backend
@@ -23,27 +22,23 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - SENSU_PAGERDUTY_TOKEN
-    - SENSU_INFLUXDB_ADDR
-    - SENSU_INFLUXDB_DB
-    - SENSU_INFLUXDB_USER
-    - SENSU_INFLUXDB_PASSWORD
+    - SENSU_INTERNAL_ENVIRONMENT
+    - SENSU_WORKSHOP_ENV_SECRET
     volumes:
-    - type: volume 
+    - type: volume
       source: sensu_data
       target: /var/lib/sensu
     command: >-
-      sensu-backend start 
+      sensu-backend start
       --log-level=debug
       --debug=true
 
-  # Sensu Agent 
+  # Sensu Agent
   #
   # Includes monitoring agent, local API, and local StatsD socket.
-  # 
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
-    # container_name: sensu-agent
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     labels:
     - io.sensu.role=sensu-agent
@@ -59,6 +54,7 @@ services:
     - SENSU_BACKEND_URL
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS
+    - SENSU_AGENT_PASSWORD
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
@@ -67,56 +63,75 @@ services:
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
     command: >-
-      sensu-agent start 
+      sensu-agent start
       --log-level=info
-      --deregister=true 
+      --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
-      --statsd-event-handlers influxdb
+      --statsd-event-handlers timescaledb
+      --password ${SENSU_AGENT_PASSWORD:-"P@ssw0rd!"}
 
-
-  # InfluxDB  
+  # Elasticsearch
   #
-  # Includes the InfluxDB time-series database for storage of telemetry data.
-  # 
-  # See: 
-  influxdb:
-    # container_name: timescaledb
-    image: influxdb:${INFLUXDB_VERSION}
+  # Includes Elasticsearch data platform for storage of event and
+  # metric data.
+  #
+  # See:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
     labels:
-    - io.sensu.role=tsdb
+    - io.sensu.role=data-platform
     ports:
-    - 8086:8086
+    - 9200:9200
+    - 9300:9300
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:8086/health
+      test: wget -q -O- http://127.0.0.1:9200/_cluster/health
       interval: 10s
       timeout: 5s
       retries: 6
     environment:
-    - INFLUXDB_DB
-    - INFLUXDB_ADMIN_USER
-    - INFLUXDB_ADMIN_PASSWORD
+    - "discovery.type=single-node"
     volumes:
-    - type: volume 
-      source: influxdb_data
-      target: /var/lib/influxdb
-    command: influxd
-      
-  # Grafana 
+    - type: volume
+      source: elasticsearch_data
+      target: /data
+
+  # Kibana
   #
-  # Includes Grafana dashboard and datasource configuration files for 
-  # Timescaledb. 
-  # 
+  # Includes the Kibana web app for operating Elasticsearch and visualizing
+  # Elasticsearch data.
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${KIBANA_VERSION}
+    labels:
+    - io.sensu.role=dashboards
+    ports:
+    - 5601:5601
+    healthcheck:
+      test: curl -i http://127.0.0.1:5601/api/status
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    volumes:
+    - type: bind
+      source: ./config/elasticsearch/kibana.yml
+      target: /usr/share/kibana/config/kibana.yml
+    depends_on:
+    - elasticsearch
+
+  # Grafana
+  #
+  # Includes Grafana dashboard and datasource configuration files for
+  # InfluxDB, TimescaleDB, and Elasticsarch.
+  #
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
-    # container_name: grafana
     image: grafana/grafana:${GRAFANA_VERSION}
     labels:
     - io.sensu.role=dashboards
     ports:
     - 3001:3000
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:3000/api/health
+      test: curl -i http://127.0.0.1:3000/api/health
       interval: 10s
       timeout: 5s
       retries: 6
@@ -125,20 +140,71 @@ services:
     - GF_AUTH_BASIC_ENABLED
     - GF_SECURITY_ADMIN_USER
     - GF_SECURITY_ADMIN_PASSWORD
+    - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
-    - type: bind
-      source: ./config/grafana/provisioning 
-      target: /etc/grafana/provisioning
-    - type: bind
-      source: ./config/grafana/dashboards/influxdb
-      target: /etc/grafana/dashboards
-    - type: volume 
+    - type: volume
       source: grafana_data
       target: /var/lib/grafana
+    - type: bind
+      source: ./config/grafana/provisioning
+      target: /etc/grafana/provisioning
+    - type: bind
+      source: ./config/grafana/dashboards/timescaledb
+      target: /etc/grafana/dashboards
+
+  # Vault
+  #
+  # Includes a Vault "devmode" server for secrets management.
+  vault:
+    image: vault:${VAULT_VERSION}
+    ports:
+    - 8200:8200
+    environment:
+    - VAULT_DEV_ROOT_TOKEN_ID
+    - VAULT_DEV_LISTEN_ADDRESS
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: >-
+      vault server -dev -log-level debug
+
+  # Artifactory
+  #
+  # Private Sensu Asset service.
+  artifactory:
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:${ARTIFACTORY_VERSION}
+    ports:
+    - 8881:8081
+    - 8882:8082
+    environment:
+    - JFROG_HOME
+    volumes:
+    - type: volume
+      source: artifactory_data
+      target: /opt/jfrog/artifactory/var
+    # - type: bind
+    #   source: ./config/artifactory/system.yaml
+    #   target: /opt/jfrog/artifactory/var/etc/system.yaml
+    # - type: bind
+    #   source: ./config/artifactory/join.key
+    #   target: /opt/jfrog/artifactory/var/etc/security/join.key
+    # - type: bind
+    #   source: ./config/artifactory/master.key
+    #   target: /opt/jfrog/artifactory/var/etc/security/master.key
+    # - type: bind
+    #   source: ./config/artifactory/bootstrap.creds
+    #   target: /opt/jfrog/artifactory/var/etc/access/bootstrap.creds
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8081/artifactory/api/system/ping
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Configurator
-  # 
-  # Configuration automation for instructor-led workshops (e.g. user profile 
+  #
+  # Configuration automation for instructor-led workshops (e.g. user profile
   # generation) using a super light-weight "configuration management" stack:
   #
   # - curl
@@ -146,18 +212,25 @@ services:
   # - envsubst (part of the gettext package)
   # - sensuctl
   # - docker & docker-compose
-  # 
+  #
   # See: ./scripts/
   configurator:
-    # container_name: configurator
     build:
-      context: docker/workshop/
+      context: ./
       dockerfile: Dockerfile
-      args: 
+      args:
       - SENSU_CLI_VERSION
+      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
+    depends_on:
+    - sensu-backend
     labels:
     - io.sensu.role=configurator
+    environment:
+    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - VAULT_ADDR
+    - VAULT_TOKEN
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -171,7 +244,7 @@ services:
     - type: bind
       source: ./docker
       target: /workshop/docker
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
@@ -181,26 +254,31 @@ services:
       source: ./config/sensu
       target: /workshop/config/sensu
       consistency: consistent
+    - type: bind
+      source: ./config/vault
+      target: /workshop/config/vault
+      consistency: consistent
     - type: volume
       source: sensuctl_data
       target: /root/.config
     command: |-
       generate_user_rbac
-  
+
   # Workstation
-  # 
-  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl 
-  # pre-installed in case the trainee workstation is missing a required 
-  # dependency. 
-  # 
+  #
+  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
+  # pre-installed in case the trainee workstation is missing a required
+  # dependency.
+  #
   # See: https://alpinelinux.org
   sensuctl:
     # container_name: sensuctl
     build:
-      context: docker/workshop/
+      context: ./
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
+      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
@@ -210,32 +288,32 @@ services:
     - SENSU_PASSWORD
     - SENSU_NAMESPACE
     - VAULT_ADDR
-    - VAULT_DEV_ROOT_TOKEN_ID
+    - VAULT_TOKEN
     working_dir: /root
     volumes:
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
       source: ./
       target: /root/workshop
-      consistency: consistent 
+      consistency: consistent
     - type: volume
       source: sensuctl_data
       target: /root/.config
-      consistency: consistent 
+      consistency: consistent
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
-      configure -n 
+      configure -n
       --url ${SENSU_API_URL}
       --username ${SENSU_USERNAME}
       --password ${SENSU_PASSWORD}
       --namespace ${SENSU_NAMESPACE}
       --format tabular
-      
+
 volumes:
   sensuctl_data:
     driver: local
@@ -243,5 +321,11 @@ volumes:
     driver: local
   influxdb_data:
     driver: local
+  timescaledb_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
   grafana_data:
+    driver: local
+  artifactory_data:
     driver: local

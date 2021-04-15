@@ -24,10 +24,7 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_WORKSHOP_ENV_SECRET
-    - SENSU_INFLUXDB_ADDR
-    - SENSU_INFLUXDB_DB
-    - SENSU_INFLUXDB_USER
-    - SENSU_INFLUXDB_PASSWORD
+    - SENSU_TIMESCALEDB_DSN
     volumes:
     - type: volume
       source: sensu_data
@@ -75,32 +72,35 @@ services:
       --statsd-event-handlers timescaledb
       --password ${SENSU_AGENT_PASSWORD:-"P@ssw0rd!"}
 
-  # InfluxDB
+  # TimescaleDB
   #
-  # Includes the InfluxDB time-series database for storage of telemetry data.
+  # Includes TimescaleDB (Postgres database) for storage of telemetry data.
   #
-  # See:
-  influxdb:
+  # See: https://docs.timescale.com/latest/introduction
+  timescaledb:
     # container_name: timescaledb
-    image: influxdb:${INFLUXDB_VERSION}
+    image: timescale/timescaledb:${TIMESCALEDB_VERSION}
     labels:
     - io.sensu.role=data-platform
     ports:
-    - 8086:8086
+    - 5432:5432
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:8086/health
+      test: pg_isready -U postgres
       interval: 10s
       timeout: 5s
       retries: 6
     environment:
-    - INFLUXDB_DB
-    - INFLUXDB_ADMIN_USER
-    - INFLUXDB_ADMIN_PASSWORD
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
     volumes:
     - type: volume
-      source: influxdb_data
-      target: /var/lib/influxdb
-    command: influxd
+      source: timescaledb_data
+      target: /var/lib/postgresql/data
+    - type: bind
+      source: ./config/timescaledb/100-sensu-metrics.sql
+      target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
+    command: >-
+      postgres
 
   # Grafana
   #
@@ -169,6 +169,18 @@ services:
     - type: volume
       source: artifactory_data
       target: /opt/jfrog/artifactory/var
+    # - type: bind
+    #   source: ./config/artifactory/system.yaml
+    #   target: /opt/jfrog/artifactory/var/etc/system.yaml
+    # - type: bind
+    #   source: ./config/artifactory/join.key
+    #   target: /opt/jfrog/artifactory/var/etc/security/join.key
+    # - type: bind
+    #   source: ./config/artifactory/master.key
+    #   target: /opt/jfrog/artifactory/var/etc/security/master.key
+    # - type: bind
+    #   source: ./config/artifactory/bootstrap.creds
+    #   target: /opt/jfrog/artifactory/var/etc/access/bootstrap.creds
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8081/artifactory/api/system/ping
       interval: 10s

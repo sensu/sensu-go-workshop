@@ -177,7 +177,8 @@
    All of the workshop configuration variables have been consolidated into a single configuration file for your convenience.
    These configuration variables make it easy to use a specific version of Sensu Go (see: `SENSU_BACKEND_VERSION`, `SENSU_AGENT_VERSION`, and `SENSU_CLI_VERSION`), or change default passwords, and more.
 
-   Please review [Customization](#customization) for more information.
+   At minimum we'll need to uncomment the `SENSU_AGENT_PASSWORD` environment variable.
+   Please review [Customization](#customization) for more information on other customizations that can be made.
 
    > **PROTIP:** if you are preparing a workshop environment for an instructor-led workshop, we recommend changing the Sensu admin username (`SENSU_CLUSTER_ADMIN_USERNAME`) and admin password (`SENSU_CLUSTER_ADMIN_PASSWORD`), as this will help workshop trainees avoid inadvertently accessing the admin account.
 

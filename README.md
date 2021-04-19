@@ -11,7 +11,6 @@
 
 ## Overview
 
-This project is intended to provide a simple template for developing training modules for Sensu Go.
 The workshop lessons included with this project are designed to help new Sensu users learn the basic concepts of an [Observability Pipeline](#) and help them get started with Sensu Go.
 
 This project has also be designed with both self-guided learning _and_ instructor-led training workshops in mind.

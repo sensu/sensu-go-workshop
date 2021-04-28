@@ -14,7 +14,7 @@ scrape_configs:
   - targets:
     - node-exporter:9100
     labels:
-      source: node-exporter
+      source: workshop
 
 - job_name: pushgateway
   honor_labels: true
@@ -23,5 +23,3 @@ scrape_configs:
   static_configs:
   - targets:
     - pushgateway:9091
-    labels:
-      source: pushgateway

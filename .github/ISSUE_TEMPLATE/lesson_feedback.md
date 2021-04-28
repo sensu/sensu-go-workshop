@@ -36,4 +36,3 @@ about: Share feedback about one of the lesson plans in the Sensu Go Workshop
 - [ ] Lesson 14 completed or in-progress
 - [ ] Lesson 15 completed or in-progress
 - [ ] Lesson 16 completed or in-progress
-

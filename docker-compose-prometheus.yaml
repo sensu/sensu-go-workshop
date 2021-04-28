@@ -82,9 +82,9 @@ services:
     image: prom/node-exporter:${PROM_NODE_EXPORTER_VERSION}
     labels:
     - io.sensu.role=exporter
+    # network: host
     ports:
     - 9100:9100
-    # network: host
     pid: host
     volumes:
     - type: bind

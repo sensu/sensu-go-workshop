@@ -292,7 +292,7 @@ Let's modify our check from the previous exercise using some Tokens.
    type: CheckConfig
    api_version: core/v2
    metadata:
-     name: disk
+     name: disk-usage
    spec:
      command: >-
        check-disk-usage
@@ -328,7 +328,7 @@ Let's modify our check from the previous exercise using some Tokens.
    Verify that the Check was successfully created using the `sensuctl check list` command:
 
    ```shell
-   sensuctl check info disk --format yaml
+   sensuctl check info disk-usage --format yaml
    ```
 
 ## EXERCISE 3: collecting metrics with Sensu Checks
@@ -351,7 +351,7 @@ Let's modify our check from the previous exercise using some Tokens.
    Verify that the Check was successfully created using the `sensuctl check list` command:
 
    ```shell
-   sensuctl check info disk --format yaml
+   sensuctl check info disk-usage --format yaml
    ```
 
 ## Learn more

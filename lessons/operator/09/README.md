@@ -152,13 +152,13 @@ Sensu Go Check Hooks are first-class API resources, which offers several benefit
 1. **Update the check using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f ntp.yaml
+   sensuctl create -f disk.yaml
    ```
 
    Now verify that the check was updated using `sensuctl` or the Sensu web app.
 
    ```shell
-   sensuctl check info ntp --format yaml
+   sensuctl check info disk-usage --format yaml
    ```
 
 ## Learn more

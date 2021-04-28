@@ -527,7 +527,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    **Mac users:**
 
    ```shell
-   sudo -E -u _sensu sensu-agent start \
+   sudo -E sensu-agent start \
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
@@ -617,7 +617,7 @@ Let's stop our agent and modify its configuration:
 
    ```shell
    SENSU_SUBSCRIPTIONS="system/macos workshop" \
-   sudo -E -u _sensu sensu-agent start \
+   sudo -E sensu-agent start \
    --config-file /opt/sensu/agent.yaml \
    --cache-dir /opt/sensu/sensu-agent/cache \
    --user ${SENSU_USER} \

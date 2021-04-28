@@ -1,0 +1,9 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Sensu Community Support
+    url: https://discourse.sensu.io
+    about: Join the Sensu Community Discourse to ask questions about Sensu or this workshop.
+  - name: Contact Sensu Inc
+    url: https://sensu.io/contact
+    about: Contact Sensu Inc directly for more information about Sensu Go licensing, commercial support, or private training.

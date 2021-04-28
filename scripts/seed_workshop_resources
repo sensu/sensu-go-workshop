@@ -1,0 +1,83 @@
+#!/bin/sh
+
+SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
+SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
+SENSU_CLUSTER_CONFIG=${SENSU_CLUSTER_CONFIG:-"config/sensu/cluster"}
+SENSU_WORKSHOP_SEEDS=${SENSU_WORKSHOP_SEEDS:-"config/sensu/seeds"}
+VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
+VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
+VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
+VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
+
+check_deps() {
+  for DEP in sensuctl vault
+  do
+    command -v ${DEP} > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      echo "Missing required dependency: \"${DEP}\""
+      exit 127
+    fi
+  done
+}
+
+validate_io() {
+  if [ ! -d ${VAULT_WORKSHOP_SEEDS} ]; then
+    echo "Missing or invalid namespace seeding secrets: \"${VAULT_WORKSHOP_SEEDS}\" (must be a directory)"
+    exit 2
+  fi
+  if [ ! -d ${SENSU_WORKSHOP_SEEDS} ]; then
+    echo "Missing or invalid namespace seeding resources: \"${SENSU_WORKSHOP_SEEDS}\" (must be a directory)"
+    exit 2
+  fi
+}
+
+validate_api_urls() {
+  curl -XGET ${SENSU_API_URL}/health > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "No Sensu API found at ${SENSU_API_URL}"
+    exit 2
+  fi
+  curl -XGET ${VAULT_ADDR}/v1/sys/health > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "No Vault API found at ${VAULT_ADDR}"
+    exit 2
+  fi
+}
+
+seed_cluster() {
+  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
+  /usr/local/bin/sensuctl create -r -f ${SENSU_CLUSTER_CONFIG}
+  if [ $? -ne 0 ]; then 
+    echo "Error encountered while seeding workshop user namespaces"
+    exit 2
+  fi 
+}
+
+seed_namespaces() {
+  for NAMESPACE in $(/usr/local/bin/sensuctl namespace list --format json | jq -r .[].name)
+  do 
+    echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
+    /usr/local/bin/sensuctl create -r -f ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
+    if [ $? -ne 0 ]; then 
+      echo "Error encountered while seeding workshop user namespaces"
+      exit 2
+    fi 
+  done
+}
+
+seed_secrets() {
+  for SECRET in $(ls ${VAULT_WORKSHOP_SEEDS})
+  do 
+    NAME=$(echo $SECRET | cut -d "." -f 1)
+    echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/${NAME}"
+    vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
+    vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/${NAME} | jq .data.data
+  done
+}
+
+check_deps
+validate_io
+validate_api_urls
+seed_cluster
+seed_namespaces
+seed_secrets

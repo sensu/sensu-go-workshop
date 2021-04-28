@@ -1,0 +1,16 @@
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: workshop_env_secret
+spec:
+  provider: env
+  id: SENSU_WORKSHOP_ENV_SECRET
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: workshop_vault_secret 
+spec:
+  provider: vault 
+  id: secret/sensu/workshop#example 

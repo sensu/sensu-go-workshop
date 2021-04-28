@@ -1,13 +1,11 @@
 #!/bin/sh
 
 USERS_RBAC=${1:-"config/sensu/rbac"}
-SENSU_API_URL=${2:-"http://sensu-backend:8080"}
-SENSU_USERNAME=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME:-"sensu"}
-SENSU_PASSWORD=${SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD:-"sensu"}
+SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
 
 check_deps() {
-  for DEP in sensuctl
+  for DEP in sensuctl jq
   do
     command -v ${DEP} > /dev/null 2>&1
     if [ $? -ne 0 ]; then
@@ -22,12 +20,16 @@ validate_io() {
     echo "Missing or invalid user RBAC resources: \"${USERS_RBAC}\" (must be a directory)"
     exit 2
   fi
+  if [ ! -d ${SENSU_WORKSHOP_SEEDS} ]; then
+    echo "Missing or invalid namespace seed resources: \"${SENSU_WORKSHOP_SEEDS}\" (must be a directory)"
+    exit 2
+  fi
 }
 
 validate_api_url() {
-  curl -XGET ${SENSU_API_URL}/version > /dev/null 2>&1
+  curl -XGET ${SENSU_API_URL}/health > /dev/null 2>&1
   if [ $? -ne 0 ]; then
-    echo "No Sensu Backend found at ${SENSU_API_URL}"
+    echo "No Sensu API found at ${SENSU_API_URL}"
     exit 2
   fi
 }

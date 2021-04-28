@@ -1,0 +1,11 @@
+---
+type: User
+api_version: core/v2
+metadata:
+  name: agent
+spec:
+  disabled: false
+  password_hash: "$2a$10$dZLXA0Em1ehnH.IiyTva.u3iOQXzeVRwwgzvhpYouwL9t1lgkJbOS"
+  groups:
+  - system:agents
+  username: agent

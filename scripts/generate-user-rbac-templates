@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Generate Sensu user RBAC profiles, including (by default) a dedicated
+# Generate Sensu user RBAC templates, including (by default) a dedicated
 # Namespace will full CRUD access (via a Role + RoleBinding), limited
 # ClusterRoleBinding (with access to create but not list or read API keys),
 # and read-only access to the default namespace (to view the instructors

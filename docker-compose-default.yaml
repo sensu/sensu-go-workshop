@@ -235,7 +235,7 @@ services:
       source: sensuctl_data
       target: /root/.config
     command: |-
-      init-workshop
+      seed-workshop-resources
 
   # Workstation
   #

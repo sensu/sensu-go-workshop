@@ -8,14 +8,6 @@
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
-## Overview
-
-The following guide will walk you through the basic concepts behind monitoring as code and the observability pipeline, and it will prepare you to start configuration your own monitoring and observability solutions using Sensu.
-The guide starts with a fresh Sensu installation, and assumes certain companion services are available (e.g. a data platform such as Prometheus, TimescaleDB, InfluxDB, Elasticsearch, or Splunk; and a graphing solution such as Grafana, Kibana, or Splunk's built-in dashboards).
-
-Multiple reference architectures will be provided for use with this workshop.
-Please consult [SETUP.md](/SETUP.md) for more information.
-
 ## What is Monitoring as Code?
 
 Monitoring as code is the natural progression of the "everything as code" movement, and a critical component of "as code" initiatives.

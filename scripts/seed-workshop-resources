@@ -47,27 +47,27 @@ validate_api_urls() {
 seed_cluster() {
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
   /usr/local/bin/sensuctl create -r -f ${SENSU_CLUSTER_CONFIG}
-  if [ $? -ne 0 ]; then 
+  if [ $? -ne 0 ]; then
     echo "Error encountered while seeding workshop user namespaces"
     exit 2
-  fi 
+  fi
 }
 
 seed_namespaces() {
   for NAMESPACE in $(/usr/local/bin/sensuctl namespace list --format json | jq -r .[].name)
-  do 
+  do
     echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
     /usr/local/bin/sensuctl create -r -f ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
-    if [ $? -ne 0 ]; then 
+    if [ $? -ne 0 ]; then
       echo "Error encountered while seeding workshop user namespaces"
       exit 2
-    fi 
+    fi
   done
 }
 
 seed_secrets() {
   for SECRET in $(ls ${VAULT_WORKSHOP_SEEDS})
-  do 
+  do
     NAME=$(echo $SECRET | cut -d "." -f 1)
     echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/${NAME}"
     vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
@@ -75,6 +75,7 @@ seed_secrets() {
   done
 }
 
+wait-for-sensuctl
 check_deps
 validate_io
 validate_api_urls

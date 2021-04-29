@@ -6,13 +6,26 @@
   - [Instructor-led workshop setup (for instructors)](#instructor-led-workshop-setup-for-instructors)
 - [References](#references)
   - [Workshop contents](#workshop-contents)
-  - [Prerequisites](#prerequisites)
   - [Customization](#customization)
   - [Maintenance & Troubleshooting](#maintenance-troubleshooting)
 
 ## Setup
 
 ### Self-guided workshop setup
+
+1. **Prerequisites.**
+
+    1. **Docker.**
+       - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
+       - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
+       - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
+	  1. **Docker Compose (`docker-compose`).**
+       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
+    1. **Git client (`git`).**
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. **Optional CLI tools.**
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
 1. **Clone this repository.**
 
@@ -23,11 +36,17 @@
 
    _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
 
-2. **Docker Compose initialization.**
+1. **Configure secrets.**
+
+   This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
+   To configure the Vault secrets that you'll need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
+   Additional secrets may be added to Vault by creating JSON files in `/config/vault/secrets` (e.g. `/config/vault/secrets/servicenow.json`), but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
+
+1. **Docker Compose initialization.**
 
    Deploy the workshop environment with the `docker-compose up` command!
 
-   ```
+   ```shell
    sudo docker-compose up -d
    ```
 
@@ -67,20 +86,15 @@
    The output should indicate that all of the services are `Up (healthy)` or "completed" (`Exit 0`).
 
    ```shell
-   Creating network "workshop_default" with the default driver
-   Creating volume "workshop_sensuctl_data" with local driver
-   Creating volume "workshop_sensu_data" with local driver
-   Creating volume "workshop_timescaledb_data" with local driver
-   Creating volume "workshop_grafana_data" with local driver
-   Creating volume "workshop_artifactory_data" with local driver
-   Creating workshop_vault_1         ... done
-   Creating workshop_grafana_1       ... done
-   Creating workshop_sensuctl_1      ... done
-   Creating workshop_sensu-backend_1 ... done
-   Creating workshop_artifactory_1   ... done
-   Creating workshop_timescaledb_1   ... done
-   Creating workshop_sensu-agent_1   ... done
-   Creating workshop_configurator_1  ... done
+                Name                        Command                       State                                                         Ports
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   workshop_configurator_1    seed-workshop-resources          Exit 0
+   workshop_grafana_1         /run.sh                          Up (healthy)            0.0.0.0:3001->3000/tcp
+   workshop_influxdb_1        /entrypoint.sh influxd           Up (healthy)            0.0.0.0:8086->8086/tcp
+   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)            2379/tcp, 2380/tcp, 3000/tcp, 0.0.0.0:49221->3031/tcp, 8080/tcp, 8081/tcp, 0.0.0.0:49220->8125/udp
+   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)            2379/tcp, 2380/tcp, 0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp, 0.0.0.0:8081->8081/tcp
+   workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
+   workshop_vault_1           docker-entrypoint.sh vault ...   Up (healthy)            0.0.0.0:8200->8200/tcp
    ```
 
    > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if any containers have the status `Up` or `Up (health: starting)`, please wait a few seconds and retry the `sudo docker-compose ps` command.
@@ -89,6 +103,14 @@
 **NEXT:** if all of the containers show a `Up (healthy)` or `Exit 0` state, then you're ready to start the workshop!
 
 ### Instructor-led workshop setup (for trainees)
+
+1. **Prerequisites.**
+
+    1. **Git client (`git`).**
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. **Optional CLI tools.**
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
@@ -163,6 +185,20 @@
 
 ### Instructor-led workshop setup (for instructors)
 
+1. **Prerequisites.**
+
+    1. **Docker**
+       - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
+       - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
+       - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
+    1. **Docker Compose (`docker-compose`).**
+       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
+    1. **Git client (`git`).**
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. **Optional CLI tools.**
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
+
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
    ```shell
@@ -184,22 +220,11 @@
 
    > _NOTE: complete this step **BEFORE** you run any `docker-compose` commands._
 
-1. **Configure workshop user accounts.**
+1. **Configure secrets.**
 
-   This workshop contains various templates and scripts for configuring workshop trainee user accounts (dedicated namespaces and RBAC profiles for each trainee).
-   To automatically generate these profiles, edit the `users/users.json` file **BEFORE** you run any `docker-compose` commands.
-   Two example users are pre-configured, as follows:
-
-   ```json
-   [
-     {"username": "user@company.com","password": "workshop"},
-     {"username": "trainee","password": "workshop"}
-   ]
-   ```
-
-   Modify this file so that there is one row per user. The `users.json` file supports defining `username` and `password` values (in plain text), or a `password_hash` (bcrypt-encrypted password hashes).
-   If a `password_hash` _and_ `password` value are provided for the same user, the `password` will be ignored.
-   The Sensu CLI provides a built-in utility for generating valid `password_hash` values, via [the `sensuctl user password-hash` command][9].
+   This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
+   To configure Vault secrets that trainees will need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
+   Additional secrets may be added to Vault by adding JSON files in `/config/vault/secrets`, but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
 
 1. **Docker Compose initialization.**
 
@@ -243,28 +268,53 @@
    The output should look like this:
 
    ```shell
-             Name                        Command                  State                             Ports
-   -----------------------------------------------------------------------------------------------------------------------------
-   workshop_configurator_1    generate_user_rbac               Exit 0
-   workshop_grafana_1         /run.sh                          Up (healthy)   0.0.0.0:3001->3000/tcp
-   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)   0.0.0.0:32830->3031/tcp, 0.0.0.0:32821->8125/udp
-   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)   0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp
+                Name                        Command                       State                                                         Ports
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   workshop_configurator_1    seed-workshop-resources          Exit 0
+   workshop_grafana_1         /run.sh                          Up (healthy)            0.0.0.0:3001->3000/tcp
+   workshop_influxdb_1        /entrypoint.sh influxd           Up (healthy)            0.0.0.0:8086->8086/tcp
+   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)            2379/tcp, 2380/tcp, 3000/tcp, 0.0.0.0:49221->3031/tcp, 8080/tcp, 8081/tcp, 0.0.0.0:49220->8125/udp
+   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)            2379/tcp, 2380/tcp, 0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp, 0.0.0.0:8081->8081/tcp
    workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
-   workshop_timescaledb_1     docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp
+   workshop_vault_1           docker-entrypoint.sh vault ...   Up (healthy)            0.0.0.0:8200->8200/tcp
    ```
 
    > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if any containers have the status `Up` or `Up (health: starting)`, please wait a few seconds and re-run the `sudo docker-compose ps` command.
    > Otherwise, if any containers have reached the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the sensu-backend container was slow to start) and re-running the `sudo docker-compose up -d` command will resolve the issue._
 
-1. **Create workshop trainee user accounts.**
+1. **Configure workshop user accounts.**
 
-   Use the workshop configurator Docker container to execute the user account creation script, as follows:
+   This workshop contains various templates and scripts for configuring workshop trainee user accounts (dedicated namespaces and RBAC profiles for each trainee).
+   To automatically generate these profiles, edit the `users/users.json` file **BEFORE** you run any `docker-compose` commands.
+   Two example users are pre-configured, as follows:
 
-   ```shell
-   sudo docker-compose run --rm configurator create_user_accounts
+   ```json
+   [
+     {"username": "user@company.com","password": "workshop"},
+     {"username": "trainee","password": "workshop"}
+   ]
    ```
 
-   The script should output a message like:
+   Modify this file so that there is one row per user. The `users.json` file supports defining `username` and `password` values (in plain text), or a `password_hash` (bcrypt-encrypted password hashes).
+   If a `password_hash` _and_ `password` value are provided for the same user, the `password` will be ignored.
+   The Sensu CLI provides a built-in utility for generating valid `password_hash` values, via [the `sensuctl user password-hash` command][9].
+
+1. **Create workshop trainee user accounts.**
+
+   Use the workshop `configurator` Docker container to generate workshop trainee user RBAC templates, create the user accounts (including dedicated namespaces), and seed each namespace with the required Sensu resources:
+
+   ```shell
+   sudo docker-compose run --rm configurator generate-user-rbac-templates
+   sudo docker-compose run --rm configurator create-user-accounts
+   sudo docker-compose run --rm configurator seed-workshop-resources
+   ```
+
+   The scripts should output a messages like the following:
+
+   ```shell
+   Generating user template: config/sensu/rbac/trainee.yaml
+   Skipping user template for "trainee" (an RBAC template at "config/sensu/rbac/trainee.yaml" already exists)
+	 ```
 
    ```shell
    Successfully created the following workshop user accounts:
@@ -272,32 +322,18 @@
       Name
     ─────────
      default
-     example
-     lizy
+     trainee
    ```
-
-   > _NOTE: if you add additional users to `users/users.json` after you execute this script you'll need to repeat this step._
-
-1. **Configure secrets.**
-
-   This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
-   To configure Vault secrets that trainees will need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
-   Additional secrets may be added to Vault by adding JSON files in `/config/vault/secrets`, but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
-   Additional/custom Sensu Secret resources may be added in the following step.
-
-1. **Seed workshop trainee namespaces with some example resources.**
-
-   Use the workshop configurator Docker container to execute the user namespace seeding script, as follows:
 
    ```shell
-   sudo docker-compose run --rm configurator seed_workshop_resources
+   Applying cluster configuration from config/sensu/cluster
+   Seeding namespace 'default' with resource templates in config/sensu/seeds
+   Seeding namespace 'trainee' with resource templates in config/sensu/seeds
    ```
 
-   > **PROTIP:** to customize the workshop, add valid sensu resource definitions to `/config/sensu/seeds` and re-run the `seed_workshop_resources` command.
+   > _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
 
-   The script will ouput several messages
-
-**NEXT:** if you're seeing seeded resources in your trainee namespaces, you're ready to start the workshop!
+**NEXT:** if you're seeing trainee user namespaces in your workshop environment, you're ready to start the workshop!
 
 ## References
 
@@ -310,32 +346,19 @@
    - A Sensu Go backend, API, and dashboard (`sensu-backend`)
    - A Sensu Go agent (`sensu-agent`)
    - A telemetry stack, including:
-     - TimescaleDB for storage
+     - InfluxDB for storage
      - Grafana for visualization
    - A Vault server, for secrets management
 
    Coming soon:
 
+   - A Vagrantfile wrapper to run the workshop in a VM
    - Deployment templates for [AWS Fargate][fargate]
-   - Deployment templates for [Heroku][heroku]
    - Alternate reference architectures (e.g. Elasticsearch or Splunk for metric storage instead of Timescale)
 
-3. Configuration files for TimescaleDB and Grafana
+3. Configuration files for all components of the workshop environment
 
 4. Dockerfiles templates for building custom Sensu Docker images
-
-5. Sensu resource templates for configuring an example pipeline
-
-### Prerequisites
-
-1. **Docker + Docker Compose**
-
-   You'll need a working Docker environment with Docker Compose to run this workshop.
-   MacOS users will need [Docker CE Desktop for Mac][1], Windows users will need [Docker CE Desktop for Windows][2].
-   Linux users can find installation instructions from the [Docker CE installation guide][3].
-
-   _NOTE: in a workshop hosted by an instructor with a shared Sensu deployment, only the instructor needs a Docker host.
-   Self-guided trainees can deploy the workshop environment on their workstations, though they may find it advantageous to deploy._
 
 ### Customization
 
@@ -720,10 +743,6 @@ To learn more about SSO for Sensu Go, please visit the [authentication provider 
    sudo ls $(sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint)
    ```
 
-
-[1]: https://hub.docker.com/editions/community/docker-ce-desktop-mac
-[2]: https://hub.docker.com/editions/community/docker-ce-desktop-windows
-[3]: https://docs.docker.com/install/
 [4]: https://docs.sensu.io/sensu-go/latest/reference/backend/#initialization
 [5]: https://docs.sensu.io/sensu-go/latest/installation/install-sensu/#install-sensuctl
 [6]: https://docs.sensu.io/sensu-go/latest/

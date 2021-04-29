@@ -4,33 +4,57 @@ SENSU_API_URL=${SENSU_API_URL:-"http://127.0.0.1:8080"}
 SENSU_USERNAME=${SENSU_USERNAME}
 SENSU_PASSWORD=${SENSU_PASSWORD}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-default}
+SENSU_ETCD_CLIENT_URLS=${SENSU_ETCD_CLIENT_URLS}
 SENSU_INIT_TEMP_FILE="/root/.config/init"
 INTERVAL=2
 RETRIES=5
 ATTEMPT=0
 SUCCESS=0
 
-while [ ${ATTEMPT} -lt ${RETRIES} ]; do
-  curl ${SENSU_API_URL}/health > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    SUCCESS=$(expr ${SUCCESS} + 1)
-    break
+sensu_backend_init() {
+  if [ ! -f ${SENSU_INIT_TEMP_FILE} ]; then
+    if [ ! -z ${SENSU_ETCD_CLIENT_URLS} ]; then
+      sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
+      if [ $? -eq 0 ]; then
+        touch ${SENSU_INIT_TEMP_FILE}
+        return 0
+      fi
+      echo "Failed to initialize the Sensu backend"
+      return 1
+    fi
   fi
-  echo "Unable to connect to ${SENSU_API_URL}, retrying in ${INTERVAL} seconds..."
-  sleep ${INTERVAL}
-  ATTEMPT=$(expr ${ATTEMPT} + 1)
-done
+  return 0
+}
 
-if [ $SUCCESS -eq 0 ]; then
-  echo "Failed to connect to ${SENSU_API_URL} after ${RETRIES} attempts; giving up."
+wait_for_sensu_backend() {
+  while [ ${ATTEMPT} -lt ${RETRIES} ]; do
+    curl ${SENSU_API_URL}/health > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      SUCCESS=$(expr ${SUCCESS} + 1)
+      break
+    fi
+    echo "Unable to connect to ${SENSU_API_URL}, retrying in ${INTERVAL} seconds..."
+    sleep ${INTERVAL}
+    ATTEMPT=$(expr ${ATTEMPT} + 1)
+  done
+
+  if [ $SUCCESS -eq 0 ]; then
+    echo "Failed to connect to ${SENSU_API_URL} after ${RETRIES} attempts; giving up."
+    exit 2
+  fi
+
+  if [ $ATTEMPT -gt 0 ] && [ $SUCCESS -gt 0 ]; then
+    # only display success message if we don't connect on the first try
+    echo "Successfully connected to ${SENSU_API_URL}"
+    touch ${SENSU_INIT_TEMP_FILE}
+  fi
+}
+
+sensu_backend_init
+if [ $? -gt 0 ]; then
+  echo "Failed to initialize the sensu-backend!"
   exit 2
 fi
-
-if [ $ATTEMPT -gt 0 ] && [ $SUCCESS -gt 0 ]; then
-  # only display success message if we don't connect on the first try
-  echo "Successfully connected to ${SENSU_API_URL}"  
-  touch ${SENSU_INIT_TEMP_FILE}
-fi 
-
+wait_for_sensu_backend
 exec $@
 exit 0

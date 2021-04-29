@@ -7,7 +7,6 @@
 - [EXERCISE 2: create an event that triggers an alert](#exercise-2-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
-- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -243,7 +242,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
    Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
 
-   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
+   > _NOTE: if you need help creating an API Key, please refer to [Lesson 3, Exercise 6: "Create an API Key for personal use"](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
    Do you see the expected values for `SENSU_API_URL`,`SENSU_NAMESPACE`, and `SENSU_API_KEY`?
    If so, you're ready to move on to the next step!
@@ -269,6 +268,9 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
    But what about the handler we configured in [Lesson 4](/lessons/04/README.md#readme)?
    If you expected that Sensu would process this event using that handler, you might have noticed that nothing happened.
+
+   > _NOTE: The `curl` commands included in this lesson should generate output that starts with `HTTP/1.1 200 OK`, `HTTP/1.1 201 Created`, or `HTTP/1.1 202 Accepted`.
+   > If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/SETUP.md), and/or ask your instructor for help._
 
 **NEXT:** Let's move on to the next exercise to see how event handling works in practice.
 
@@ -367,35 +369,6 @@ If so you're ready to move on to the next step!
 
 ## Next steps
 
-[Share your feedback on Lesson 05](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2005%20Feedback)
+[Share your feedback on Lesson 05](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-05&title=Lesson%2005%20Feedback)
 
 [Lesson 6: Introduction to Filters](../06/README.md#readme)
-
------
-
-## Troubleshooting
-
-### Sensu API Keys
-
-If you need help creating an API Key for Sensu Go, please refer to the [Lesson 3 EXERCISE: create an API Key for personal use](/lessons/operator/03/README.md#exercise-create-an-api-key-for-personal-use)._
-
-### `curl`
-
-This `curl` commands included in this lesson should generate output that starts with `HTTP/1.1 200 OK`, `HTTP/1.1 201 Created`, or `HTTP/1.1 202 Accepted`.
-If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/SETUP.md), and/or ask your instructor for help.
-
-### Slack
-
-If Sensu is not generating Slack messages, please ask your instructor for help, or try the following troubleshooting steps:
-
-1. Verify that you have a valid Slack Webhook URL
-
-   ```shell
-   curl -X POST -H 'Content-type: application/json' --data '{"text":"This is a test message to verify that I have a valid Slack Webhook URL"}' YOUR_WEBHOOK_URL
-   ```
-
-   Reference: https://api.slack.com/tutorials/slack-apps-hello-world
-
-1. Check the `sensu-backend` log for errors
-
-   ==TODO==

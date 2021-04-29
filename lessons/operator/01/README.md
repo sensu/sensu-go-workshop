@@ -135,6 +135,6 @@ Sensu's observability pipeline
 
 ## Next steps
 
-[Share your feedback on Lesson 01](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2001%20Feedback)
+[Share your feedback on Lesson 01](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-01&title=Lesson%2001%20Feedback)
 
 [Lesson 2: Introduction to the Observability Data Model](../02/README.md#readme)

@@ -168,7 +168,7 @@ developer training (coming soon).==
 
 ## Next steps
 
-[Share your feedback on Lesson 10](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2010%20Feedback)
+[Share your feedback on Lesson 10](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-10&title=Lesson%2010%20Feedback)
 
 [Lesson 11: Introduction to Silencing & Scheduled Maintenance](../11/README.md#readme)
 

@@ -369,6 +369,6 @@ Let's modify our check from the previous exercise using some Tokens.
 
 ## Next steps
 
-[Share your feedback on Lesson 08](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2008%20Feedback)
+[Share your feedback on Lesson 08](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-08&title=Lesson%2008%20Feedback)
 
 [Lesson 9: Introduction to Check Hooks](../09/README.md#readme)

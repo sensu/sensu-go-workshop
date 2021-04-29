@@ -27,6 +27,6 @@
 
 ## Next steps
 
-[Share your feedback on Lesson 13](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2013%20Feedback)
+[Share your feedback on Lesson 13](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-13&title=Lesson%2013%20Feedback)
 
 [Lesson 14: Introduction to Namespaces & RBAC](../14/README.md#readme)

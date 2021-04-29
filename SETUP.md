@@ -15,17 +15,17 @@
 
 1. **Prerequisites.**
 
-   1. Docker
-     - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
-     - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
-     - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
-	 1. Docker Compose (`docker-compose`).
-      Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
-   1. Git client (`git`).
-      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-   1. Optional CLI tools.
-      The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-      - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
+    1. Docker
+      - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
+      - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
+      - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
+	  1. Docker Compose (`docker-compose`).
+       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
+    1. Git client (`git`).
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. Optional CLI tools.
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
 
 1. **Clone this repository.**
 
@@ -107,11 +107,11 @@
 
 1. **Prerequisites.**
 
-   1. Git client (`git`).
-      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-   1. Optional CLI tools.
-      The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-      - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
+    1. Git client (`git`).
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. Optional CLI tools.
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
@@ -189,17 +189,17 @@
 
 1. **Prerequisites.**
 
-   1. Docker
-     - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
-     - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
-     - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
-   1. Docker Compose (`docker-compose`).
-      Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
-   1. Git client (`git`).
-      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-   1. Optional CLI tools.
-      The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-      - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
+    1. Docker
+      - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
+      - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
+      - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
+    1. Docker Compose (`docker-compose`).
+       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
+    1. Git client (`git`).
+       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. Optional CLI tools.
+       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/))
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 

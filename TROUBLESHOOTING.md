@@ -5,6 +5,7 @@
 - [Certain `sensuctl` commands produce authorization errors](#certain-sensuctl-commands-produce-authorization-errors)
 - [The sensu-agent reports various "permission denied" errors](#the-sensu-agent-reports-various-permission-denied-errors)
 - [Unknown user `sensu` or `_sensu` when starting Sensu Agent](#unknown-user-sensu-or-_sensu-when-starting-sensu-agent)
+- [Create a Sensu user account (service account)](#create-a-sensu-user-account-service-account)
 - [Encountering "command not found" errors when running `sensu-agent` on MacOS](#encountering-command-not-found-errors-when-running-sensu-agent-on-macos)
 - [How to access Sensu Agent logs when starting the agent via systemd](#how-to-access-sensu-agent-logs-when-starting-the-agent-via-systemd)
 - [Help installing a Sensu Agent](#help-installing-a-sensu-agent)
@@ -119,7 +120,7 @@ sensuctl config set-namespace trainee
 
 ## The sensu-agent reports various "permission denied" errors
 
-If you have run the `sensu-agent` as the `root` user, or other user with elevated privileges, and then attempt to start the `sensu-agent` process via service management or using a service account, you may encounter various "permission denied" errors.
+If you have run the `sensu-agent` as the `root` user, or other user with elevated privileges, and then attempt to start the `sensu-agent` process via service management or using a service account, you may encounter various "permission denied" errors (e.g. "error creating agent: could not open api queue").
 The officially supported Sensu Agent installation packages (e.g. `.rpm` and `.deb` packages) will install and run all Sensu services as the `sensu` user (i.e. not `root`).
 To ensure that the `sensu` users owns all of the files needed to run the Sensu Agent, run the following commands:
 
@@ -141,6 +142,17 @@ This should resolve any outstanding permissions errors.
 
 ## Unknown user `sensu` or `_sensu` when starting Sensu Agent
 
+This workshop encourages Linux and MacOS users to run the `sensu-agent` with an unpriveleged service account (e.g. `sensu` or `_sensu`).
+Executing commands like `sudo -u _sensu sensu-agent-start...` may result in errors like the following:
+
+```shell
+sudo: unknown user: _sensu
+```
+
+To resolve this issue, please [Create a Sensu user account (service account)](#create-a-sensu-user-account-service-account).
+
+## Create a Sensu user account (service account)
+
 **MacOS users:**
 
 MacOS installer packages are not yet available for Sensu Go, but Mac users are encouraged to run the `sensu-agent` using a MacOS service account (e.g. `_sensu`).
@@ -157,7 +169,7 @@ sudo dscl . -create /Users/_sensu NFSHomeDirectory /opt/sensu
 sudo dscl . -create /Users/_sensu UserShell /bin/bash
 sudo dscl . -create /Users/_sensu RealName "Sensu Go service account"
 sudo dscl . -create /Users/_sensu passwd "*"
-sudo mkdir -p /opt/sensu
+sudo mkdir -p /opt/sensu/tmp
 sudo chown -R _sensu:_sensu /opt/sensu
 ```
 

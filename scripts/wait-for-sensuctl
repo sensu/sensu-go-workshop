@@ -1,0 +1,37 @@
+#!/bin/sh
+
+export SENSUCTL_READY=""
+export RETRIES=0
+
+check_deps() {
+  for DEP in sensuctl jq
+  do
+    command -v ${DEP} > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      echo "Missing required dependency: \"${DEP}\""
+      exit 127
+    fi
+  done
+}
+
+check_sensuctl_config() {
+  SENSUCTL_READY=$(sensuctl config view --format json 2> /dev/null | jq -r .namespace)
+}
+
+wait_for_sensuctl() {
+	check_sensuctl_config
+  while [ -z ${SENSUCTL_READY} ] && [ ${RETRIES} -lt 5 ]; do
+    RETRIES=$(expr ${RETRIES} + 1)
+    echo "Waiting for sensuctl configuration to initialize (attempt ${RETRIES})..."
+		check_sensuctl_config
+	  sleep 2
+  done
+  if [ -z ${SENSUCTL_READY} ]; then
+    echo "No sensuctl configuration found; exiting..."
+    exit 2
+  fi
+	exit 0
+}
+
+check_deps
+wait_for_sensuctl

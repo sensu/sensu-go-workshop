@@ -524,7 +524,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
 1. **Start the Sensu Agent.**
 
    _NOTE: Mac and Linux users are encouraged to run the `sensu-agent` with a service account (e.g. a `sensu` or `_sensu` user).
-   To create this service account, please refer to the ["Create a Sensu user account (service account)](/TROUBLESHOOTING.md#create-a-sensu-user-account-service-account) instructions in [TROUBLESHOOTING.md](/TROUBLESHOOTING.md#readme).
+   To create this service account, please refer to the ["Create a Sensu user account (service account)"](/TROUBLESHOOTING.md#create-a-sensu-user-account-service-account) instructions in [TROUBLESHOOTING.md](/TROUBLESHOOTING.md#readme).
    Alternatively, Mac and Linux users may modify the `sensu-agent start` commands by removing the `-u sensu` or `-u _sensu` flag._
 
    **Mac users:**

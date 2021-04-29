@@ -249,6 +249,6 @@ Labels and annotations are identical in format &ndash; they are represented as 
 
 ## Next steps
 
-[Share your feedback on Lesson 02](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2002%20Feedback)
+[Share your feedback on Lesson 02](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-02&title=Lesson%2002%20Feedback)
 
 [Lesson 3: Introduction to Sensu Go](../03/README.md#readme)

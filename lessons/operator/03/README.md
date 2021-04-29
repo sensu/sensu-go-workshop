@@ -569,6 +569,6 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 
 ## Next steps
 
-[Share your feedback on Lesson 03](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback&title=Lesson%2003%20Feedback)
+[Share your feedback on Lesson 03](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-03&title=Lesson%2003%20Feedback)
 
 [Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)

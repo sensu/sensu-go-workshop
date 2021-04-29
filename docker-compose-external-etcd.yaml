@@ -3,8 +3,8 @@ version: "3.3"
 services:
   # Etcd
   #
-  # Standalone etcd server.  
-  # 
+  # Standalone etcd server.
+  #
   # See: https://etcd.io/docs/v3.4.0/op-guide/container/#running-a-single-node-etcd-1
   etcd:
     image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
@@ -21,28 +21,28 @@ services:
     environment:
     - ETCD_HOST
     volumes:
-    - type: volume 
+    - type: volume
       source: etcd_data
       target: /var/lib/etcd
     command: >-
-      /usr/local/bin/etcd 
+      /usr/local/bin/etcd
       --data-dir=/var/lib/etcd
-      --name etcd-1 
+      --name etcd-1
       --initial-cluster-state "new"
-      --initial-advertise-peer-urls "http://${ETCD_HOST}:2380" 
-      --listen-peer-urls "http://0.0.0.0:2380" 
-      --advertise-client-urls "http://${ETCD_HOST}:2379" 
-      --listen-client-urls "http://0.0.0.0:2379" 
+      --initial-advertise-peer-urls "http://${ETCD_HOST}:2380"
+      --listen-peer-urls "http://0.0.0.0:2380"
+      --advertise-client-urls "http://${ETCD_HOST}:2379"
+      --listen-client-urls "http://0.0.0.0:2379"
       --initial-cluster "etcd-1=http://${ETCD_HOST}:2380"
 
   # Sensu Backend Cluster
   #
-  # Includes embedded database, API, event processor, and web UI). 
-  # 
+  # Includes embedded database, API, event processor, and web UI).
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
-    depends_on: 
+    depends_on:
     - etcd
     labels:
     - io.sensu.role=sensu-backend
@@ -57,20 +57,20 @@ services:
     - SENSU_NO_EMBED_ETCD=true
     - SENSU_PAGERDUTY_TOKEN
     volumes:
-    - type: volume 
+    - type: volume
       source: sensu_data
       target: /var/lib/sensu
     command: >-
-      sensu-backend start 
+      sensu-backend start
       --log-level=debug
       --debug=true
       --no-embed-etcd
       --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
 
-  # Sensu Agent 
+  # Sensu Agent
   #
   # Includes monitoring agent, local API, and local StatsD socket.
-  # 
+  #
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
     # container_name: sensu-agent
@@ -99,18 +99,18 @@ services:
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
     command: >-
-      sensu-agent start 
+      sensu-agent start
       --log-level=info
-      --deregister=true 
+      --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
       --statsd-event-handlers timescaledb
 
   # Sensu Backend Load Balancer
-  # 
+  #
   # Nginx load balancer
-  # 
-  # See: https://nginx.com 
+  #
+  # See: https://nginx.com
   sensu-lb:
     container_name: sensu-backend
     image: nginx:${NGINX_VERSION}
@@ -131,23 +131,23 @@ services:
     - type: bind
       source: ./config/nginx/nginx.lb.conf
       target: /etc/nginx/nginx.conf
-    - type: bind 
+    - type: bind
       source: ./config/nginx/upstream_app.conf
       target: /etc/nginx/upstream_etcd.conf
-    - type: bind 
+    - type: bind
       source: ./config/nginx/upstream_app.conf
       target: /etc/nginx/upstream_app.conf
-    - type: bind 
+    - type: bind
       source: ./config/nginx/upstream_api.conf
       target: /etc/nginx/upstream_api.conf
-    - type: bind 
+    - type: bind
       source: ./config/nginx/upstream_websockets.conf
       target: /etc/nginx/upstream_websockets.conf
 
-  # TimescaleDB  
+  # TimescaleDB
   #
   # Includes TimescaleDB (Postgres database) for storage of telemetry data.
-  # 
+  #
   # See: https://docs.timescale.com/latest/introduction
   timescaledb:
     # container_name: timescaledb
@@ -164,19 +164,19 @@ services:
     environment:
     - POSTGRES_PASSWORD
     - POSTGRES_DB
-    volumes: 
-    - type: bind 
+    volumes:
+    - type: bind
       source: ./config/timescaledb/100-sensu-metrics.sql
       target: /docker-entrypoint-initdb.d/100-sensu-metrics.sql
-    - type: volume 
+    - type: volume
       source: timescaledb_data
       target: /var/lib/postgresql/data
-      
-  # Grafana 
+
+  # Grafana
   #
-  # Includes Grafana dashboard and datasource configuration files for 
-  # Timescaledb. 
-  # 
+  # Includes Grafana dashboard and datasource configuration files for
+  # Timescaledb.
+  #
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
     # container_name: grafana
@@ -197,18 +197,18 @@ services:
     - GF_SECURITY_ADMIN_PASSWORD
     volumes:
     - type: bind
-      source: ./config/grafana/provisioning 
+      source: ./config/grafana/provisioning
       target: /etc/grafana/provisioning
     - type: bind
       source: ./config/grafana/dashboards/timescaledb
       target: /etc/grafana/dashboards
-    - type: volume 
+    - type: volume
       source: grafana_data
       target: /var/lib/grafana
 
   # Configurator
-  # 
-  # Configuration automation for instructor-led workshops (e.g. user profile 
+  #
+  # Configuration automation for instructor-led workshops (e.g. user profile
   # generation) using a super light-weight "configuration management" stack:
   #
   # - curl
@@ -216,14 +216,14 @@ services:
   # - envsubst (part of the gettext package)
   # - sensuctl
   # - docker & docker-compose
-  # 
+  #
   # See: ./scripts/
   configurator:
     # container_name: configurator
     build:
       context: docker/workshop/
       dockerfile: Dockerfile
-      args: 
+      args:
       - SENSU_CLI_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
@@ -247,7 +247,7 @@ services:
     - type: bind
       source: ./docker
       target: /workshop/docker
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
@@ -261,14 +261,14 @@ services:
       source: sensuctl_data
       target: /root/.config
     command: |-
-      generate_user_rbac
-  
+      seed-workshop-resources
+
   # Workstation
-  # 
-  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl 
-  # pre-installed in case the trainee workstation is missing a required 
-  # dependency. 
-  # 
+  #
+  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
+  # pre-installed in case the trainee workstation is missing a required
+  # dependency.
+  #
   # See: https://alpinelinux.org
   sensuctl:
     # container_name: sensuctl
@@ -292,26 +292,26 @@ services:
     - type: bind
       source: /var/run/docker.sock
       target: /var/run/docker.sock
-    - type: bind 
+    - type: bind
       source: ./scripts
       target: /usr/local/bin/scripts
     - type: bind
       source: ./
       target: /root/workshop
-      consistency: consistent 
+      consistency: consistent
     - type: volume
       source: sensuctl_data
       target: /root/.config
-      consistency: consistent 
+      consistency: consistent
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
-      configure -n 
+      configure -n
       --url ${SENSU_API_URL}
       --username ${SENSU_USERNAME}
       --password ${SENSU_PASSWORD}
       --namespace ${SENSU_NAMESPACE}
       --format tabular
-      
+
 volumes:
   etcd_data:
     driver: local

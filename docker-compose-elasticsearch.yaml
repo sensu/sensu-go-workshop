@@ -262,7 +262,7 @@ services:
       source: sensuctl_data
       target: /root/.config
     command: |-
-      generate_user_rbac
+      seed-workshop-resources
 
   # Workstation
   #

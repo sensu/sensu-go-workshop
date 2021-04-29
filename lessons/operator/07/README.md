@@ -524,10 +524,15 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
 
 1. **Start the Sensu Agent.**
 
+   _NOTE: Mac and Linux users are encouraged to run the `sensu-agent` with a service account (e.g. a `sensu` or `_sensu` user).
+   To create this service account, please refer to the ["Create a Sensu user account (service account)](/TROUBLESHOOTING.md#create-a-sensu-user-account-service-account) instructions in [TROUBLESHOOTING.md](/TROUBLESHOOTING.md#readme).
+   Alternatively, Mac and Linux users may modify the `sensu-agent start` commands by removing the `-u sensu` or `-u _sensu` flag._
+
    **Mac users:**
 
    ```shell
-   sudo -E sensu-agent start \
+   TMPDIR=/opt/sensu/tmp \
+   sudo -E -u _sensu sensu-agent start \
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
@@ -616,6 +621,7 @@ Let's stop our agent and modify its configuration:
    **Mac users:**
 
    ```shell
+   TMPDIR=/opt/sensu/tmp \
    SENSU_SUBSCRIPTIONS="system/macos workshop" \
    sudo -E sensu-agent start \
    --config-file /opt/sensu/agent.yaml \

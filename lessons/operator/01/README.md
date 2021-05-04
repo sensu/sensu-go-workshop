@@ -64,7 +64,7 @@ _FIGURE 1: a generic/conceptual observability pipeline ([source](https://bravene
 If the pseudo architecture diagram (or "markitecture diagram") looks a little bit like a [Rube Goldberg machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine), that's effectively what all DIY observabilty pipelines become, sooner or later.
 Thankfully, you don't need to cobble together collection of services to adopt an observability pipeline – Sensu Go is a turn-key observabilty pipeline that enables monitoring as code on any cloud.
 
-![](img/sensu-observability-pipeline)
+![](img/sensu-observability-pipeline.png)
 
 _FIGURE 2: Sensu's turn-key solution enables organizations to adopt observability pipelines with ease._
 
@@ -84,7 +84,7 @@ This question is answered in our [monitoring as code whitepaper](https://sensu.i
 
 Simply shoving observability data through a pipeline where you can filter and route it to various backends is a great first step in an observability pipeline journey – but how to you manage the overall solution?
 And how do you onboard new users – including teams with a multitude of disparate tools spanning multiple generations of technology?
-Sensu's observability provides a centralized control plane and end-to-end solution for monitoring as code, which enables organizations to onboard workloads to the observability pipeline in an incremental manner.
+Sensu's observability pipeline provides a centralized control plane and end-to-end solution for monitoring as code, which enables organizations to onboard workloads to the observability pipeline in an incremental manner.
 
 ![](img/technology-adoption-lifecycle.jpg)
 

@@ -218,7 +218,7 @@ Labels and annotations are identical in format &ndash; they are represented as 
   Annotations are not indexed by Sensu, so they should not be used for grouping/selecting purposes.
 
 <details>
-<summary><strong>Example Sensu event <code>check</code> object:</strong></summary>
+<summary><strong>Example Sensu event <code>metadata</code> object:</strong></summary>
 
 ```json
 {
@@ -237,6 +237,9 @@ Labels and annotations are identical in format &ndash; they are represented as 
   "timestamp": 1234567890
 }
 ```
+
+_NOTE: in Sensu Go, almost every API resource supports `metadata`, typically including `metadata.labels`, `metadata.annotations`, and a `metadata.name` field.
+As a result, Sensu Events may contain top-level event metadata as shown above, as well as Check metadata and Entity metadata._
 
 </details>
 

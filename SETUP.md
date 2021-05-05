@@ -33,7 +33,7 @@
        The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
     1. **Compatible text editor.**
        This workshop requires creation and editing of various configuration files and monitoring code templates.
-       Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](#), [Atom](), or [Submlime Text]() (or if you're a `vim` or `emacs` fan, that's fine too).
+       Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
        _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
     1. **Optional CLI tools.**
        The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
@@ -130,7 +130,7 @@
       The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
    1. **Compatible text editor.**
       This workshop requires creation and editing of various configuration files and monitoring code templates.
-      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](#), [Atom](), or [Submlime Text]() (or if you're a `vim` or `emacs` fan, that's fine too).
+      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
       _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
    1. **Optional CLI tools.**
       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
@@ -225,7 +225,7 @@
       The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
    1. **Compatible text editor.**
       This workshop requires creation and editing of various configuration files and monitoring code templates.
-      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](#), [Atom](), or [Submlime Text]() (or if you're a `vim` or `emacs` fan, that's fine too).
+      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
       _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
    1. **Optional CLI tools.**
       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):

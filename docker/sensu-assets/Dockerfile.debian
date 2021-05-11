@@ -1,0 +1,19 @@
+FROM debian:stretch
+ARG SMB_PASSWORD="workshop"
+
+# Install
+RUN \
+  apt-get update && apt-get install -y curl ca-certificates samba && \
+  whereis samba
+
+# Configure
+RUN \
+  useradd -mr -s /bin/bash -d /home/sensu sensu && \
+  mkdir /home/sensu/assets && \
+  chown -R sensu:sensu /home/sensu/assets && \
+  printf "${SMB_PASSWORD}\n${SMB_PASSWORD}\n" | smbpasswd -a sensu 
+# USER sensu
+# WORKDIR /home/sensu
+
+# Run
+CMD smbd --foreground --log-stdout --configfile /etc/samba/smb.conf

@@ -71,7 +71,7 @@ services:
       --log-level=info
       --deregister=true
       --detect-cloud-provider
-      --labels="environment=training,workshop_version=${WORKSHOP_VERSION}"
+      --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
       --statsd-event-handlers timescaledb
       --password ${SENSU_AGENT_PASSWORD:-"P@ssw0rd!"}
 
@@ -171,6 +171,9 @@ services:
     - type: volume
       source: asset_data
       target: /usr/share/nginx/html/assets
+    - type: volume
+      source: config_data
+      target: /usr/share/nginx/html/config
     healthcheck:
       test: curl -s -I http://127.0.0.1:80/
       interval: 10s
@@ -234,6 +237,10 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - VAULT_ADDR
     - VAULT_TOKEN
+    - WORKSHOP_HOSTNAME
+    - WORKSHOP_SENSU_VERSION
+    - WORKSHOP_SENSU_BUILD
+    - WORKSHOP_PASSWORD
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -264,6 +271,9 @@ services:
     - type: volume
       source: sensuctl_data
       target: /root/.config
+    - type: volume
+      source: config_data
+      target: /config
     command: |-
       seed-workshop-resources
 
@@ -323,6 +333,8 @@ volumes:
   sensu_data:
     driver: local
   asset_data:
+    driver: local
+  config_data:
     driver: local
   influxdb_data:
     driver: local

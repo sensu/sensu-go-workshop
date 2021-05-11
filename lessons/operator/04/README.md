@@ -167,7 +167,7 @@ spec:
     secret: slack_webhook_url
 ```
 
-Here's an example check configuration template which would override the channel provided in the handler template to the `--handler` flag.
+Here's an example check configuration template which overrides the default Slack channel provided in the handler template `--channel` flag.
 
 ```yaml
 ---

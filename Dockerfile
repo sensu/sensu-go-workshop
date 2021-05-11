@@ -11,6 +11,18 @@ FROM vault:${VAULT_VERSION} AS vault
 RUN vault version
 
 # Build the workshop workstation image
+#
+# Includes the following CLI tools:
+#
+# - sensuctl
+# - sensu-backend (for "sensu-backend init")
+# - vault
+# - curl
+# - jq
+# - envsubst
+# - docker
+# - docker-compose
+# - workshop /scripts utilities
 FROM alpine:latest AS workshop
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/

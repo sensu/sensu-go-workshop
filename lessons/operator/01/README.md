@@ -8,14 +8,6 @@
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
-## Overview
-
-The following guide will walk you through the basic concepts behind monitoring as code and the observability pipeline, and it will prepare you to start configuration your own monitoring and observability solutions using Sensu.
-The guide starts with a fresh Sensu installation, and assumes certain companion services are available (e.g. a data platform such as Prometheus, TimescaleDB, InfluxDB, Elasticsearch, or Splunk; and a graphing solution such as Grafana, Kibana, or Splunk's built-in dashboards).
-
-Multiple reference architectures will be provided for use with this workshop.
-Please consult [SETUP.md](/SETUP.md) for more information.
-
 ## What is Monitoring as Code?
 
 Monitoring as code is the natural progression of the "everything as code" movement, and a critical component of "as code" initiatives.
@@ -69,10 +61,10 @@ While simple in concept, observabilty pipelines can be quite complex to build in
 
 _FIGURE 1: a generic/conceptual observability pipeline ([source](https://bravenewgeek.com/the-observability-pipeline/))._
 
-If the pseudo architecture diagram (or "markitecture diagram") looks a little bit like a [Rube Goldberg machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine), that's effectively what all DIY observabilty pipelines become, sooner or later.
+If the pseudo architecture diagram (or "marketecture diagram") looks a little bit like a [Rube Goldberg machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine), that's effectively what all DIY observabilty pipelines become, sooner or later.
 Thankfully, you don't need to cobble together collection of services to adopt an observability pipeline – Sensu Go is a turn-key observabilty pipeline that enables monitoring as code on any cloud.
 
-![](img/sensu-observability-pipeline)
+![](img/sensu-observability-pipeline.png)
 
 _FIGURE 2: Sensu's turn-key solution enables organizations to adopt observability pipelines with ease._
 
@@ -90,9 +82,9 @@ This question is answered in our [monitoring as code whitepaper](https://sensu.i
 >
 > ![](img/everything-as-code.png)
 
-Simply shoving observability data through a pipeline where you can filter and route it to various backends is a great first step in an observability pipeline journey – but how to you manage the overall solution?
-And how do you onboard new users – including teams with a multitude of disparate tools spanning multiple generations of technology?
-Sensu's observability provides a centralized control plane and end-to-end solution for monitoring as code, which enables organizations to onboard workloads to the observability pipeline in an incremental manner.
+Simply shoving observability data through a generic pipeline where you can cobble together disparate components to filter and route data to various backends is a great first step in an observability pipeline journey – but how to you manage the overall solution?
+And how do you onboard new users to such a bespoke solution – including teams with a multitude of disparate tools spanning multiple generations of technology?
+Sensu's turn-key observability pipeline provides a centralized control plane and end-to-end solution for monitoring as code, which enables organizations to onboard workloads to the observability pipeline in an incremental manner.
 
 ![](img/technology-adoption-lifecycle.jpg)
 

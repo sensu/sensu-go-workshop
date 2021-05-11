@@ -15,6 +15,12 @@
 
 1. **Prerequisites.**
 
+   The Sensu Go Workshop was designed with modern IT operations, DevOps, and SRE tooling in mind, so we would expect that most users should already have everything they need to complete the workshop.
+   In general, any laptop or other workstation with a `git` client, Docker, text editor, and a modern web browser will work great.
+   Please note the following details for more information:
+
+    1. **Workstation**.
+       Workshop users will need a workstation running a recent version of MacOS, Windows, or Linux to participate in this workshop.
     1. **Docker.**
        - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
        - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
@@ -23,6 +29,12 @@
        Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
     1. **Git client (`git`).**
        Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+    1. **Supported web browser.**
+       The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
+    1. **Compatible text editor.**
+       This workshop requires creation and editing of various configuration files and monitoring code templates.
+       Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
+       _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
     1. **Optional CLI tools.**
        The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
        - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
@@ -106,11 +118,23 @@
 
 1. **Prerequisites.**
 
-    1. **Git client (`git`).**
-       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-    1. **Optional CLI tools.**
-       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
+   The Sensu Go Workshop was designed with modern IT operations, DevOps, and SRE tooling in mind, so we would expect that most users should already have everything they need to complete the workshop.
+   In general, any laptop or other workstation with a `git` client, text editor, and a modern web browser will work great.
+   Please note the following details for more information:
+
+   1. **Workstation**.
+      Workshop users will need a workstation running a recent version of MacOS, Windows, or Linux to participate in this workshop.
+   1. **Git client (`git`).**
+      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+   1. **Supported web browser.**
+      The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
+   1. **Compatible text editor.**
+      This workshop requires creation and editing of various configuration files and monitoring code templates.
+      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
+      _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
+   1. **Optional CLI tools.**
+      The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+      - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 
@@ -187,17 +211,25 @@
 
 1. **Prerequisites.**
 
-    1. **Docker**
-       - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
-       - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
-       - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
-    1. **Docker Compose (`docker-compose`).**
-       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
-    1. **Git client (`git`).**
-       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-    1. **Optional CLI tools.**
-       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
+   1. **Workshop Hosting Environment**.
+      Instructors are encouraged to deploy shared workshop environment on a Linux host (e.g. cloud compute instance or VM).
+   1. **Docker**
+      - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
+      - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
+      - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
+   1. **Docker Compose (`docker-compose`).**
+      Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
+   1. **Git client (`git`).**
+      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
+   1. **Supported web browser.**
+      The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
+   1. **Compatible text editor.**
+      This workshop requires creation and editing of various configuration files and monitoring code templates.
+      Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Submlime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
+      _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
+   1. **Optional CLI tools.**
+      The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
+      - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
 1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
 

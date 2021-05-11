@@ -170,37 +170,55 @@ services:
     command: >-
       vault server -dev -log-level debug
 
-  # Artifactory
+  # Sensu Asset Server
   #
-  # Private Sensu Asset service.
-  artifactory:
-    image: releases-docker.jfrog.io/jfrog/artifactory-oss:${ARTIFACTORY_VERSION}
+  # Serve Sensu Assets over HTTP using NGINX.
+  sensu-assets:
+    image: "nginx:latest"
+    labels:
+    - io.sensu.role=asset-server
     ports:
-    - 8881:8081
-    - 8882:8082
-    environment:
-    - JFROG_HOME
+    - 8000:80
     volumes:
+    - type: bind
+      source: ./config/nginx/nginx.conf
+      target: /etc/nginx/nginx.conf
     - type: volume
-      source: artifactory_data
-      target: /opt/jfrog/artifactory/var
-    # - type: bind
-    #   source: ./config/artifactory/system.yaml
-    #   target: /opt/jfrog/artifactory/var/etc/system.yaml
-    # - type: bind
-    #   source: ./config/artifactory/join.key
-    #   target: /opt/jfrog/artifactory/var/etc/security/join.key
-    # - type: bind
-    #   source: ./config/artifactory/master.key
-    #   target: /opt/jfrog/artifactory/var/etc/security/master.key
-    # - type: bind
-    #   source: ./config/artifactory/bootstrap.creds
-    #   target: /opt/jfrog/artifactory/var/etc/access/bootstrap.creds
+      source: asset_data
+      target: /usr/share/nginx/html/assets
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:8081/artifactory/api/system/ping
+      test: curl -s -I http://127.0.0.1:80/
       interval: 10s
       timeout: 5s
       retries: 6
+
+  # Sensu Asset SMB Adapter
+  #
+  # Access the Sensu Assets service via SMB.
+  sensu-assets-smb:
+    build:
+      context: ./docker/sensu-assets/
+      dockerfile: Dockerfile.debian
+    image: sensu-assets:latest
+    labels:
+    - io.sensu.role=asset-server
+    # user: sensu
+    ports:
+    - 139:139
+    - 445:445
+    volumes:
+    - type: bind
+      source: ./config/samba/smb.conf
+      target: /etc/samba/smb.conf
+    - type: volume
+      source: asset_data
+      target: /home/sensu/assets
+    healthcheck:
+      test: smbstatus --brief
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
 
   # Configurator
   #
@@ -319,6 +337,8 @@ volumes:
     driver: local
   sensu_data:
     driver: local
+  asset_data:
+    driver: local
   influxdb_data:
     driver: local
   timescaledb_data:
@@ -328,6 +348,4 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
-    driver: local
-  artifactory_data:
     driver: local

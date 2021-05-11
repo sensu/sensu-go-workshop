@@ -171,10 +171,15 @@ services:
     - type: volume
       source: asset_data
       target: /usr/share/nginx/html/assets
+    healthcheck:
+      test: curl -s -I http://127.0.0.1:80/
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Sensu Asset SMB Adapter
   #
-  # See:
+  # Access the Sensu Assets service via SMB.
   sensu-assets-smb:
     build:
       context: ./docker/sensu-assets/
@@ -193,6 +198,11 @@ services:
     - type: volume
       source: asset_data
       target: /home/sensu/assets
+    healthcheck:
+      test: smbstatus --brief
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
 
   # Configurator

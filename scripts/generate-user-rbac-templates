@@ -61,11 +61,16 @@ validate_io() {
 }
 
 create_users() {
-  for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64'); do
+  for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
       export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
+      echo "PASSWORD ==== ${PASSWORD}"
+      if [ ${PASSWORD} == "null" ]; then
+        export PASSWORD=${WORKSHOP_PASSWORD}
+      fi
+      echo "PASSWORD ==== ${PASSWORD}"
       export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
       if [ ${PASSWORD_HASH} == "null" ]; then
         export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)

@@ -396,9 +396,21 @@
 
 Please note the following configuration parameters:
 
-- `WORKSHOP_VERSION=0.2.0`
+- `WORKSHOP_SENSU_VERSION`
 
-  Informational use only (not used in the workshop).
+  The Sensu version used in the workshop.
+
+- `WORKSHOP_SENSU_BUILD`
+
+  The Sensu build number used in the workshop.
+
+- `WORKSHOP_HOSTNAME`
+
+  The hostname of the workshop environment (used in instructor-led workshops only).
+
+- `WORKSHOP_PASSWORD`
+
+  The default password used in the workshop.
 
 - `COMPOSE_PROJECT_NAME`
 

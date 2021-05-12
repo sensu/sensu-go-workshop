@@ -479,10 +479,17 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
 
    **Windows users (Powershell):**
 
+   First download the Sensu agent package:
+
    ```powershell
    Invoke-WebRequest `
      -Uri "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${Env:SENSU_VERSION}/sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" `
      -OutFile "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
+   ```
+   
+   Once the download is complete, install the package and add the executable into your command path:
+
+   ```powershell
    msiexec.exe /i "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" /qr
    rm "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
    ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"

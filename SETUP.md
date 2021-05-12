@@ -299,33 +299,49 @@
 
    Use the workshop `configurator` Docker container to generate workshop trainee user RBAC templates, create the user accounts (including dedicated namespaces), and seed each namespace with the required Sensu resources:
 
-   ```shell
-   sudo docker-compose run --rm configurator generate-user-rbac-templates
-   sudo docker-compose run --rm configurator create-user-accounts
-   sudo docker-compose run --rm configurator seed-workshop-resources
-   ```
+   - **generate-user-rbac-templates**
 
-   The scripts should output a messages like the following:
+     ```shell
+     sudo docker-compose run --rm configurator generate-user-rbac-templates
+     ```
 
-   ```shell
-   Generating user template: config/sensu/rbac/trainee.yaml
-   Skipping user template for "trainee" (an RBAC template at "config/sensu/rbac/trainee.yaml" already exists)
-	 ```
+     Example output:
 
-   ```shell
-   Successfully created the following workshop user accounts:
+     ```shell
+     Generating user template: config/sensu/rbac/trainee.yaml
+     Skipping user template for "trainee" (an RBAC template at "config/sensu/rbac/trainee.yaml" already exists)
+	   ```
 
-      Name
-    ─────────
-     default
-     trainee
-   ```
+   - **create-user-accounts**
 
-   ```shell
-   Applying cluster configuration from config/sensu/cluster
-   Seeding namespace 'default' with resource templates in config/sensu/seeds
-   Seeding namespace 'trainee' with resource templates in config/sensu/seeds
-   ```
+     ```shell
+     sudo docker-compose run --rm configurator create-user-accounts
+     ```
+
+     Example output:
+
+     ```shell
+     Successfully created the following workshop user accounts:
+
+        Name
+      ─────────
+       default
+       trainee
+     ```
+
+   - **seed-workshop-resources**
+
+     ```shell
+     sudo docker-compose run --rm configurator seed-workshop-resources
+     ```
+
+     Example output:
+
+     ```shell
+     Applying cluster configuration from config/sensu/cluster
+     Seeding namespace 'default' with resource templates in config/sensu/seeds
+     Seeding namespace 'trainee' with resource templates in config/sensu/seeds
+     ```
 
    > _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
 

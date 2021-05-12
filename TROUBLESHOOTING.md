@@ -374,11 +374,13 @@ In some cases this can be easily resolved via the following steps:
    ```
 
    If you are unable to run Powershell as Administrator, you can scope the execution policy to CurrentUser instead with:
+
    ```powershell
    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
    ```
 
    To check the active execution policy is st to unrestricted use the following command:
+
    ```powershell
    Get-ExecutionPolicy
    ```

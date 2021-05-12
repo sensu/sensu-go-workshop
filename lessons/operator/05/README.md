@@ -272,7 +272,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
 **NEXT:** Let's move on to the next exercise to see how event handling works in practice.
 
-## EXERCISE 1: create an event that triggers an alert
+## EXERCISE 2: create an event that triggers an alert
 
 Sensu matches incoming events with the corresponding event pipelines using an event attribute called `handlers` (e.g. `handlers:["slack","pagerduty"]`).
 Let's create an event that will be processed using the handler we configured in [Lesson 4](/lessons/04/README.md#readme).

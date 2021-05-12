@@ -343,7 +343,7 @@
      Seeding namespace 'trainee' with resource templates in config/sensu/seeds
      ```
 
-   > _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
+   _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
 
 **NEXT:** if you're seeing trainee user namespaces in your workshop environment, you're ready to start the workshop!
 

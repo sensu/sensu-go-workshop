@@ -1,5 +1,8 @@
 # Troubleshooting
 
+- [Scale one of the workshop services](#scale-one-of-the-workshop-services)
+- [Reset the workshop environment](#reset-the-workshop-environment)
+- [Inspect the contents of a Docker volume](#inspect-the-contents-of-a-docker-volume)
 - [Error executing `git` commands on MacOS (Developer Tools)](#error-executing-git-commands-on-macos-developer-tools)
 - [Deploying the workshop using `docker-compose` without `sudo`](#sudo-less-docker-compose)
 - [Certain `sensuctl` commands produce authorization errors](#certain-sensuctl-commands-produce-authorization-errors)
@@ -13,6 +16,105 @@
 - [Copy files into running containers](#copy-files-into-running-containers)
 - [Delete trainee namespaces](#delete-trainee-namespaces)
 - [Unable to execute Powershell scripts on a Windows workstation](#unable-to-execute-powershell-scripts-on-a-windows-workstation)
+
+### Scale one of the workshop services
+
+1. **Add more Sensu Agent containers.**
+
+   ```shell
+   sudo docker-compose up -d --scale sensu-agent=3
+   ```
+
+   The output should look like this:
+
+   ```shell
+   workshop_sensu-backend_1 is up-to-date
+   workshop_vault_1 is up-to-date
+   Starting workshop_sensuctl_1 ...
+   workshop_timescaledb_1 is up-to-date
+   workshop_grafana_1 is up-to-date
+   Starting workshop_sensuctl_1     ... done
+   Starting workshop_sensu-agent_1  ... done
+   Starting workshop_configurator_1 ... done
+   Creating workshop_sensu-agent_2  ... done
+   Creating workshop_sensu-agent_3  ... done
+   ```
+
+### Reset the workshop environment
+
+1. **Stop all containers, remove all networks and volumes.**
+
+   ```shell
+   sudo docker-compose down -v
+   ```
+
+   The output should look like this:
+
+   ```shell
+   Stopping workshop_sensu-agent_1   ... done
+   Stopping workshop_sensu-backend_1 ... done
+   Stopping workshop_timescaledb_1   ... done
+   Stopping workshop_artifactory_1   ... done
+   Stopping workshop_grafana_1       ... done
+   Stopping workshop_vault_1         ... done
+   Removing workshop_configurator_1  ... done
+   Removing workshop_sensu-agent_1   ... done
+   Removing workshop_sensu-backend_1 ... done
+   Removing workshop_timescaledb_1   ... done
+   Removing workshop_artifactory_1   ... done
+   Removing workshop_grafana_1       ... done
+   Removing workshop_vault_1         ... done
+   Removing workshop_sensuctl_1      ... done
+   Removing network workshop_default
+   Removing volume workshop_sensuctl_data
+   Removing volume workshop_sensu_data
+   Removing volume workshop_timescaledb_data
+   Removing volume workshop_grafana_data
+   Removing volume workshop_artifactory_data
+   ```
+
+### Inspect the contents of a Docker Volume
+
+1. **Inspect the Docker `volume` resource.**
+
+   ```shell
+   sudo docker volume inspect workshop_timescaledb_data
+   ```
+
+   The output should look like this:
+
+   ```json
+   [
+     {
+       "CreatedAt": "2020-07-22T10:24:59-07:00",
+       "Driver": "local",
+       "Labels": {
+         "com.docker.compose.project": "workshop",
+         "com.docker.compose.version": "1.25.5",
+         "com.docker.compose.volume": "timescaledb_data"
+       },
+       "Mountpoint": "/var/lib/docker/volumes/workshop_timescaledb_data/_data",
+       "Name": "workshop_timescaledb_data",
+       "Options": null,
+       "Scope": "local"
+     }
+   ]
+   ```
+
+   The "Mountpoint" field indicates the subdirectory where you can find the contents of the volume.
+
+   If you have `jq` installed, the following commands may be useful:
+
+   ```shell
+   sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint
+   "/var/lib/docker/volumes/workshop_timescaledb_data/_data"
+   ```
+
+   For example, to list the contents of a volume:
+
+   ```shell
+   sudo ls $(sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint)
+   ```
 
 ## Error executing `git` commands on MacOS (Developer Tools)
 

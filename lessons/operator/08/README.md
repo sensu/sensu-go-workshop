@@ -13,7 +13,7 @@
   - [Proxy checks (pollers)](#proxy-checks-pollers)
   - [Execution environment & environment variables](#execution-environment--environment-variables)
 - [EXERCISE 1: configure a check](#exercise-1-configure-a-check)
-- [EXERCISE 2: modify a check configuration using tokens](#exercise-2-modify-a-check-using-tokens)
+- [EXERCISE 2: modify a check configuration using tokens](#exercise-2-modify-check-configuration-using-tokens)
 - [EXERCISE 3: collecting metrics with Sensu Checks](#exercise-3-collecting-metrics-with-sensu-checks)
 - [Next steps](#next-steps)
 - [Learn more](#learn-more)

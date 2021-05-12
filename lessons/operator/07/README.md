@@ -444,51 +444,26 @@ The Sensu Agent is available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, Ma
 This exercise will focus on a simplified install for running a Sensu agent on your local workstation, but it will not go into as much detail as the official documentation.
 The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides detailed instructions for installing & operating Sensu Agents.
 
-1. **Verify environment variables.**
+1. **Configure environment variables.**
 
-   If you're installing the Sensu Agent on a system other than the workstation where you've been following along with the rest of this workshop you'll need to set a few environment variables.
+   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
+   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
 
-   To verify if the required environment variables are already set, run the following command:
-
-   **Linux and Mac users:**
+   **Mac and Linux users (`.envrc`):**
 
    ```shell
+   source .envrc
    env | grep SENSU
    ```
 
-   **Windows users (Powershell):**
+   **Windows users (`.envrc.ps1`):**
 
    ```powershell
+   . .\.envrc.ps1
    Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
 
-   Do you see the expected values for `SENSU_BACKEND_URL` and `SENSU_NAMESPACE`?
-   If so, you're ready to move on to the next step!
-
-   If not, run the following commands to set the environment variables:
-
-   **Mac and Linux users:**
-
-   ```
-   export SENSU_VERSION=${SENSU_VERSION:-"6.2.7"}
-   export SENSU_BACKEND_URL=${SENSU_BACKEND_URL:-"ws://127.0.0.1:8081"}
-   export SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
-   export SENSU_USER=${SENSU_USER:-"sensu"}
-   export SENSU_PASSWORD=${SENSU_PASSWORD:-"sensu"}
-   ```
-
-   **Windows users (Powershell):**
-
-   ```powershell
-   ${Env:SENSU_VERSION}="6.2.7"
-   ${Env:SENSU_BUILD}="4449"
-   ${Env:SENSU_BACKEND_URL}="ws://127.0.0.1:8081"
-   ${Env:SENSU_NAMESPACE}="default"
-   ${Env:SENSU_USER}="sensu"
-   ${Env:SENSU_PASSWORD}="sensu"
-   ```
-
-   Instructor-led workshop users will need to replace the `SENSU_BACKEND_URL` IP address (or hostname), `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORZD` with the values provided by their instructor.
+   The output should include the expected values for `SENSU_VERSION` (i.e. a supported Sensu version such as "6.2.7"), `SENSU_BUILD`  (i.e. a supported Sensu build such as "4449"), `SENSU_BACKEND_URL`, `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORD`.
 
 1. **Download & install the latest Sensu Agent for MacOS, Windows, or Linux.**
 
@@ -612,6 +587,27 @@ Let's stop our agent and modify its configuration:
    ```
 
    Make sure to save the contents of the file before moving on to the next step.
+
+1. **Configure environment variables.**
+
+   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
+   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+
+   **Mac and Linux users (`.envrc`):**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include the expected values for `SENSU_USER` and `SENSU_PASSWORD`.
 
 1. **Start/Restart the Sensu Agent.**
 

@@ -7,7 +7,6 @@
 - [References](#references)
   - [Workshop contents](#workshop-contents)
   - [Customization](#customization)
-  - [Maintenance & Troubleshooting](#maintenance-troubleshooting)
 
 ## Setup
 
@@ -124,8 +123,6 @@
 
    1. **Workstation**.
       Workshop users will need a workstation running a recent version of MacOS, Windows, or Linux to participate in this workshop.
-   1. **Git client (`git`).**
-      Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
    1. **Supported web browser.**
       The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
    1. **Compatible text editor.**
@@ -136,54 +133,25 @@
       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
-1. **Clone the `sensu/sensu-go-workshop` GitHub repository.**
+1. **Downlaod your user `.envrc` or `.envrc.ps1` file.**
+
+   Run the following commands, using the values provided by your instructor for `WORKSHOP_HOSTNAME` and `WORKSHOP_USERNAME`.
+
+   **Mac and Linux users:**
 
    ```shell
-   git clone https://github.com/sensu/sensu-go-workshop.git
-   cd sensu-go-workshop/
+   WORKSHOP_HOSTNAME=127.0.0.1
+   WORKSHOP_USERNAME=trainee
+   curl -L "http://${WORKSHOP_HOSTNAME}:8000/config/${WORKSHOP_USERNAME}.envrc" -o .envrc
    ```
 
-   _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
-
-1. **Modify the contents of the `.envrc` or `.envrc.ps1` file.**
-
-   Modify the contents of `.envrc` using the details provided by your instructor.
-   At minimum you will need to edit the `SENSU_BACKEND_HOST`, `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORD` property.
-   Unless otherwise instructed, your `SENSU_NAMESPACE` should be the same as the workshop username provded by your instructor.
-
-   **Mac and Linux users (`.envrc`):**
-
-   ```shell
-   export SENSU_VERSION=6.2.7
-   export SENSU_BUILD=4449
-   export SENSU_PLATFORM=linux
-   export SENSU_ARCH=amd64
-   export SENSU_BACKEND_HOST=127.0.0.1
-   export SENSU_NAMESPACE=default
-   export SENSU_USER=sensu
-   export SENSU_PASSWORD=sensu
-   export SENSU_BACKEND_URL=ws://${SENSU_BACKEND_HOST}:8081
-   export SENSU_API_URL=http://${SENSU_BACKEND_HOST}:8080
-   # export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-   ```
-
-   **Windows users (`.envrc.ps1`):**
+   **Windows users (Powershell):**
 
    ```powershell
-   ${Env:SENSU_VERSION}="6.2.7"
-   ${Env:SENSU_BUILD}="4449"
-   ${Env:SENSU_PLATFORM}="linux"
-   ${Env:SENSU_ARCH}="amd64"
-   ${Env:SENSU_BACKEND_HOST}="127.0.0.1"
-   ${Env:SENSU_NAMESPACE}="default"
-   ${Env:SENSU_USER}="sensu"
-   ${Env:SENSU_PASSWORD}="sensu"
-   ${Env:SENSU_BACKEND_URL}="ws://${Env:SENSU_BACKEND_HOST}:8081"
-   ${Env:SENSU_API_URL}="http://${Env:SENSU_BACKEND_HOST}:8080"
-   # ${Env:SENSU_API_KEY}="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+   ${Env:WORKSHOP_HOSTNAME}="127.0.0.1"
+   ${Env:WORKSHOP_USERNAME}="trainee"
+   Invoke-WebRequest -Uri "http://${Env:WORKSHOP_HOSTNAME}:8000/config/${Env:WORKSHOP_USERNAME}.envrc.ps1" -OutFile .envrc.ps1
    ```
-
-   _NOTE: don't worry about setting `SENSU_API_KEY` for now - we'll cover that in [Lesson 3](/lessons/operator/03/README.md#readme)._
 
 1. **Configure environment variables.**
 
@@ -200,10 +168,6 @@
    . .\.envrc.ps1
    Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
-
-   > _NOTE: self-guided users should see the username `sensu`.
-   > Instructor-led workshop users should see the username assigned to them by the instructor.
-   > If you don't see a username printed out after the `echo $SENSU_WORKSHOP_USERNAME` command, please check with your instructor._
 
 **NEXT:** if you see the expected values output after you run the `env | grep SENSU` command, you're ready for your workshop!
 
@@ -329,41 +293,57 @@
 
    Modify this file so that there is one row per user. The `users.json` file supports defining `username` and `password` values (in plain text), or a `password_hash` (bcrypt-encrypted password hashes).
    If a `password_hash` _and_ `password` value are provided for the same user, the `password` will be ignored.
-   The Sensu CLI provides a built-in utility for generating valid `password_hash` values, via [the `sensuctl user password-hash` command][9].
+   The Sensu CLI provides a built-in utility for generating valid `password_hash` values, via [the `sensuctl user password-hash` command](https://docs.sensu.io/sensu-go/latest/sensuctl/#generate-a-password-hash).
 
 1. **Create workshop trainee user accounts.**
 
    Use the workshop `configurator` Docker container to generate workshop trainee user RBAC templates, create the user accounts (including dedicated namespaces), and seed each namespace with the required Sensu resources:
 
-   ```shell
-   sudo docker-compose run --rm configurator generate-user-rbac-templates
-   sudo docker-compose run --rm configurator create-user-accounts
-   sudo docker-compose run --rm configurator seed-workshop-resources
-   ```
+   - **generate-user-rbac-templates**
 
-   The scripts should output a messages like the following:
+     ```shell
+     sudo docker-compose run --rm configurator generate-user-rbac-templates
+     ```
 
-   ```shell
-   Generating user template: config/sensu/rbac/trainee.yaml
-   Skipping user template for "trainee" (an RBAC template at "config/sensu/rbac/trainee.yaml" already exists)
-	 ```
+     Example output:
 
-   ```shell
-   Successfully created the following workshop user accounts:
+     ```shell
+     Generating user template: config/sensu/rbac/trainee.yaml
+     Skipping user template for "trainee" (an RBAC template at "config/sensu/rbac/trainee.yaml" already exists)
+	   ```
 
-      Name
-    ─────────
-     default
-     trainee
-   ```
+   - **create-user-accounts**
 
-   ```shell
-   Applying cluster configuration from config/sensu/cluster
-   Seeding namespace 'default' with resource templates in config/sensu/seeds
-   Seeding namespace 'trainee' with resource templates in config/sensu/seeds
-   ```
+     ```shell
+     sudo docker-compose run --rm configurator create-user-accounts
+     ```
 
-   > _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
+     Example output:
+
+     ```shell
+     Successfully created the following workshop user accounts:
+
+        Name
+      ─────────
+       default
+       trainee
+     ```
+
+   - **seed-workshop-resources**
+
+     ```shell
+     sudo docker-compose run --rm configurator seed-workshop-resources
+     ```
+
+     Example output:
+
+     ```shell
+     Applying cluster configuration from config/sensu/cluster
+     Seeding namespace 'default' with resource templates in config/sensu/seeds
+     Seeding namespace 'trainee' with resource templates in config/sensu/seeds
+     ```
+
+   _NOTE: if you add additional users to `users/users.json` after you complete this step you'll need to repeat the commands in this step._
 
 **NEXT:** if you're seeing trainee user namespaces in your workshop environment, you're ready to start the workshop!
 
@@ -385,7 +365,7 @@
    Coming soon:
 
    - A Vagrantfile wrapper to run the workshop in a VM
-   - Deployment templates for [AWS Fargate][fargate]
+   - Deployment templates for [AWS Fargate](https://www.docker.com/blog/from-docker-straight-to-aws/)
    - Alternate reference architectures (e.g. Elasticsearch or Splunk for metric storage instead of Timescale)
 
 3. Configuration files for all components of the workshop environment
@@ -429,12 +409,12 @@ Please note the following configuration parameters:
 - `SENSU_BACKEND_CLUSTER_ADMIN_USERNAME`
 
   The Sensu Go cluster admin username.
-  _NOTE: if you're a long-time Sensu Go user you may recall that the default cluster admin username was `admin`; since version 5.16.0 the default cluster admin user has been removed and must now be provided via a new [`sensu-backend init` command][4]._
+  _NOTE: if you're a long-time Sensu Go user you may recall that the default cluster admin username was `admin`; since version 5.16.0 the default cluster admin user has been removed and must now be provided via a new [`sensu-backend init` command](https://docs.sensu.io/sensu-go/latest/reference/backend/#initialization)._
 
 - `SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD`
 
   The Sensu Go cluster admin password.
-  _NOTE: if you're a long-time Sensu Go user you may recall that the default cluster admin password was `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has been removed and must now be provided via the [`sensu-backend init` command][4]._
+  _NOTE: if you're a long-time Sensu Go user you may recall that the default cluster admin password was `P@ssw0rd!`; since version 5.16.0 the default cluster admin password has been removed and must now be provided via the [`sensu-backend init` command](https://docs.sensu.io/sensu-go/latest/reference/backend/#initialization)._
 
 - `SENSU_INTERNAL_ENVIRONMENT`
 
@@ -676,123 +656,3 @@ Please note the following configuration parameters:
 - `NGINX_VERSION`
 
   ==TODO==
-
-## Maintenance & Troubleshooting
-
-### Adding Sensu RBAC resources
-
-This workshop includes some example Role Based Access Control (RBAC) resources that may be useful for instructors who wish to prepare a shared (multi-tenant) workshop environment for multiple trainees.
-These resources include namespaces, roles & cluster roles, role-bindings & cluster-role-bindings, and "basic auth" user accounts.
-To learn more about RBAC in Sensu Go, please visit the [RBAC reference documentation][7].
-
-In organizations where an SSO provider is available, we recommend configuring Sensu for single sign-on (supports LDAP, Active Directory, OAuth, and OIDC).
-To learn more about SSO for Sensu Go, please visit the [authentication provider documentation][8].
-
-### Scale one of the workshop services
-
-1. **Add more Sensu Agent containers.**
-
-   ```shell
-   sudo docker-compose up -d --scale sensu-agent=3
-   ```
-
-   The output should look like this:
-
-   ```shell
-   workshop_sensu-backend_1 is up-to-date
-   workshop_vault_1 is up-to-date
-   Starting workshop_sensuctl_1 ...
-   workshop_timescaledb_1 is up-to-date
-   workshop_grafana_1 is up-to-date
-   Starting workshop_sensuctl_1     ... done
-   Starting workshop_sensu-agent_1  ... done
-   Starting workshop_configurator_1 ... done
-   Creating workshop_sensu-agent_2  ... done
-   Creating workshop_sensu-agent_3  ... done
-   ```
-
-### Reset the workshop environment
-
-1. **Stop all containers, remove all networks and volumes.**
-
-   ```shell
-   sudo docker-compose down -v
-   ```
-
-   The output should look like this:
-
-   ```shell
-   Stopping workshop_sensu-agent_1   ... done
-   Stopping workshop_sensu-backend_1 ... done
-   Stopping workshop_timescaledb_1   ... done
-   Stopping workshop_artifactory_1   ... done
-   Stopping workshop_grafana_1       ... done
-   Stopping workshop_vault_1         ... done
-   Removing workshop_configurator_1  ... done
-   Removing workshop_sensu-agent_1   ... done
-   Removing workshop_sensu-backend_1 ... done
-   Removing workshop_timescaledb_1   ... done
-   Removing workshop_artifactory_1   ... done
-   Removing workshop_grafana_1       ... done
-   Removing workshop_vault_1         ... done
-   Removing workshop_sensuctl_1      ... done
-   Removing network workshop_default
-   Removing volume workshop_sensuctl_data
-   Removing volume workshop_sensu_data
-   Removing volume workshop_timescaledb_data
-   Removing volume workshop_grafana_data
-   Removing volume workshop_artifactory_data
-   ```
-
-### Inspect the contents of a Docker Volume
-
-1. **Inspect the Docker `volume` resource.**
-
-   ```shell
-   sudo docker volume inspect workshop_timescaledb_data
-   ```
-
-   The output should look like this:
-
-   ```json
-   [
-     {
-       "CreatedAt": "2020-07-22T10:24:59-07:00",
-       "Driver": "local",
-       "Labels": {
-         "com.docker.compose.project": "workshop",
-         "com.docker.compose.version": "1.25.5",
-         "com.docker.compose.volume": "timescaledb_data"
-       },
-       "Mountpoint": "/var/lib/docker/volumes/workshop_timescaledb_data/_data",
-       "Name": "workshop_timescaledb_data",
-       "Options": null,
-       "Scope": "local"
-     }
-   ]
-   ```
-
-   The "Mountpoint" field indicates the subdirectory where you can find the contents of the volume.
-
-   If you have `jq` installed, the following commands may be useful:
-
-   ```shell
-   sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint
-   "/var/lib/docker/volumes/workshop_timescaledb_data/_data"
-   ```
-
-   For example, to list the contents of a volume:
-
-   ```shell
-   sudo ls $(sudo docker volume inspect workshop_timescaledb_data | jq -r .[].Mountpoint)
-   ```
-
-[4]: https://docs.sensu.io/sensu-go/latest/reference/backend/#initialization
-[5]: https://docs.sensu.io/sensu-go/latest/installation/install-sensu/#install-sensuctl
-[6]: https://docs.sensu.io/sensu-go/latest/
-[7]: https://docs.sensu.io/sensu-go/latest/reference/rbac/
-[8]: https://docs.sensu.io/sensu-go/latest/operations/control-access/auth/
-[9]: https://docs.sensu.io/sensu-go/latest/sensuctl/#generate-a-password-hash
-
-[fargate]: https://www.docker.com/blog/from-docker-straight-to-aws/
-[heroku]: https://devcenter.heroku.com/categories/deploying-with-docker

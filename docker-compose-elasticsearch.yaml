@@ -187,7 +187,7 @@ services:
       source: asset_data
       target: /usr/share/nginx/html/assets
     healthcheck:
-      test: curl -s -I http://127.0.0.1:80/
+      test: curl -s -I -A "Docker health check (curl)" http://127.0.0.1:80/
       interval: 10s
       timeout: 5s
       retries: 6

@@ -280,7 +280,28 @@ $ sensuctl configure -n \
   --format json
 ```
 
-## EXERCISE 3-2: install and configure `sensuctl`
+## EXERCISE 2: install and configure `sensuctl`
+
+1. **Configure environment variables.**
+
+   _NOTE: instructor-led workshop users will need to download an `.envrc` or `.envrc.ps1` file at this time;
+   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+
+   **Mac and Linux users (`.envrc`):**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include a value for `SENSU_VERSION` (i.e. a supported Sensu version such as "6.2.7").
 
 1. **Download and install `sensuctl`.**
 
@@ -326,7 +347,7 @@ $ sensuctl configure -n \
    Backend URL:
 
    - **Self guided users:** self-guided trainees who are running the workshop on their local workstation should use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
-   - **Instructor-led workshop users:** please use the Backend URL, namespace, and username + password provided by your instructor.
+   - **Instructor-led workshop users:** please use the Backend URL, namespace, username, and password provided by your instructor (these values are available in your `.envrc` or `.envrc.ps1` file).
 
    The `sensuctl configure` runs in interactive mode by default and will prompt you for the following settings:
 
@@ -479,7 +500,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-1. **Save the API Key user in a future exercise.**
+1. **Save the API Key for use in a future exercise.**
 
    For the purposes of this workshop, we want to capture this API key (the
    `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) for use in a future exercise.
@@ -499,7 +520,7 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    ```
 
    > **PROTIP:** if you like to automate things like this using shell scripts, you might already be thinking about how to parse the output of the `sensuctl api-key grant` command.
-   > The following example should do the trick:
+   > The following example should do the trick for Mac and Linux users:
    >
    > ```shell
    > export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')

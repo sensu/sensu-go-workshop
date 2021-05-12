@@ -18,7 +18,7 @@
 Handlers are actions the Sensu backend executes on incoming events (observability data).
 Because Handler configuration determines what happens to events that flow through the Sensu pipeline, they are one of the most important building blocks of the Sensu solution.
 
-Mutliple types of handlers are supported by Sensu, the most popular of which is the `pipe` handler.
+Multiple types of handlers are supported by Sensu, the most popular of which is the `pipe` handler.
 
 Handler types:
 

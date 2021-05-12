@@ -475,6 +475,18 @@ In some cases this can be easily resolved via the following steps:
    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine
    ```
 
+   If you are unable to run Powershell as Administrator, you can scope the execution policy to CurrentUser instead with:
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+   ```
+
+   To check the active execution policy is st to unrestricted use the following command:
+
+   ```powershell
+   Get-ExecutionPolicy
+   ```
+
 If a user is unable to modify the execution policy for their workstation, they should still be able to execute the commands contained in the Powershell script file directly via their terminal.
 
 Reference: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies

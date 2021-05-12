@@ -3,7 +3,7 @@
 - [Overview](#overview)
 - [Events are observations](#events-are-observations)
 - [Use cases](#use-cases)
-- [EXERCISE 1: create an event using curl and the Sensu Events API](#exercise-1-create-an-event-using-curl-and-the-Sensu-Events-API-no-op)
+- [EXERCISE 1: create an event using curl and the Sensu Events API](#exercise-1-create-an-event-using-curl-and-the-Sensu-Events-API)
 - [EXERCISE 2: create an event that triggers an alert](#exercise-2-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)

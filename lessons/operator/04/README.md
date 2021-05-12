@@ -118,7 +118,7 @@ spec:
 ### Handler templating
 
 Sensu handlers developed using the Sensu Plugin SDK – including all officially supported handler integrations – provide built-in support for templating handler output (e.g. email notifications or Slack message contents).
-Sensu handler templates use the [Golang `text/template` package](https://pkg.go.dev/text/template), and support generating text output that includes observabilty data from Sensu events, enabling users to provide include meaningful context and actionable alerts.
+Sensu handler templates use the [Golang `text/template` package](https://pkg.go.dev/text/template), and support generating text output that includes observability data from Sensu events, enabling users to provide include meaningful context and actionable alerts.
 
 **Example HTML email template:**
 

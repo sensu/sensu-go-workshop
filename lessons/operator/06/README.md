@@ -72,6 +72,29 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    sensuctl handler info slack --format yaml
    ```
 
+1. **Configure environment variables.**
+
+   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
+   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+
+   **Mac and Linux users (`.envrc`):**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include the expected values for `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY`.
+
+   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
+
 1. **Test the filter.**
 
    The `is_incident` filter will prevent processing of healthy (`"status": 0`) events, unless they are resolving an incident.
@@ -194,6 +217,29 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    sensuctl handler info slack --format yaml
    ```
+
+1. **Configure environment variables.**
+
+   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
+   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+
+   **Mac and Linux users (`.envrc`):**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include the expected values for `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY`.
+
+   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
 1. **Test the filter.**
 

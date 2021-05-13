@@ -234,6 +234,8 @@ services:
     build:
       context: ./docker/sensu-assets/
       dockerfile: Dockerfile.debian
+      args:
+      - WORKSHOP_PASSWORD
     image: sensu-assets:latest
     labels:
     - io.sensu.role=asset-server

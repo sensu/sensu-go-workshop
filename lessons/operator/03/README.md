@@ -363,20 +363,27 @@ $ sensuctl configure -n \
 1. **Verify your `sensuctl` configuration.**
 
    If you do not receive an error message after entering your username and password you should have a successfully configured CLI.
-   To confirm, let's run a `sensuctl` command to verify that we are successfully connected to the cluster:
+   To confirm, let's run a `sensuctl` command to verify our configuration:
 
    ```shell
-   sensuctl namespace list
+   sensuctl config view
    ```
 
    The output should look something like the following:
 
    ```
-      Name
-    ─────────
-     default
-     user
+   === Active Configuration
+   API URL:                  http://127.0.0.1:8080
+   Namespace:                default
+   Format:                   tabular
+   Timeout:                  15s
+   Username:                 sensu
+   JWT Expiration Timestamp: 1234567890
    ```
+
+   - **Self guided users:** if you're running the workshop on your local workstation should you should see the default API URL (`http://127.0.0.1:8080`), namespace (`default`), and username (`sensu`).
+   - **Instructor-led workshop users:** you should see the API URL provided by your instructor, and _matching values_ for namespace and username (e.g. "caleb").
+     If namespace is set to "default", you can update the configuration using the `sensuctl config set-namespace <username>` command (replacing `<username>` with your actual username).
 
 **NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
 
@@ -566,7 +573,7 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 1. **Get a complete list of resource types supported by `sensuctl dump`.**
 
    ```shell
-   sensuctl describe-type all --format yaml
+   sensuctl describe-type all
    ```
 
    Notice that some resources have "short names" (e.g. `core/v2.CheckConfig` has the short name `check`).

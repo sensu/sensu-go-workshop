@@ -37,11 +37,11 @@ _NOTE: Dynamic Runtime Assets are covered in greater detail in [Lesson 10: intro
 
 Sensu includes built-in event helper functions and event filters to help you customize event pipelines for metrics and alerts, including:
 
-- **`is_incident` filter:** only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
-- **`not_silenced` filter:** prevents processing of events that include the `silenced` attribute.
-- **`has_metrics` filter:** only process events containing Sensu Metrics.
-- **`hour()` function:** a custom SQE function that returns the hour of a UNIX epoch timestamp in UTC and 24-hour time notation (e.g. `hour(event.timestamp) >= 17`)
-- **`weekday()` function:** a custom SQE function that returns a number that represents the day of the week of a UNIX epoch timestamp (Sunday is `0`; e.g. `weekday(event.timestamp) == 0`)
+- **`is_incident` (built-in filter):** only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
+- **`not_silenced` (built-in filter):** prevents processing of events that include the `silenced` attribute.
+- **`has_metrics` (built-in filter):** only process events containing Sensu Metrics.
+- **`hour()` (helper function):** a custom SQE function that returns the hour of a UNIX epoch timestamp in UTC and 24-hour time notation (e.g. `hour(event.timestamp) >= 17`)
+- **`weekday()` (helper function):** a custom SQE function that returns a number that represents the day of the week of a UNIX epoch timestamp (Sunday is `0`; e.g. `weekday(event.timestamp) == 0`)
 
 ## Filter plugins
 
@@ -335,7 +335,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```
 
    Try running these commands multiple times in different combinations and observing the behavior.
-   The `is_incident` and an occurence-based filter like `filter-repeated` work very well together for reducing alert fatigue (i.e. with alert and incident management handlers).
+   The `is_incident` and an occurrence-based filter like `filter-repeated` work very well together for reducing alert fatigue (i.e. with alert and incident management handlers).
    These few examples are just a small preview of Sensu's flexible filtering system, which makes it easy to customize how and when observability events will be processed by the observability pipeline.
 
 **NEXT:** if you have successfully applied your filter and observed it working as described above, then you're ready to move on to the next lesson!

@@ -18,7 +18,7 @@
 Handlers are actions the Sensu backend executes on incoming events (observability data).
 Because Handler configuration determines what happens to events that flow through the Sensu pipeline, they are one of the most important building blocks of the Sensu solution.
 
-Mutliple types of handlers are supported by Sensu, the most popular of which is the `pipe` handler.
+Multiple types of handlers are supported by Sensu, the most popular of which is the `pipe` handler.
 
 Handler types:
 
@@ -118,7 +118,7 @@ spec:
 ### Handler templating
 
 Sensu handlers developed using the Sensu Plugin SDK – including all officially supported handler integrations – provide built-in support for templating handler output (e.g. email notifications or Slack message contents).
-Sensu handler templates use the [Golang `text/template` package](https://pkg.go.dev/text/template), and support generating text output that includes observabilty data from Sensu events, enabling users to provide include meaningful context and actionable alerts.
+Sensu handler templates use the [Golang `text/template` package](https://pkg.go.dev/text/template), and support generating text output that includes observability data from Sensu events, enabling users to provide include meaningful context and actionable alerts.
 
 **Example HTML email template:**
 

@@ -308,6 +308,7 @@ services:
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
+      - VAULT_VERSION  
     image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
@@ -317,6 +318,7 @@ services:
     - SENSU_PASSWORD
     - SENSU_NAMESPACE
     - VAULT_ADDR
+    - VAULT_TOKEN
     - VAULT_DEV_ROOT_TOKEN_ID
     - SENSU_ETCD_CLIENT_URLS
     working_dir: /root

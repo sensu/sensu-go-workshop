@@ -57,9 +57,9 @@ services:
       retries: 6
     environment:
     - SENSU_BACKEND_URL
+    - SENSU_AGENT_PASSWORD
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS
-    - SENSU_AGENT_PASSWORD
     - SENSU_KEEPALIVE_INTERVAL=5
     - SENSU_KEEPALIVE_WARNING_THRESHOLD=10
     - SENSU_KEEPALIVE_CRITICAL_THRESHOLD=20
@@ -73,11 +73,72 @@ services:
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
-      --statsd-event-handlers timescaledb
-      --password ${SENSU_AGENT_PASSWORD:-"P@ssw0rd!"}
+      --statsd-event-handlers prometheus
+      --password ${SENSU_AGENT_PASSWORD}
+
+  # Sensu Asset Server
+  #
+  # Serve Sensu Assets over HTTP using NGINX.
+  # 
+  # See: https://nginx.org/en/docs/
+  sensu-assets:
+    image: "nginx:latest"
+    labels:
+    - io.sensu.role=asset-server
+    ports:
+    - 8000:80
+    volumes:
+    - type: bind
+      source: ./config/nginx/nginx.conf
+      target: /etc/nginx/nginx.conf
+    - type: volume
+      source: asset_data
+      target: /usr/share/nginx/html/assets
+    - type: volume
+      source: user_data
+      target: /usr/share/nginx/html/users
+    healthcheck:
+      test: curl -s -I -A "Docker health check (curl)" http://127.0.0.1:80/
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  # Sensu Asset SMB Adapter
+  #
+  # Upload assets to the workshop Sensu Assets service via SMB.
+  #
+  # See: https://www.samba.org/samba/docs/
+  sensu-assets-smb:
+    build:
+      context: ./docker/sensu-assets/
+      dockerfile: Dockerfile.debian
+      args:
+      - WORKSHOP_PASSWORD
+    image: sensu-assets:latest
+    labels:
+    - io.sensu.role=asset-server
+    ports:
+    - 139:139
+    - 445:445
+    volumes:
+    - type: bind
+      source: ./config/samba/smb.conf
+      target: /etc/samba/smb.conf
+    - type: volume
+      source: asset_data
+      target: /home/sensu/assets
+    healthcheck:
+      test: smbstatus --brief
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
 
   # Prometheus node_exporter
   #
+  # Example Prometheus exporter. 
+  #
+  # See: https://prometheus.io/docs/guides/node-exporter/
   node-exporter:
     image: prom/node-exporter:${PROM_NODE_EXPORTER_VERSION}
     labels:
@@ -101,8 +162,7 @@ services:
 
   # Prometheus Push Gateway
   #
-  # Includes the Prometheus Pushgateway for pushing metrics to the Prometheus
-  # TSDB.
+  # Includes the Prometheus Pushgateway for pushing metrics to the Prometheus TSDB.
   #
   # See: https://github.com/prometheus/pushgateway
   pushgateway:
@@ -193,6 +253,8 @@ services:
   # Vault
   #
   # Includes a Vault "devmode" server for secrets management.
+  #
+  # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
     ports:
@@ -208,57 +270,55 @@ services:
     command: >-
       vault server -dev -log-level debug
 
-  # Sensu Asset Server
+  # Workstation
   #
-  # Serve Sensu Assets over HTTP using NGINX.
-  sensu-assets:
-    image: "nginx:latest"
-    labels:
-    - io.sensu.role=asset-server
-    ports:
-    - 8000:80
-    volumes:
-    - type: bind
-      source: ./config/nginx/nginx.conf
-      target: /etc/nginx/nginx.conf
-    - type: volume
-      source: asset_data
-      target: /usr/share/nginx/html/assets
-    healthcheck:
-      test: curl -s -I -A "Docker health check (curl)" http://127.0.0.1:80/
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
-  # Sensu Asset SMB Adapter
+  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
+  # pre-installed in case the trainee workstation is missing a required
+  # dependency.
   #
-  # Access the Sensu Assets service via SMB.
-  sensu-assets-smb:
+  # See: https://alpinelinux.org
+  sensuctl:
+    # container_name: sensuctl
     build:
-      context: ./docker/sensu-assets/
-      dockerfile: Dockerfile.debian
+      context: ./
+      dockerfile: Dockerfile
       args:
-      - WORKSHOP_PASSWORD
-    image: sensu-assets:latest
+      - SENSU_CLI_VERSION
+      - VAULT_VERSION
+    image: workshop:${SENSU_CLI_VERSION}
     labels:
-    - io.sensu.role=asset-server
-    # user: sensu
-    ports:
-    - 139:139
-    - 445:445
+    - io.sensu.role=sensuctl
+    environment:
+    - SENSU_API_URL
+    - SENSU_USERNAME
+    - SENSU_PASSWORD
+    - SENSU_NAMESPACE
+    - VAULT_ADDR
+    - VAULT_TOKEN
+    working_dir: /root
     volumes:
     - type: bind
-      source: ./config/samba/smb.conf
-      target: /etc/samba/smb.conf
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    - type: bind
+      source: ./scripts
+      target: /usr/local/bin/scripts
+    - type: bind
+      source: ./
+      target: /root/workshop
+      consistency: consistent
     - type: volume
-      source: asset_data
-      target: /home/sensu/assets
-    healthcheck:
-      test: smbstatus --brief
-      interval: 10s
-      timeout: 5s
-      retries: 6
-    command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
+      source: sensuctl_data
+      target: /root/.config
+      consistency: consistent
+    entrypoint: wait-for-sensu-backend sensuctl
+    command: >-
+      configure -n
+      --url ${SENSU_API_URL}
+      --username ${SENSU_USERNAME}
+      --password ${SENSU_PASSWORD}
+      --namespace ${SENSU_NAMESPACE}
+      --format tabular
 
   # Configurator
   #
@@ -323,75 +383,32 @@ services:
     - type: volume
       source: sensuctl_data
       target: /root/.config
-    command: |-
-      seed-workshop-resources
-
-  # Workstation
-  #
-  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
-  # pre-installed in case the trainee workstation is missing a required
-  # dependency.
-  #
-  # See: https://alpinelinux.org
-  sensuctl:
-    # container_name: sensuctl
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      args:
-      - SENSU_CLI_VERSION
-      - VAULT_VERSION
-    image: workshop:${SENSU_CLI_VERSION}
-    labels:
-    - io.sensu.role=sensuctl
-    environment:
-    - SENSU_API_URL
-    - SENSU_USERNAME
-    - SENSU_PASSWORD
-    - SENSU_NAMESPACE
-    - VAULT_ADDR
-    - VAULT_TOKEN
-    working_dir: /root
-    volumes:
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
-    - type: bind
-      source: ./scripts
-      target: /usr/local/bin/scripts
-    - type: bind
-      source: ./
-      target: /root/workshop
-      consistency: consistent
     - type: volume
-      source: sensuctl_data
-      target: /root/.config
-      consistency: consistent
-    entrypoint: wait-for-sensu-backend sensuctl
-    command: >-
-      configure -n
-      --url ${SENSU_API_URL}
-      --username ${SENSU_USERNAME}
-      --password ${SENSU_PASSWORD}
-      --namespace ${SENSU_NAMESPACE}
-      --format tabular
+      source: user_data
+      target: /users
+    command: |-
+      init-workshop
 
 volumes:
+  sensu_data:
+    driver: local
   sensuctl_data:
     driver: local
-  sensu_data:
+  etcd_data:
+    driver: local
+  postgres_data:
     driver: local
   asset_data:
     driver: local
-  config_data:
+  user_data:
+    driver: local
+  grafana_data:
     driver: local
   influxdb_data:
     driver: local
   timescaledb_data:
     driver: local
-  elasticsearch_data:
-    driver: local
   prometheus_data:
     driver: local
-  grafana_data:
+  elasticsearch_data:
     driver: local

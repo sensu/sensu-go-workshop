@@ -36,16 +36,17 @@ validate_api_url() {
 
 create_user_accounts() {
   /usr/local/bin/sensuctl create -r -f ${USERS_RBAC}
-  if [ $? -ne 0 ]; then 
+  if [ $? -ne 0 ]; then
     echo "Error encountered while creating workshop user accounts"
     exit 2
   else
     echo "Successfully created the following workshop user accounts:"
-    echo 
+    echo
     sensuctl namespace list --format tabular
-  fi 
+  fi
 }
 
+wait-for-sensuctl
 check_deps
 validate_io
 validate_api_url

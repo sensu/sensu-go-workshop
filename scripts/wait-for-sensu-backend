@@ -14,7 +14,7 @@ SUCCESS=0
 sensu_backend_init() {
   if [ ! -f ${SENSU_INIT_TEMP_FILE} ]; then
     if [ ! -z ${SENSU_ETCD_CLIENT_URLS} ]; then
-      sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
+      sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS} --cluster-admin-username ${SENSU_USERNAME} --cluster-admin-password ${SENSU_PASSWORD}
       if [ $? -eq 0 ]; then
         touch ${SENSU_INIT_TEMP_FILE}
         return 0

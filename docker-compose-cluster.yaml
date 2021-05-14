@@ -1,33 +1,27 @@
 ---
 version: "3.3"
 services:
-  # Sensu Backend
+  # Sensu Backend Cluster
   #
-  # Includes embedded database, API, event processor, and web app.
+  # Includes embedded database, API, event processor, and web UI).
   #
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
+    depends_on:
+    - etcd
     labels:
     - io.sensu.role=sensu-backend
-    ports:
-    - 3000:3000
-    - 8080:8080
-    - 8081:8081
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8080/health
       interval: 10s
       timeout: 5s
       retries: 6
     environment:
-    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
-    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - SENSU_INTERNAL_ENVIRONMENT
-    - SENSU_WORKSHOP_ENV_SECRET
-    - SENSU_INFLUXDB_ADDR
-    - SENSU_INFLUXDB_DB
-    - SENSU_INFLUXDB_USER
-    - SENSU_INFLUXDB_PASSWORD
+    - SENSU_TIMESCALEDB_DSN
+    - SENSU_ETCD_CLIENT_URLS
+    - SENSU_NO_EMBED_ETCD=true
+    - SENSU_PAGERDUTY_TOKEN
     volumes:
     - type: volume
       source: sensu_data
@@ -36,6 +30,8 @@ services:
       sensu-backend start
       --log-level=debug
       --debug=true
+      --no-embed-etcd
+      --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
 
   # Sensu Agent
   #
@@ -44,6 +40,8 @@ services:
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
+    depends_on:
+    - sensu-backend
     labels:
     - io.sensu.role=sensu-agent
     ports:
@@ -55,7 +53,7 @@ services:
       timeout: 5s
       retries: 6
     environment:
-    - SENSU_BACKEND_URL
+    - SENSU_BACKEND_URL=ws://sensu-lb:8081
     - SENSU_AGENT_PASSWORD
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS
@@ -74,6 +72,91 @@ services:
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
       --statsd-event-handlers influxdb
       --password ${SENSU_AGENT_PASSWORD}
+
+  # Sensu Backend Load Balancer
+  #
+  # HAproxy load balancer
+  #
+  # See: http://haproxy.org/#docs
+  sensu-lb:
+    image: haproxy:${HAPROXY_VERSION}
+    depends_on:
+    - sensu-backend
+    labels:
+    - io.sensu.role=sensu-lb
+    ports:
+    - 3000:3000
+    - 8080:8080
+    - 8081:8081
+    healthcheck:
+      test: wget -q -O- -U "Docker health check (wget)" http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    volumes:
+    - type: bind
+      source: ./config/haproxy/haproxy.cfg
+      target: /usr/local/etc/haproxy/haproxy.cfg
+
+  # Etcd
+  #
+  # Standalone etcd server.
+  #
+  # See: https://etcd.io/docs/v3.4.0/op-guide/container/#running-a-single-node-etcd-1
+  etcd:
+    image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
+    labels:
+    - io.sensu.role=sensu-backend-etcd
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:2379/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    ports:
+    - 2379:2379
+    - 2380:2380
+    environment:
+    - ETCD_HOST
+    volumes:
+    - type: volume
+      source: etcd_data
+      target: /var/lib/etcd
+    command: >-
+      /usr/local/bin/etcd
+      --data-dir=/var/lib/etcd
+      --name etcd-1
+      --initial-cluster-state "new"
+      --initial-advertise-peer-urls "http://${ETCD_HOST}:2380"
+      --listen-peer-urls "http://0.0.0.0:2380"
+      --advertise-client-urls "http://${ETCD_HOST}:2379"
+      --listen-client-urls "http://0.0.0.0:2379"
+      --initial-cluster "etcd-1=http://${ETCD_HOST}:2380"
+
+  # Postgres
+  #
+  # Sensu data store.
+  #
+  # See: https://www.postgresql.org/docs/
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    labels:
+    - io.sensu.role=postgres
+    ports:
+    - 5432
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    environment:
+    - POSTGRES_PASSWORD
+    - POSTGRES_USER
+    - POSTGRES_DB
+    - PGDATA=/var/lib/postgresql/data
+    volumes:
+    - type: volume
+      source: postgres_data
+      target: /var/lib/postgresql/data
 
   # Sensu Asset Server
   #
@@ -181,17 +264,16 @@ services:
     - GF_AUTH_BASIC_ENABLED
     - GF_SECURITY_ADMIN_USER
     - GF_SECURITY_ADMIN_PASSWORD
-    - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
-    - type: volume
-      source: grafana_data
-      target: /var/lib/grafana
     - type: bind
       source: ./config/grafana/provisioning
       target: /etc/grafana/provisioning
     - type: bind
       source: ./config/grafana/dashboards/timescaledb
       target: /etc/grafana/dashboards
+    - type: volume
+      source: grafana_data
+      target: /var/lib/grafana
 
   # Vault
   #
@@ -226,17 +308,17 @@ services:
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
-      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
     environment:
-    - SENSU_API_URL
+    - SENSU_API_URL=http://sensu-lb:8080
     - SENSU_USERNAME
     - SENSU_PASSWORD
     - SENSU_NAMESPACE
     - VAULT_ADDR
-    - VAULT_TOKEN
+    - VAULT_DEV_ROOT_TOKEN_ID
+    - SENSU_ETCD_CLIENT_URLS
     working_dir: /root
     volumes:
     - type: bind
@@ -283,12 +365,13 @@ services:
       - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
-    - sensu-backend
+    - etcd
     labels:
     - io.sensu.role=configurator
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_ETCD_CLIENT_URLS
     - VAULT_ADDR
     - VAULT_TOKEN
     - WORKSHOP_HOSTNAME

@@ -1,7 +1,8 @@
 #!/bin/sh
 
 export SENSUCTL_READY=""
-export RETRIES=0
+export RETRIES=5
+export ATTEMPT=0
 
 check_deps() {
   for DEP in sensuctl jq
@@ -20,9 +21,9 @@ check_sensuctl_config() {
 
 wait_for_sensuctl() {
 	check_sensuctl_config
-  while [ -z ${SENSUCTL_READY} ] && [ ${RETRIES} -lt 5 ]; do
-    RETRIES=$(expr ${RETRIES} + 1)
-    echo "Waiting for sensuctl configuration to initialize (attempt ${RETRIES})..."
+  while [ -z ${SENSUCTL_READY} ] && [ ${ATTEMPT} -lt ${RETRIES} ]; do
+    ATTEMPT=$(expr ${ATTEMPT} + 1)
+    echo "Waiting for sensuctl configuration to initialize (attempt ${ATTEMPT})..."
 		check_sensuctl_config
 	  sleep 2
   done

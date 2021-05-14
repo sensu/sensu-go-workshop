@@ -89,7 +89,7 @@ services:
     - 8080:8080
     - 8081:8081
     healthcheck:
-      test: wget -q -O- -U "Docker health check (wget)" http://127.0.0.1:8080/health
+      test: wget -q -O- -U "Docker health check (wget)" http://127.0.0.1:8404/stats
       interval: 10s
       timeout: 5s
       retries: 6

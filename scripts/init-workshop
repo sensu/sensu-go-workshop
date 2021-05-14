@@ -1,0 +1,4 @@
+#!/bin/sh
+generate-user-rbac-templates
+create-user-accounts
+seed-workshop-resources

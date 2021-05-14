@@ -1,6 +1,5 @@
 ARG SENSU_CLI_VERSION
 ARG VAULT_VERSION
-ARG VAULT_TOKEN
 
 # Use multi-stage Dockerfile to fetch desired sensuctl version
 FROM sensu/sensu:${SENSU_CLI_VERSION} AS sensu

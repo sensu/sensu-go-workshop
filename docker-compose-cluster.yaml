@@ -12,11 +12,7 @@ services:
     - etcd
     labels:
     - io.sensu.role=sensu-backend
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:8080/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
+    ports: []
     environment:
     - SENSU_TIMESCALEDB_DSN
     - SENSU_ETCD_CLIENT_URLS
@@ -26,6 +22,11 @@ services:
     - type: volume
       source: sensu_data
       target: /var/lib/sensu
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
       sensu-backend start
       --log-level=debug
@@ -47,11 +48,6 @@ services:
     ports:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:3031/healthz
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - SENSU_BACKEND_URL=ws://sensu-lb:8081
     - SENSU_AGENT_PASSWORD
@@ -64,6 +60,12 @@ services:
     - SENSU_API_PORT
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
+    volumes: []
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3031/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
       sensu-agent start
       --log-level=info
@@ -88,15 +90,16 @@ services:
     - 3000:3000
     - 8080:8080
     - 8081:8081
+    environment: []
+    volumes:
+    - type: bind
+      source: ./config/haproxy/haproxy.cfg
+      target: /usr/local/etc/haproxy/haproxy.cfg
     healthcheck:
       test: wget -q -O- -U "Docker health check (wget)" http://127.0.0.1:8404/stats
       interval: 10s
       timeout: 5s
       retries: 6
-    volumes:
-    - type: bind
-      source: ./config/haproxy/haproxy.cfg
-      target: /usr/local/etc/haproxy/haproxy.cfg
 
   # Etcd
   #
@@ -107,11 +110,6 @@ services:
     image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
     labels:
     - io.sensu.role=sensu-backend-etcd
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:2379/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
     ports:
     - 2379:2379
     - 2380:2380
@@ -121,6 +119,11 @@ services:
     - type: volume
       source: etcd_data
       target: /var/lib/etcd
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:2379/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
       /usr/local/bin/etcd
       --data-dir=/var/lib/etcd
@@ -143,11 +146,6 @@ services:
     - io.sensu.role=postgres
     ports:
     - 5432
-    healthcheck:
-      test: pg_isready -U postgres
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - POSTGRES_PASSWORD
     - POSTGRES_USER
@@ -157,11 +155,16 @@ services:
     - type: volume
       source: postgres_data
       target: /var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Sensu Asset Server
   #
   # Serve Sensu Assets over HTTP using NGINX.
-  # 
+  #
   # See: https://nginx.org/en/docs/
   sensu-assets:
     image: "nginx:latest"
@@ -169,6 +172,7 @@ services:
     - io.sensu.role=asset-server
     ports:
     - 8000:80
+    environment: []
     volumes:
     - type: bind
       source: ./config/nginx/nginx.conf
@@ -202,6 +206,7 @@ services:
     ports:
     - 139:139
     - 445:445
+    environment: []
     volumes:
     - type: bind
       source: ./config/samba/smb.conf
@@ -227,15 +232,15 @@ services:
     - io.sensu.role=data-platform
     ports:
     - 8086:8086
+    environment:
+    - INFLUXDB_DB
+    - INFLUXDB_ADMIN_USER
+    - INFLUXDB_ADMIN_PASSWORD
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8086/health
       interval: 10s
       timeout: 5s
       retries: 6
-    environment:
-    - INFLUXDB_DB
-    - INFLUXDB_ADMIN_USER
-    - INFLUXDB_ADMIN_PASSWORD
     volumes:
     - type: volume
       source: influxdb_data
@@ -254,11 +259,6 @@ services:
     - io.sensu.role=dashboards
     ports:
     - 3001:3000
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:3000/api/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - POSTGRES_PASSWORD
     - GF_AUTH_BASIC_ENABLED
@@ -274,6 +274,11 @@ services:
     - type: volume
       source: grafana_data
       target: /var/lib/grafana
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3000/api/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Vault
   #
@@ -282,11 +287,14 @@ services:
   # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
+    labels:
+    - io.sensu.role=secrets-manager
     ports:
     - 8200:8200
     environment:
     - VAULT_DEV_ROOT_TOKEN_ID
     - VAULT_DEV_LISTEN_ADDRESS
+    volumes: []
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
       interval: 10s
@@ -308,10 +316,11 @@ services:
       dockerfile: Dockerfile
       args:
       - SENSU_CLI_VERSION
-      - VAULT_VERSION  
+      - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     labels:
     - io.sensu.role=sensuctl
+    ports: []
     environment:
     - SENSU_API_URL=http://sensu-lb:8080
     - SENSU_USERNAME
@@ -321,7 +330,6 @@ services:
     - VAULT_TOKEN
     - VAULT_DEV_ROOT_TOKEN_ID
     - SENSU_ETCD_CLIENT_URLS
-    working_dir: /root
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -337,6 +345,7 @@ services:
       source: sensuctl_data
       target: /root/.config
       consistency: consistent
+    working_dir: /root
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
       configure -n
@@ -370,6 +379,7 @@ services:
     - etcd
     labels:
     - io.sensu.role=configurator
+    ports: []
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD

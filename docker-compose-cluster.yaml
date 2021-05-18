@@ -10,6 +10,10 @@ services:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
     depends_on:
     - etcd
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
     labels:
     - io.sensu.role=sensu-backend
     ports: []
@@ -43,6 +47,10 @@ services:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     depends_on:
     - sensu-backend
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
     - io.sensu.role=sensu-agent
     ports:
@@ -84,6 +92,10 @@ services:
     image: haproxy:${HAPROXY_VERSION}
     depends_on:
     - sensu-backend
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
     - io.sensu.role=sensu-lb
     ports:
@@ -108,6 +120,10 @@ services:
   # See: https://etcd.io/docs/v3.4.0/op-guide/container/#running-a-single-node-etcd-1
   etcd:
     image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
     labels:
     - io.sensu.role=sensu-backend-etcd
     ports:
@@ -142,6 +158,10 @@ services:
   # See: https://www.postgresql.org/docs/
   postgres:
     image: postgres:${POSTGRES_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
     labels:
     - io.sensu.role=postgres
     ports:
@@ -168,6 +188,10 @@ services:
   # See: https://nginx.org/en/docs/
   sensu-assets:
     image: "nginx:latest"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
     - io.sensu.role=asset-server
     ports:
@@ -201,6 +225,10 @@ services:
       args:
       - WORKSHOP_PASSWORD
     image: sensu-assets:latest
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
     - io.sensu.role=asset-server
     ports:
@@ -228,6 +256,10 @@ services:
   # See: https://docs.influxdata.com/influxdb/
   influxdb:
     image: influxdb:${INFLUXDB_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
     labels:
     - io.sensu.role=data-platform
     ports:
@@ -255,6 +287,10 @@ services:
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
     labels:
     - io.sensu.role=dashboards
     ports:
@@ -287,6 +323,10 @@ services:
   # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
     - io.sensu.role=secrets-manager
     ports:
@@ -318,6 +358,13 @@ services:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     labels:
     - io.sensu.role=sensuctl
     ports: []
@@ -377,6 +424,13 @@ services:
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - etcd
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     labels:
     - io.sensu.role=configurator
     ports: []

@@ -233,6 +233,12 @@ services:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
+    depends_on:
+    - sensu-backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     labels:
     - io.sensu.role=sensuctl
     ports: []
@@ -290,6 +296,10 @@ services:
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - sensu-backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     labels:
     - io.sensu.role=configurator
     ports: []

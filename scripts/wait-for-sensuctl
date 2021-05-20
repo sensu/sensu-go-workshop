@@ -35,5 +35,10 @@ wait_for_sensuctl() {
 	exit 0
 }
 
-check_deps
+check_deps && \
 wait_for_sensuctl
+if [ $? -gt 0 ]; then
+  exit 2
+fi
+echo ""
+echo 0

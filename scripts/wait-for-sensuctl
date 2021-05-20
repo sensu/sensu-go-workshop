@@ -38,6 +38,7 @@ wait_for_sensuctl() {
 check_deps && \
 wait_for_sensuctl
 if [ $? -gt 0 ]; then
+  echo ""
   exit 2
 fi
 echo ""

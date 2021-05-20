@@ -90,10 +90,12 @@ check_deps && \
 validate_io && \
 validate_json
 if [ $? -gt 0 ]; then
+  echo ""
   exit 2
 fi
 create_users
 if [ $? -gt 0 ]; then
+  echo ""
   exit 2
 fi
 echo ""

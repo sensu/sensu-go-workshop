@@ -103,6 +103,7 @@ echo "Seeding Sensu Go Workshop resources..."
 wait-for-sensuctl
 if [ $? -gt 0 ]; then
   echo "Failed to create Sensu user accounts."
+  echo ""
   exit 2
 fi
 check_deps && \
@@ -114,6 +115,7 @@ seed_user_envrc_files && \
 seed_secrets
 if [ $? -gt 0 ]; then
   echo "Failed to create Sensu user accounts."
+  echo ""
   exit 2
 fi
 echo ""

@@ -364,7 +364,7 @@ services:
           memory: 64M
       restart_policy:
         condition: on-failure
-        max_attempts: 3
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
     - io.sensu.role=sensuctl
     ports: []
@@ -430,7 +430,7 @@ services:
           memory: 64M
       restart_policy:
         condition: on-failure
-        max_attempts: 3
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
     - io.sensu.role=configurator
     ports: []

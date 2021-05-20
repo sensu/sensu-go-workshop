@@ -14,11 +14,6 @@ services:
     - 3000:3000
     - 8080:8080
     - 8081:8081
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:8080/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
@@ -32,6 +27,11 @@ services:
     - type: volume
       source: sensu_data
       target: /var/lib/sensu
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
       sensu-backend start
       --log-level=debug
@@ -49,11 +49,6 @@ services:
     ports:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:3031/healthz
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - SENSU_BACKEND_URL
     - SENSU_AGENT_PASSWORD
@@ -66,6 +61,11 @@ services:
     - SENSU_API_PORT
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3031/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
       sensu-agent start
       --log-level=info
@@ -78,7 +78,7 @@ services:
   # Sensu Asset Server
   #
   # Serve Sensu Assets over HTTP using NGINX.
-  # 
+  #
   # See: https://nginx.org/en/docs/
   sensu-assets:
     image: "nginx:latest"
@@ -86,6 +86,7 @@ services:
     - io.sensu.role=asset-server
     ports:
     - 8000:80
+    environment: []
     volumes:
     - type: bind
       source: ./config/nginx/nginx.conf
@@ -119,6 +120,7 @@ services:
     ports:
     - 139:139
     - 445:445
+    environment: []
     volumes:
     - type: bind
       source: ./config/samba/smb.conf
@@ -144,11 +146,6 @@ services:
     - io.sensu.role=data-platform
     ports:
     - 8086:8086
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:8086/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - INFLUXDB_DB
     - INFLUXDB_ADMIN_USER
@@ -157,6 +154,11 @@ services:
     - type: volume
       source: influxdb_data
       target: /var/lib/influxdb
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:8086/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: influxd
 
   # Grafana
@@ -171,11 +173,6 @@ services:
     - io.sensu.role=dashboards
     ports:
     - 3001:3000
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:3000/api/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
     environment:
     - POSTGRES_PASSWORD
     - GF_AUTH_BASIC_ENABLED
@@ -192,6 +189,11 @@ services:
     - type: bind
       source: ./config/grafana/dashboards/timescaledb
       target: /etc/grafana/dashboards
+    healthcheck:
+      test: wget -q -O- http://127.0.0.1:3000/api/health
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Vault
   #
@@ -200,11 +202,14 @@ services:
   # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
+    labels:
+    - io.sensu.role=secrets-manager
     ports:
     - 8200:8200
     environment:
     - VAULT_DEV_ROOT_TOKEN_ID
     - VAULT_DEV_LISTEN_ADDRESS
+    volumes: []
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
       interval: 10s
@@ -228,8 +233,15 @@ services:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
     image: workshop:${SENSU_CLI_VERSION}
+    depends_on:
+    - sensu-backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
     - io.sensu.role=sensuctl
+    ports: []
     environment:
     - SENSU_API_URL
     - SENSU_USERNAME
@@ -237,7 +249,6 @@ services:
     - SENSU_NAMESPACE
     - VAULT_ADDR
     - VAULT_TOKEN
-    working_dir: /root
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -253,6 +264,7 @@ services:
       source: sensuctl_data
       target: /root/.config
       consistency: consistent
+    working_dir: /root
     entrypoint: wait-for-sensu-backend sensuctl
     command: >-
       configure -n
@@ -284,8 +296,13 @@ services:
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - sensu-backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
     - io.sensu.role=configurator
+    ports: []
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD

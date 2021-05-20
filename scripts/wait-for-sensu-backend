@@ -53,6 +53,7 @@ wait_for_sensu_backend() {
 sensu_backend_init
 if [ $? -gt 0 ]; then
   echo "Failed to initialize the sensu-backend!"
+  echo ""
   exit 2
 fi
 wait_for_sensu_backend

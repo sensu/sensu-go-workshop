@@ -85,7 +85,18 @@ create_users() {
   done
 }
 
-check_deps
-validate_io
+echo "Generating Sensu RBAC templates..."
+check_deps && \
+validate_io && \
 validate_json
+if [ $? -gt 0 ]; then
+  echo ""
+  exit 2
+fi
 create_users
+if [ $? -gt 0 ]; then
+  echo ""
+  exit 2
+fi
+echo ""
+exit 0

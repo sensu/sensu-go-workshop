@@ -16,7 +16,7 @@ check_deps() {
 }
 
 check_sensuctl_config() {
-  SENSUCTL_READY=$(sensuctl config view --format json 2> /dev/null | jq -r .namespace)
+  SENSUCTL_READY=$(sensuctl config view 2>&1 /dev/null && sensuctl config view --format json 2> /dev/null | jq -r .namespace)
 }
 
 wait_for_sensuctl() {

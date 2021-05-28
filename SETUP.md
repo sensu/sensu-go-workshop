@@ -133,7 +133,7 @@
       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
 
-1. **Downlaod your user `.envrc` or `.envrc.ps1` file.**
+1. **Download your user `.envrc` or `.envrc.ps1` file.**
 
    Run the following commands, using the values provided by your instructor for `WORKSHOP_HOSTNAME` and `WORKSHOP_USERNAME`.
 

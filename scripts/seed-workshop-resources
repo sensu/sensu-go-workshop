@@ -12,7 +12,10 @@ VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
 VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
-
+ROCKETCHAT_ADDR=${ROCKETCHAT_ADDR:-"http://rocketchat:5000"}
+ROCKETCHAT_ADMIN_USER=${ROCKETCHAT_ADMIN_USER:-"admin"}
+ROCKETCHAT_ADMIN_PASSWORD=${ROCKETCHAT_ADMIN_PASSWORD:-"admin"}
+ROCKETCHAT_USER_PASSWORD=${WORKSHOP_PASSWORD:-"workshop"}
 check_deps() {
   for DEP in sensuctl vault
   do
@@ -73,6 +76,48 @@ seed_namespaces() {
   done
 }
 
+seed_chat_users() {
+	result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}") 
+	if [ $? -gt 0 ]; then
+  		echo "Failed to auth with rocketchat"
+  		echo ""
+  		exit 2
+	fi
+	token=$(echo $result | jq -r .data.authToken)
+	id=$(echo $result | jq -r .data.userId)
+	echo "Rocket Chat Admin Token: ${token}"
+	echo "Rocket Chat Admin Id: ${id}"
+	curl -s -H "X-Auth-Token: ${token}" -H "X-User-Id: ${id}" ${ROCKETCHAT_ADDR}/api/v1/me > /dev/null
+	if [ $? -gt 0 ]; then
+  		echo "rocketchat token/id are invalid"
+  		echo ""
+  		exit 2
+	fi
+  	for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
+    		export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
+    		export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
+	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
+                     -H "X-User-Id: ${id}" \
+                     -H "Content-type:application/json" \
+                     ${ROCKETCHAT_ADDR}/api/v1/users.create \
+		     -d "{\"name\": \"${USERNAME}\", \"email\": \"${USERNAME_ORIGINAL}\", \"password\": \"${ROCKETCHAT_USER_PASSWORD}\", \"username\": \"${USERNAME}\"}")
+		if [ $? -gt 0 ]; then
+  			echo "rocketchat user not created for $USERNAME"
+  			echo ""
+  			exit 2
+		fi
+	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
+                     -H "X-User-Id: ${id}" \
+                     -H "Content-type:application/json" \
+		     ${ROCKETCHAT_ADDR}/api/v1/users.getStatus?username=${USERNAME})
+		if [ $(echo $result | jq -r .success) != "true" ]; then
+  			echo "rocketchat user not created for $USERNAME"
+  			echo ""
+  			exit 2
+		fi
+	done
+}
+
 seed_user_envrc_files() {
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
@@ -97,6 +142,22 @@ seed_secrets() {
     vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
     vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/${NAME} | jq .data.data
   done
+
+
+
+  result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}") 
+  if [ $? -gt 0 ]; then
+  	echo "Failed to auth with rocketchat"
+  	echo ""
+  	exit 2
+  fi
+  rc_token=$(echo $result | jq -r .data.authToken)
+  rc_id=$(echo $result | jq -r .data.userId)
+  echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/rocketchat"
+  vault kv put ${VAULT_SECRET_PATH_PREFIX}/rocketchat token=${rc_token} id=${rc_id} > /dev/null 2>&1
+  vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/rocketchat | jq .data.data
+
+	
 }
 
 echo "Seeding Sensu Go Workshop resources..."
@@ -106,12 +167,15 @@ if [ $? -gt 0 ]; then
   echo ""
   exit 2
 fi
+
+
 check_deps && \
 validate_io && \
 validate_api_urls && \
 seed_cluster && \
 seed_namespaces && \
 seed_user_envrc_files && \
+seed_chat_users && \
 seed_secrets
 if [ $? -gt 0 ]; then
   echo "Failed to create Sensu user accounts."

@@ -495,14 +495,22 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"
    ```
 
-   **Linux users:**
+   **Linux users (amd64):**
 
    ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz && \
-   tar -xzf sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz -C /usr/bin/ && \
-   rm sensu-go_${SENSU_VERSION}_${SENSU_PLATFORM}_${SENSU_ARCH}.tar.gz
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
+   sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/
+   rm sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
    ```
 
+   **Linux users (arm64):**
+
+   ```shell
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
+   sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/
+   rm sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
+   ```
+   
 1. **Start the Sensu Agent.**
 
    _NOTE: Mac and Linux users are encouraged to run the `sensu-agent` with a service account (e.g. a `sensu` or `_sensu` user).

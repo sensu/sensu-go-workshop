@@ -498,16 +498,16 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    **Linux users (amd64):**
 
    ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz && \
-   tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/ && \
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
+   sudo tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/
    rm sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
    ```
 
    **Linux users (arm64):**
 
    ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz && \
-   tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/ && \
+   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
+   sudo tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/
    rm sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
    ```
    

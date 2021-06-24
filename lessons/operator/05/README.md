@@ -3,7 +3,7 @@
 - [Overview](#overview)
 - [Events are observations](#events-are-observations)
 - [Use cases](#use-cases)
-- [EXERCISE 1: create an event using curl and the Sensu Events API](#exercise-1-create-an-event-using-curl-and-the-Sensu-Events-API)
+- [EXERCISE 1: create an event using shell commands and the Sensu Events API](#exercise-1-create-an-event-using-shell-commands-and-the-Sensu-Events-API)
 - [EXERCISE 2: create an event that triggers an alert](#exercise-2-create-an-event-that-triggers-an-alert)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
@@ -219,7 +219,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 >
 > _NOTE: entities and proxy entities are covered in more detail in [Lesson 7: introduction to Agents & Entities](/lessons/operator/07/README.md#readme) and [Lesson 12: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/12/README.md#readme)._
 
-## EXERCISE 1: create an event using curl and the Sensu Events API
+## EXERCISE 1: create an event using shell commands and the Sensu Events API
 
 1. Configure environment variables
 
@@ -245,13 +245,26 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
    > _NOTE: if you need help creating an API Key, please refer to [Lesson 3, Exercise 6: "Create an API Key for personal use"](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
-1. Create an event using `curl` and the Sensu Events API
+1. Create an event using shell commands and the Sensu Events API
 
-   ```
+   **Mac and Linux users:**
+
+   ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
         -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
+   ```
+
+   **Windows users (Powershell):**
+
+   ```powershell
+   Invoke-RestMethod `
+     -Method POST `
+     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
+     -ContentType "application/json" `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' `
+     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
    What happens when Sensu processes an event?
@@ -300,7 +313,7 @@ Let's create an event that will be processed using the handler we configured in 
 
    > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
-1. **Create an event using `curl` and the Sensu Events API.**
+1. **Create an event using shell commands and the Sensu Events API.**
 
    Do you notice anything different about the contents of the event in the next step?
    There's an additional property called `handlers: ["slack"]` that provides instructions on which pipeline(s) Sensu should use to process the event (in this case, the Slack handler we configured in Lesson 4).
@@ -328,7 +341,7 @@ Let's create an event that will be processed using the handler we configured in 
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-1. **Create a resolution event using `curl` and the Sensu Events API.**
+1. **Create a resolution event using shell commands and the Sensu Events API.**
 
    Let's send one more event to indicate that our imaginary app is now restored to a functional state:
 

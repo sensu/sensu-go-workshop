@@ -173,8 +173,12 @@ seed_secrets() {
   fi
   rc_token=$(echo $result | jq -r .data.authToken)
   rc_id=$(echo $result | jq -r .data.userId)
+  rc_user=${ROCKETCHAT_ADMIN_USER}
+  rc_password=${ROCKETCHAT_ADMIN_PASSWORD}
+  rc_channel="#general"
+  rc_url="http://rocketchat:5000"
   echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/rocketchat"
-  vault kv put ${VAULT_SECRET_PATH_PREFIX}/rocketchat token=${rc_token} id=${rc_id} > /dev/null 2>&1
+  vault kv put ${VAULT_SECRET_PATH_PREFIX}/rocketchat url=${rc_url} token=${rc_token} id=${rc_id} user=${rc_user} password=${rc_password} channel=${rc_channel} > /dev/null 2>&1
   vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/rocketchat | jq .data.data
 
 	

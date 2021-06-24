@@ -14,4 +14,36 @@ metadata:
 spec:
   provider: vault
   id: secret/sensu/rocketchat#id
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: rocketchat_user
+spec:
+  provider: vault
+  id: secret/sensu/rocketchat#user
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: rocketchat_password
+spec:
+  provider: vault
+  id: secret/sensu/rocketchat#password
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: rocketchat_url
+spec:
+  provider: vault
+  id: secret/sensu/rocketchat#url
+---
+type: Secret
+api_version: secrets/v1
+metadata:
+  name: rocketchat_channel
+spec:
+  provider: vault
+  id: secret/sensu/rocketchat#channel
 

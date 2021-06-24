@@ -93,6 +93,16 @@ seed_chat_users() {
   		echo ""
   		exit 2
 	fi
+	result=$(curl -sS -H "X-Auth-Token: ${token}" \
+             -H "X-User-Id: ${id}" \
+             -H "Content-type:application/json" \
+	     ${ROCKETCHAT_ADDR}/api/v1/roles.addUserToRole \
+	     -d "{ \"roleName\": \"bot\" , \"username\": \"admin\" }")
+ 	if [ $(echo $result | jq -r .success) != "true" ]; then
+  		echo "rocketchat user admin not added to role bot"
+  		echo ""
+  		exit 2
+	fi
   	for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
     		export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     		export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')

@@ -14,21 +14,4 @@ metadata:
 spec:
   provider: vault
   id: secret/sensu/rocketchat#id
----
-type: Asset
-api_version: core/v2
-metadata:
-  annotations:
-    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/sensu-rocketchat-handler
-    io.sensu.bonsai.name: sensu-rocketchat-handler
-    io.sensu.bonsai.namespace: sensu
-    io.sensu.bonsai.tags: ""
-    io.sensu.bonsai.tier: Supported
-    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/sensu-rocketchat-handler
-    io.sensu.bonsai.version: 0.1.0
-  created_by: sensu
-  labels:
-    sensu.io/managed_by: sensuctl
-  name: sensu/sensu-rocketchat-handler:0.1.0
-spec:
-  builds:
+

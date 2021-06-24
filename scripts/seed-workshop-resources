@@ -115,6 +115,16 @@ seed_chat_users() {
   			echo ""
   			exit 2
 		fi
+	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
+                     -H "X-User-Id: ${id}" \
+                     -H "Content-type:application/json" \
+		     ${ROCKETCHAT_ADDR}/api/v1/roles.addUserToRole \
+		     -d "{ \"roleName\": \"bot\" , \"username\": \"${USERNAME}\" }")
+		if [ $(echo $result | jq -r .success) != "true" ]; then
+  			echo "rocketchat user $USERNAME not added to role bot"
+  			echo ""
+  			exit 2
+		fi
 	done
 }
 

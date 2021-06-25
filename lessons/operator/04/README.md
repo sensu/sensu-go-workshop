@@ -109,6 +109,7 @@ spec:
   type: set
   handlers:
   - email
+  - rocketchat
   - slack
   - microsoft-teams
 ```

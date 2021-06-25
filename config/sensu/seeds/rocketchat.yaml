@@ -67,46 +67,45 @@ spec:
     - entity.system.os == 'windows'
     - entity.system.arch == 'amd64'
     headers: null
-    sha512: 3d4cba800075b1adb2326ad0bdce8fcd33ecde707e46a535a9090f639e5a1285aba099999439ac740402f1ac9094d1d88b4e1bb74c0ac7b9245b1788c7acc038
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_windows_amd64.tar.gz
+    sha512: a152e412a4612fff736102ac321e1abc7a2d0de8be1c92143d7f7c515f78c47210e0aa548f7395e3dac41366f2de4d33a876351240a9a74782976fe47b26b8c5
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_windows_amd64.tar.gz
   - filters:
     - entity.system.os == 'darwin'
     - entity.system.arch == 'amd64'
     headers: null
-    sha512: 5ee04dae0e05ac6746de06f5966b28057c011395bdc930b46ae60e1d8168cfb6ef193ace1fd17563f6008cdb320c8aa4f0b59aac820d76cbe24e39aff3140d69
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_darwin_amd64.tar.gz
+    sha512: 05063d0dd466da0e4adcbb09255f9ce89f5d9338917577bf1aac68c59d084400d4acdfbe8176fb6a6a2fc173de09b6be075dff16d86b9de9422b666850087012
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_darwin_amd64.tar.gz
   - filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'arm'
     - entity.system.arm_version == 6
     headers: null
-    sha512: b7800ab1b15e92b35a8154fdd4cfca57086c05f4ce479fd40e2cc6787fbe257645cb889e36863c893a8346edf3afcc4bf6fda6d28d48b01e29b163c990b02c9c
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_linux_armv6.tar.gz
+    sha512: fd576a80159e6f68e93256a9d02eb87658ae01f30e0df71c96ae342bc4eb79b0b389d29ce1bbbad87d12fd99e38150a14a302a5ef46860c2ecadd49543f7adc6
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_linux_armv6.tar.gz
   - filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'arm'
     - entity.system.arm_version == 7
     headers: null
-    sha512: 695c82e4be6a2be6623027a5ef8189b36a615353c0411e5038b6d066e50373811d79172a8c2c71f9fbdcc6975a37aa21b3e77bf63cc3ba163209f9985de7534b
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_linux_armv7.tar.gz
+    sha512: 4f253c0805d48862294dbbee3f398ebb2c4583f3126d2e199b55569e8f41db867631ad4e3bddb590859828a4f3aaa6827283931439b5b59b6e59abe77eceace6
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_linux_armv7.tar.gz
   - filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'arm64'
     headers: null
-    sha512: fba3f70db5925d59c2664777b88d5f1623ebfd12479406c133d9f5f4323e82b6ed998e751abe14579388412cdaffec981f21a8e2d0fc28e45b74d1010103e9b2
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_linux_arm64.tar.gz
+    sha512: 492d628a5a1ad3d2d1fcf569c609d32e6dff8d91946afd287690cac25b79022e7f0d101c0de6a832bffaf58f666657ed9702279acf672fbee85d81cc676f3d2a
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_linux_arm64.tar.gz
   - filters:
     - entity.system.os == 'linux'
     - entity.system.arch == '386'
     headers: null
-    sha512: ee658b9e362ad3ef3b14e0b3cb889d823b10f390345cc01e02b7b1fb9c4adb321dedc878d3e542d081c16841babb7b3ea1067c53486de5928755b118b0dc12b1
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_linux_386.tar.gz
+    sha512: a2a85376ac9e7e01e23ef4109a45e27b6b865ef452eeb82cf532550b9afa299940a45ef51ccf16072f84dffe11c5c661c750b634d8a8a194253c1ffa99dfca2a
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_linux_386.tar.gz
   - filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'amd64'
     headers: null
-    sha512: 9e4337ca406e5aebf164cc6813ef58c2067db012aab8ee17d58f9bd1d464ae566942ce773513872e6fec6b08bc953fcbf72fcae29d45448985c96513d2665f53
-    url: https://assets.bonsai.sensu.io/a2299af95a4fa0aed9da508f70262eab4b971b52/sensu-rocketchat-handler_0.1.0_linux_amd64.tar.gz
+    sha512: bbe2817c57b8930895b5de479de2466a5aa9f3ee3c131b7a6c373510115dd38c118fe060294c583f92e326082cfa80bd07ed52eb7a116cc9225a3f3c529078d2
+    url: https://assets.bonsai.sensu.io/84d89696e51ce8e3fb7a580721423570afbdd908/sensu-rocketchat-handler_0.1.0_linux_amd64.tar.gz
   filters: null
   headers: null
-

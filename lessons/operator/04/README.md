@@ -211,7 +211,7 @@ For more information on configuration overrides via check and entity annotations
        sensu-rocketchat-handler
        --url ${ROCKETCHAT_URL}
        --channel ${ROCKETCHAT_CHANNEL}
-       --username ${ROCKETCHAT_USER}
+       --user ${ROCKETCHAT_USER}
        --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
      runtime_assets:
      - sensu/sensu-rocketchat-handler:0.1.0

@@ -31,7 +31,7 @@ Handler types:
 Sensu event handlers can be used for a wide variety of workflows.
 Some of the more popular uses cases are:
 
-- **Send alerts** using tools like Slack
+- **Send alerts** using tools like Slack or RocketChat
 - **Create and resolve** incidents using tools like Pagerduty, ServiceNow, and JIRA
 - **Store observability data** (including metrics) in data platforms like SumoLogic, Elasticsearch, and Splunk
 - **Store metrics** to time-series databases (TSDBs) like Prometheus, InfluxDB, Graphite, Wavefront, and TimescaleDB
@@ -117,7 +117,7 @@ spec:
 
 ### Handler templating
 
-Sensu handlers developed using the Sensu Plugin SDK – including all officially supported handler integrations – provide built-in support for templating handler output (e.g. email notifications or Slack message contents).
+Sensu handlers developed using the Sensu Plugin SDK – including all officially supported handler integrations – provide built-in support for templating handler output (e.g. email notifications or Slack/RocketChat message contents).
 Sensu handler templates use the [Golang `text/template` package](https://pkg.go.dev/text/template), and support generating text output that includes observability data from Sensu events, enabling users to provide include meaningful context and actionable alerts.
 
 **Example HTML email template:**
@@ -138,36 +138,36 @@ Sensu handlers developed using the Sensu Plugin SDK – including all officially
 
 **Example:**
 
-For example, the Sensu Slack handler must be configured with a default channel to send notifications to; the default channel is configured via the `sensu-slack-handler --channel` flag. This setting should be configured in your Slack handler template, but you can override this setting using the `sensu.io/plugins/slack/config/channel` annotation, which may be set on a per-check or per-entity basis.
+For example, the Sensu RocketChat handler must be configured with a default channel to send notifications to; the default channel is configured via the `sensu-rocketchat-handler --channel` flag. This setting should be configured in your RocketChat handler template, but you can override this setting using the `sensu.io/plugins/rocketchat/config/channel` annotation, which may be set on a per-check or per-entity basis.
 
-Here's an example Slack handler template:
+Here's an example RocketChat handler template:
 
 ```yaml
 ---
 type: Handler
 api_version: core/v2
 metadata:
-  name: slack
+  name: rocketchat
 spec:
   type: pipe
   command: >-
-    sensu-slack-handler
+    sensu-rocketchat-handler
     --channel "#sensu"
-    --username SensuGo
     --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
-    --webhook-url ${SENSU_WEBHOOK_URL}
+    --user SensuGo
+    --password ${ROCKETCHAT_PASSWORD}
   timeout: 0
   filters:
   - is_incident
   - not_silenced
   runtime_assets:
-  - sensu/sensu-slack-handler:1.4.0
+  - sensu/sensu-rocketchat-handler:0.1.0
   secrets:
-  - name: SLACK_WEBHOOK_URL
-    secret: slack_webhook_url
+  - name: ROCKETCHAT_PASSWORD
+    secret: rocketchat_password
 ```
 
-Here's an example check configuration template which overrides the default Slack channel provided in the handler template `--channel` flag.
+Here's an example check configuration template which overrides the default RocketChat channel provided in the handler template `--channel` flag.
 
 ```yaml
 ---
@@ -176,7 +176,7 @@ api_version: core/v2
 metadata:
   name: nginx-status
   annotations:
-    sensu.io/plugins/slack/config/channel: "#ops"
+    sensu.io/plugins/rocketchat/config/channel: "#ops"
 spec:
   command: check-nginx-status.rb --url http://127.0.0.1:80/nginx_status
   publish: true
@@ -185,47 +185,52 @@ spec:
   interval: 30
   timeout: 10
   handlers:
-    - slack
+    - rocketchat
 ```
 
-For more information on configuration overrides via check and entity annotations, please consult the corresponding handler documentation (examples: [Slack](https://bonsai.sensu.io/assets/sensu/sensu-slack-handler#annotations), [Pagerduty](https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler#argument-annotations), and [ServiceNow](https://bonsai.sensu.io/assets/sensu/sensu-servicenow-handler#annotations)).
+For more information on configuration overrides via check and entity annotations, please consult the corresponding handler documentation (examples: [RocketChat](https://bonsai.sensu.io/assets/sensu/sensu-rocketchat-handler#annotations), [Slack](https://bonsai.sensu.io/assets/sensu/sensu-slack-handler#annotations), [Pagerduty](https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler#argument-annotations), and [ServiceNow](https://bonsai.sensu.io/assets/sensu/sensu-servicenow-handler#annotations)).
 
 ## EXERCISE 1: configure an alert handler
 
-1. **Configure a Sensu Event Handler for sending alerts via Slack.**
+1. **Configure a Sensu Event Handler for sending alerts via RocketChat.**
 
-   Copy and paste the following contents to a file named `slack.yaml`:
+   Copy and paste the following contents to a file named `rocketchat.yaml`:
 
    ```yaml
    ---
    type: Handler
    api_version: core/v2
    metadata:
-     name: slack
+     name: rocketchat
      labels:
        sensu.io/workflow: sensu-flow/v1
    spec:
      type: pipe
      command: >-
-       sensu-slack-handler
-       --channel ${SLACK_CHANNEL}
-       --username SensuGo
+       sensu-rocketchat-handler
+       --url ${ROCKETCHAT_URL}
+       --channel ${ROCKETCHAT_CHANNEL}
+       --username ${ROCKETCHAT_USER}
        --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
      runtime_assets:
-     - sensu/sensu-slack-handler:1.4.0
+     - sensu/sensu-rocketchat-handler:0.1.0
      timeout: 10
      filters: []
      secrets:
-     - name: SLACK_WEBHOOK_URL
-       secret: slack_webhook_url
-     - name: SLACK_CHANNEL
-       secret: slack_channel
+     - name: ROCKETCHAT_URL
+       secret: rocketchat_url
+     - name: ROCKETCHAT_CHANNEL
+       secret: rocketchat_channel
+     - name: ROCKETCHAT_USER
+       secret: rocketchat_user
+     - name: ROCKETCHAT_PASSWORD
+       secret: rocketchat_password
    ```
 
 1. **Create the Handler using the `sensuctl create -f` command.**
 
    ```shell
-   sensuctl create -f slack.yaml
+   sensuctl create -f rocketchat.yaml
    ```
 
    Verify that your Handler was successfully created using the `sensuctl handler list` command:
@@ -239,10 +244,10 @@ For more information on configuration overrides via check and entity annotations
    ```shell
      Name    Type   Timeout     Filters     Mutator            Execute            Environment Variables               Assets
     ─────── ────── ───────── ───────────── ───────── ─────────────────────────── ─────────────────────── ─────────────────────────────────
-     slack   pipe        10   is_incident             RUN:  sensu-slack-handler                           sensu/sensu-slack-handler:1.4.0
+    rocketchat   pipe     10   is_incident           RUN:  sensu-rocketchat-handler                      sensu/sensu-rocketchat-handler:0.1.0
    ```
 
-**NEXT:** Do you see the `slack` handler in the output?
+**NEXT:** Do you see the `rocketchat` handler in the output?
 If so, you're ready to proceed to the next step!
 
 ## EXERCISE 2: configure a metrics handler

@@ -221,7 +221,9 @@
    This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
    To configure Vault secrets that trainees will need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
    Additional secrets may be added to Vault by adding JSON files in `/config/vault/secrets`, but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
-
+   
+   Note: Secrets for workshop containerized services, such as RocketChat will be seeded automatically.  
+ 
 1. **Docker Compose initialization.**
 
    ```shell

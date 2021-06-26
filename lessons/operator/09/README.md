@@ -56,6 +56,7 @@ spec:
     - unknown:
         - nginx-config-validation
   handlers:
+    - rocketchat
     - slack
 ```
 

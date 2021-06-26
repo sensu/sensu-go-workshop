@@ -287,7 +287,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
 ## EXERCISE 2: create an event that triggers an alert
 
-Sensu matches incoming events with the corresponding event pipelines using an event attribute called `handlers` (e.g. `handlers:["slack","pagerduty"]`).
+Sensu matches incoming events with the corresponding event pipelines using an event attribute called `handlers` (e.g. `handlers:["rocketchat","pagerduty"]`).
 Let's create an event that will be processed using the handler we configured in [Lesson 4](/lessons/04/README.md#readme).
 
 1. **Configure environment variables.**
@@ -316,9 +316,9 @@ Let's create an event that will be processed using the handler we configured in 
 1. **Create an event using shell commands and the Sensu Events API.**
 
    Do you notice anything different about the contents of the event in the next step?
-   There's an additional property called `handlers: ["slack"]` that provides instructions on which pipeline(s) Sensu should use to process the event (in this case, the Slack handler we configured in Lesson 4).
+   There's an additional property called `handlers: ["rocketchat"]` that provides instructions on which pipeline(s) Sensu should use to process the event (in this case, the RocketChat handler we configured in Lesson 4).
    If the `handlers` property is omitted from an event, Sensu will simply store the event and no additional processing will be performed.
-   Run the following command to create an event that will be processed using our Slack handler.
+   Run the following command to create an event that will be processed using our RocketChat handler.
 
    **Mac and Linux users:**
 
@@ -326,7 +326,7 @@ Let's create an event that will be processed using the handler we configured in 
    curl \
      -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
-     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
      "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -337,7 +337,7 @@ Let's create an event that will be processed using the handler we configured in 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -351,7 +351,7 @@ Let's create an event that will be processed using the handler we configured in 
    curl \
      -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
-     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
      "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -362,12 +362,13 @@ Let's create an event that will be processed using the handler we configured in 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-**NEXT:** Did Sensu create messages in Slack?
+**NEXT:** Did Sensu create messages in RocketChat?
 If so you're ready to move on to the next step!
+Note: self-guided workshop users can login to the workshop provided Rocketchat instance at `http://127.0.0.1:5000` with `user: trainee` `password: workshop`. 
 
 ## Learn more
 

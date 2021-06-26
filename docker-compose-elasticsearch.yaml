@@ -234,6 +234,59 @@ services:
     command: >-
       vault server -dev -log-level debug
 
+  # Chat
+  #
+  # Provide a Let's Chat service instance for use for alert notifications
+  # See: https://sdelements.github.io/lets-chat/
+  rocketchat:
+    image: registry.rocket.chat/rocketchat/rocket.chat:latest
+    ports:
+      - 5000:5000
+    depends_on:
+      - mongo
+    volumes:
+    - type: volume
+      source: rocketchat_data
+      target: /app/uploads
+      consistency: consistent
+    environment:
+      - PORT=5000
+      - ROOT_URL=http://localhost:5000
+      - MONGO_URL=mongodb://mongo:27017/rocketchat
+      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
+      - ADMIN_USERNAME=$ROCKETCHAT_ADMIN_USER
+      - ADMIN_PASS=$ROCKETCHAT_ADMIN_PASSWORD
+      - ADMIN_EMAIL=admin@example.com
+      - OVERWRITE_SETTING_Show_Setup_Wizard=completed
+      - CREATE_TOKENS_FOR_USERS=true
+
+  # Mongo
+  # Provides a mongoDB intance for use by chat service
+  mongo:
+    image: mongo:4.0
+    command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
+    volumes:
+    - type: volume
+      source: mongo_data
+      target: /data/db
+      consistency: consistent
+  mongo-init-replica:
+    image: mongo:4.0
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          mongo mongo/rocketchat --eval \"
+            rs.initiate({
+              _id: 'rs0',
+              members: [ { _id: 0, host: 'localhost:27017' } ]})\" &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 secs...\";
+          sleep 5;
+        done; (exit $$s)"
+    depends_on:
+      - mongo
+
+
   # Workstation
   #
   # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
@@ -387,3 +440,8 @@ volumes:
     driver: local
   elasticsearch_data:
     driver: local
+  mongo_data:
+    driver: local
+  rocketchat_data:
+    driver: local
+      

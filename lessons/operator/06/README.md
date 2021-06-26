@@ -24,7 +24,7 @@ Some example use cases include:
 - **Eliminating alert fatigue** by deduplicating incoming events and limiting repeat processing to predefined conditions (e.g. only alert once per hour per incident)
 - **Optimizing metrics processing** by dropping events that do not contain metric data, or sampling metrics to reduce storage costs
 - **Orchestrating event processing** via occurrence filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
-- **Configuring conditional triggers** by evaluating incoming events to determine which event handler to use (e.g. notify developers via Slack, but send all incidents assigned to operations via Pagerduty using a handler set and corresponding filters)
+- **Configuring conditional triggers** by evaluating incoming events to determine which event handler to use (e.g. notify developers via RocketChat, but send all incidents assigned to operations via Pagerduty using a handler set and corresponding filters)
 
 ## Filter execution environment & built-in helper functions
 
@@ -53,7 +53,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Modify a handler configuration template to use a built-in filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `slack.yaml`), and replace the `filters: []` line with the following:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `rocketchat.yaml`), and replace the `filters: []` line with the following:
 
    ```yaml
    filters:
@@ -63,13 +63,13 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f slack.yaml
+   sensuctl create -f rocketchat.yaml
    ```
 
    Now verify that the handler configuration was updated by viewing the handler using `sensuctl` or the Sensu web app.
 
    ```shell
-   sensuctl handler info slack --format yaml
+   sensuctl handler info rocketchat --format yaml
    ```
 
 1. **Configure environment variables.**
@@ -107,7 +107,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -118,7 +118,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -129,7 +129,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -140,7 +140,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -198,7 +198,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Modify a handler configuration template to use a custom filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `slack.yaml`), and update the `filters` field with the following:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `rocketchat.yaml`), and update the `filters` field with the following:
 
    ```yaml
    filters:
@@ -209,13 +209,13 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f slack.yaml
+   sensuctl create -f rocketchat.yaml
    ```
 
    Now verify that the handler configuration was updated by viewing the handler using `sensuctl` or the Sensu web app.
 
    ```shell
-   sensuctl handler info slack --format yaml
+   sensuctl handler info rocketchat --format yaml
    ```
 
 1. **Configure environment variables.**
@@ -253,7 +253,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -264,7 +264,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -275,7 +275,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -286,7 +286,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -297,7 +297,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -308,7 +308,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -319,7 +319,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -330,7 +330,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["slack"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 

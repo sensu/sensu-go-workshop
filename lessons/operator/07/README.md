@@ -597,7 +597,8 @@ Let's stop our agent and modify its configuration:
      foo: bar
      environment: training
    annotations:
-     sensu.io/plugins/slack/config/username: sensu-trainee
+     sensu.io/plugins/rockerchat/config/alias: sensu-trainee
+
    deregister: true
    ```
 

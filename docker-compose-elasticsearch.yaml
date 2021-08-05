@@ -239,7 +239,7 @@ services:
   # Provide a Let's Chat service instance for use for alert notifications
   # See: https://sdelements.github.io/lets-chat/
   rocketchat:
-    image: registry.rocket.chat/rocketchat/rocket.chat:latest
+    image: registry.rocket.chat/rocketchat/rocket.chat:3.17.0
     ports:
       - 5000:5000
     depends_on:

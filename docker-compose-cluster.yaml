@@ -513,6 +513,8 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_PASSWORD
+    - ROCKETCHAT_ADMIN_USER
+    - ROCKETCHAT_ADMIN_PASSWORD
     - SENSU_CLUSTER_EXTRAS=config/sensu/store
     volumes:
     - type: bind

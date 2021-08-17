@@ -437,6 +437,8 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_PASSWORD
+    - ROCKETCHAT_ADMIN_USER
+    - ROCKETCHAT_ADMIN_PASSWORD
     volumes:
     - type: bind
       source: /var/run/docker.sock

@@ -89,6 +89,9 @@ services:
     - type: bind
       source: ./config/nginx/nginx.conf
       target: /etc/nginx/nginx.conf
+    - type: bind
+      source: ./config/nginx/www
+      target: /usr/share/nginx/html
     - type: volume
       source: asset_data
       target: /usr/share/nginx/html/assets

@@ -74,9 +74,8 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Configure environment variables.**
 
-   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
-   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
-
+   Setup the necessary environment variables by running one of the following commands:
+   
    **Mac and Linux users (`.envrc`):**
 
    ```shell
@@ -220,8 +219,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Configure environment variables.**
 
-   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
-   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+   Setup the necessary environment variables by running one of the following commands:
 
    **Mac and Linux users (`.envrc`):**
 

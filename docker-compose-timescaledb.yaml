@@ -329,8 +329,8 @@ services:
 
   # Configurator
   #
-  # Configuration automation for instructor-led workshops (e.g. user profile
-  # generation) using a super light-weight "configuration management" stack:
+  # Configuration automation for user profile generation using 
+  # a super light-weight "configuration management" stack:
   #
   # - curl
   # - jq

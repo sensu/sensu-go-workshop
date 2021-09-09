@@ -7,6 +7,11 @@ to [Semantic Versioning][semver].
 
 ## Unreleased
 
+- Remove instructor-led workshop workflow, making self-guided the only
+  supported learning path.
+
+## [0.5.0]
+
 - Added this changelog & documented the original project goals, for posterity
 - Replaced InfluxDB with TimescaleDB, a simpler reference architecture
 - Add a docker-compose `.env` file for easy configuration 

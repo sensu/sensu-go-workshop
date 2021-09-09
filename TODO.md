@@ -63,13 +63,6 @@ The following are planned improvements to the workshop:
    variable to see if this helps improve "cross-platform" support for the 
    workshop. 
 
-1. Automate provisioning of one agent per namespace in instructor-led 
-   workshops.
-
-   ```shell
-   $ sudo docker-compose run --no-deps -d --rm -e SENSU_NAMESPACE=lizy sensu-agent
-   ```
-
 1. Add alternate docker-compose templates: 
 
    - Sensu cluster w/ standalone/external etcd
@@ -81,8 +74,6 @@ The following are planned improvements to the workshop:
      resources (i.e. assets, checks, filters, mutators, handlers, etc)
    - Include instructions for creating a "production" namespace and restoring 
      pipeline resources in the new namespace
-   - Include instructions for instructor-led workshops, for reseting the 
-     workshop environment and having trainees restore their configs
 
 1. Investigate `volumes.:volume.external` to create a seamless transition
    from the landing page "quick start" to the workshop. 

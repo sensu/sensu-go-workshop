@@ -218,58 +218,68 @@ services:
     command: >-
       vault server -dev -log-level debug
 
- # Chat
+  # RocketChat
   #
-  # Provide a Let's Chat service instance for use for alert notifications
-  # See: https://sdelements.github.io/lets-chat/
+  # Includes a rocket.chat deployment (an OSS Slack alternative) for chat/alerting.
+  #
+  # See: https://rocket.chat
   rocketchat:
-    image: registry.rocket.chat/rocketchat/rocket.chat:3.17.0
-    ports:
-      - 5000:5000
+    image: rocket.chat:${ROCKETCHAT_VERSION}
+    labels:
+    - io.sensu.role=chat
     depends_on:
-      - mongo
+    - mongo
+    ports:
+    - 5000:5000
+    environment:
+    - PORT=5000
+    - ROOT_URL=http://localhost:5000
+    - MONGO_URL=mongodb://mongo:27017/rocketchat
+    - MONGO_OPLOG_URL=mongodb://mongo:27017/local
+    - ADMIN_USERNAME=$ROCKETCHAT_ADMIN_USER
+    - ADMIN_PASS=$ROCKETCHAT_ADMIN_PASSWORD
+    - ADMIN_EMAIL=admin@example.com
+    - OVERWRITE_SETTING_Show_Setup_Wizard=completed
+    - CREATE_TOKENS_FOR_USERS=true
     volumes:
     - type: volume
       source: rocketchat_data
       target: /app/uploads
       consistency: consistent
-    environment:
-      - PORT=5000
-      - ROOT_URL=http://localhost:5000
-      - MONGO_URL=mongodb://mongo:27017/rocketchat
-      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
-      - ADMIN_USERNAME=$ROCKETCHAT_ADMIN_USER
-      - ADMIN_PASS=$ROCKETCHAT_ADMIN_PASSWORD
-      - ADMIN_EMAIL=admin@example.com
-      - OVERWRITE_SETTING_Show_Setup_Wizard=completed
-      - CREATE_TOKENS_FOR_USERS=true
 
-  # Mongo
-  # Provides a mongoDB intance for use by chat service
+  # MongoDB
+  #
+  # Includes MongoDB backend for rocket.chat deployment.
+  #
+  # See: https://www.mongodb.com
   mongo:
-    image: mongo:4.0
-    command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
+    image: mongo:${MONGODB_VERSION}
+    labels:
+    - io.sensu.role=chat
+    ports:
+    - 27017:27107
+    # environment:
+    # - MONGO_INITDB_ROOT_USERNAME
+    # - MONGO_INITDB_ROOT_PASSWORD
+    # - MONGO_INITDB_DATABASE
     volumes:
     - type: volume
       source: mongo_data
       target: /data/db
       consistency: consistent
-  mongo-init-replica:
-    image: mongo:4.0
-    command: >
-      bash -c
-        "for i in `seq 1 30`; do
-          mongo mongo/rocketchat --eval \"
-            rs.initiate({
-              _id: 'rs0',
-              members: [ { _id: 0, host: 'localhost:27017' } ]})\" &&
-          s=$$? && break || s=$$?;
-          echo \"Tried $$i times. Waiting 5 secs...\";
-          sleep 5;
-        done; (exit $$s)"
-    depends_on:
-      - mongo
-
+    - type: bind
+      source: ./config/mongodb/mongod.conf
+      target: /etc/mongo/mongod.conf
+    - type: bind
+      source: ./config/mongodb/init-scripts
+      target: /docker-entrypoint-initdb.d/
+      consistency: consistent
+    healthcheck:
+      test: mongo --eval 'db.runCommand("ping").ok' localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: mongod --smallfiles --oplogSize 128 --replSet rs01
 
   # Workstation
   #
@@ -365,6 +375,8 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_PASSWORD
+    - ROCKETCHAT_ADMIN_USER
+    - ROCKETCHAT_ADMIN_PASSWORD
     volumes:
     - type: bind
       source: /var/run/docker.sock

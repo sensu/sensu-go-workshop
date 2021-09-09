@@ -94,7 +94,7 @@ seed_namespaces() {
 }
 
 seed_chat_users() {
-	result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}") 
+	result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}")
 	if [ $? -gt 0 ]; then
   		echo "Failed to auth with rocketchat"
   		echo ""
@@ -114,7 +114,7 @@ seed_chat_users() {
              -H "X-User-Id: ${id}" \
              -H "Content-type:application/json" \
 	     ${ROCKETCHAT_ADDR}/api/v1/roles.addUserToRole \
-	     -d "{ \"roleName\": \"bot\" , \"username\": \"admin\" }")
+	     -d "{ \"roleName\": \"bot\" , \"username\": \"${ROCKETCHAT_ADMIN_USER}\" }")
  	if [ $(echo $result | jq -r .success) != "true" ]; then
   		echo "rocketchat user admin not added to role bot"
   		echo ""
@@ -179,10 +179,7 @@ seed_secrets() {
     vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
     vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/${NAME} | jq .data.data
   done
-
-
-
-  result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}") 
+  result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}")
   if [ $? -gt 0 ]; then
   	echo "Failed to auth with rocketchat"
   	echo ""
@@ -197,8 +194,6 @@ seed_secrets() {
   echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/rocketchat"
   vault kv put ${VAULT_SECRET_PATH_PREFIX}/rocketchat url=${rc_url} token=${rc_token} id=${rc_id} user=${rc_user} password=${rc_password} channel=${rc_channel} > /dev/null 2>&1
   vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/rocketchat | jq .data.data
-
-	
 }
 
 echo "Seeding Sensu Go Workshop resources..."
@@ -208,8 +203,6 @@ if [ $? -gt 0 ]; then
   echo ""
   exit 2
 fi
-
-
 check_deps && \
 validate_io && \
 validate_api_urls && \

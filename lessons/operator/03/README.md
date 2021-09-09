@@ -128,12 +128,11 @@ A similar editor is available for Filters, Mutators, and Handlers._
 
 1. **Log in to the Sensu web app.**
 
-   - **Self guided users:** please visit http://127.0.0.1:3000 and login with the default workshop admin username (`sensu`) and password (`sensu`).
-   - **Instructor-led workshop users:** please visit the URL provided by your instructor and login using the username and password provided by your instructor.
+   Please visit http://127.0.0.1:3000 and login with the default workshop admin username (`sensu`) and password (`sensu`).
 
    ![](/docs/img/login.png)
 
-   > _TROUBLESHOOTING: if you are unable to reach the login screen, please consult with your instructor, or double-check that you completed all of the steps in [SETUP.md](/SETUP.md) before proceeding._
+   > _TROUBLESHOOTING: if you are unable to reach the login screen, please double-check that you completed all of the steps in [SETUP.md](/SETUP.md) before proceeding._
 
 **NEXT:** if you were able to login you're ready to move on to the next step.
 
@@ -284,8 +283,7 @@ $ sensuctl configure -n \
 
 1. **Configure environment variables.**
 
-   _NOTE: instructor-led workshop users will need to download an `.envrc` or `.envrc.ps1` file at this time;
-   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+   Setup the necessary environment variables by running one of the following commands:
 
    **Mac and Linux users (`.envrc`):**
 
@@ -344,10 +342,7 @@ $ sensuctl configure -n \
    sensuctl configure
    ```
 
-   Backend URL:
-
-   - **Self guided users:** self-guided trainees who are running the workshop on their local workstation should use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
-   - **Instructor-led workshop users:** please use the Backend URL, namespace, username, and password provided by your instructor (these values are available in your `.envrc` or `.envrc.ps1` file).
+   For this workshop, we will use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
 
    The `sensuctl configure` runs in interactive mode by default and will prompt you for the following settings:
 
@@ -381,9 +376,7 @@ $ sensuctl configure -n \
    JWT Expiration Timestamp: 1234567890
    ```
 
-   - **Self guided users:** if you're running the workshop on your local workstation should you should see the default API URL (`http://127.0.0.1:8080`), namespace (`default`), and username (`sensu`).
-   - **Instructor-led workshop users:** you should see the API URL provided by your instructor, and _matching values_ for namespace and username (e.g. "caleb").
-     If namespace is set to "default", you can update the configuration using the `sensuctl config set-namespace <username>` command (replacing `<username>` with your actual username).
+   You should see the default API URL (`http://127.0.0.1:8080`), namespace (`default`), and username (`sensu`).
 
 **NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
 
@@ -468,8 +461,6 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
    sensuctl event list
    ```
 
-   _NOTE (for trainees in instructor-led workshops): try adding `--namespace default` to get a list of events from the `default` namespace._
-
 1. **Use the `sensuctl entity list` command to get a list of nodes under management.**
 
    ```shell
@@ -494,12 +485,11 @@ Learning how to navigate the `sensuctl` tool with the assistance of the `--help`
 
 1. **Use the `sensuctl api-key grant` command to create an API Key.**
 
+   Grant an api-key for the default user (`sensu`).
+
    ```shell
    sensuctl api-key grant sensu
    ```
-
-   > _NOTE: self-guided trainees should grant an api-key for the default user (`sensu`), as shown above.
-   > Trainees in instructor-led workshops should create an api-key for their own user, using the username provided by the instructor (e.g. `sensuctl api-key grant <username>`)._
 
    The output of this command will look like:
 

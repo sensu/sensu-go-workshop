@@ -134,7 +134,7 @@ The handler converts incoming events into the required format, then sends it to 
 
 ### Events and Metrics
 
-In Sensu, all observability data is modelled as [events][events_reference_docs]. 
+In Sensu, observability data is modelled as [events][events_reference_docs]. 
 Some events contain metrics as part of their payload in the `metrics` property. 
 Learn more about metrics in the [metrics reference docs](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/#metrics-attribute).
 
@@ -221,7 +221,7 @@ Handlers are part of the [process stage][process_stage_docs] of the [observabili
 
 Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers using `sensuctl` to push the desired configuration to the backend via the [Handler API][handler_api_docs].
 
-We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, storing the handler configurations in local YAML files. 
+We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, authoring the handler configurations with YAML files. 
 We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. 
 
 The the executables are stored as assets in [Bonsai] (or a private asset server), and the secrets are stored in [Vault].

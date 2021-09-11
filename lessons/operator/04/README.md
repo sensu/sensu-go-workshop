@@ -107,7 +107,7 @@ The handler will send event data to a channel in a [RocketChat] instance.
    sensuctl create -f rocketchat.yaml
    ```
 
-   This command will create the handler configuration contained in the YAML file by sending it to the [Sensu Handler API][sensu_handler_api_docs].
+   This command will create the handler configuration contained in the YAML file by sending it to the [Sensu Handler API][handler_api_docs].
 
 1. **Verify that the handler was successfully created.**
 

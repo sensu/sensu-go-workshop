@@ -215,11 +215,11 @@ You learned how to create a handler using a YAML file, use handler templating to
 
 ### Where Do Handlers Run?
 
-Handlers are part of the [process stage][process_stage_docs] of the [observability pipeline][observability_pipeline_docs]. That means all of this happens on the Sensu backend, running the same place where agents and checks send their observability data. 
+Handlers are part of the [process stage][process_stage_docs] of the [observability pipeline][observability_pipeline_docs]. That means all of this happens on the Sensu backend, running the handlers in the same place where agents and checks send their observability data. 
 
 ### Monitoring as Code and Sensu's API-based Architecture
 
-Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers using `sensuctl` to push the desired configuration to the backend via the [Handler API][handler_api_docs].
+Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers remotely, using `sensuctl` to push the desired configuration to the backend via the [Handler API][handler_api_docs].
 
 We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, authoring the handler configurations with YAML files. 
 We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. 

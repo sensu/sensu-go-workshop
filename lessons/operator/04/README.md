@@ -3,15 +3,15 @@
 - [Goals](#goals)
 - [Handlers](#handlers)
   - [Pipe Handlers](#pipe-handlers)
-- [EXERCISE 1: Create a Handler that Sends Alerts to a Chat App](#exercise-1-create-a-handler-that-sends-alerts-to-a-chat-app)
+  - [EXERCISE 1: Create a Handler that Sends Alerts to a Chat App](#exercise-1-create-a-handler-that-sends-alerts-to-a-chat-app)
 - [Using Handlers to Store Observability Data](#using-handlers-to-store-observability-data)
   - [Events and Metrics](#events-and-metrics)
   - [Handler Filters](#handler-filters)
-- [EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database](#exercise-2-create-a-handler-that-stores-metrics-to-a-time-series-database)
+  - [EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database](#exercise-2-create-a-handler-that-stores-metrics-to-a-time-series-database)
 - [Discussion](#discussion)
   - [Where Do Handlers Run?](#where-do-handlers-run)
   - [Monitoring as Code and Sensu’s API-based Architecture](#monitoring-as-code-and-sensus-api-based-architecture)
-  - [Plugin SDK, Templating, and Configuration Overrides](#plugin-sdk-templating-and-configuration-overrides)
+  - [Sensu Plugin SDK, Templating, and Configuration Overrides](#sensu-plugin-sdk-templating-and-configuration-overrides)
   - [Additional Use Cases](#additional-use-cases)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
@@ -48,18 +48,18 @@ spec:
   command: do_something.sh
 ```
 
-## EXERCISE 1: Create a Handler that Sends Alerts to a Chat App
+### EXERCISE 1: Create a Handler that Sends Alerts to a Chat App
 
-### Scenario
+#### Scenario
 
 Your SRE team primarily communicates via a chat app like [Slack] or [RocketChat]. They want to recieve alerts as chat messages.
 
-### Solution
+#### Solution
 
 To accomplish this we will use the [sensu-rocketchat-handler][sensu_rocketchat_handler].
 The handler will send event data to a channel in a [RocketChat] instance.
 
-### Steps
+#### Steps
 
 1. **Create a YAML File Containing the Handler Configuration**
 
@@ -146,18 +146,18 @@ There are some [built-in filters][builtin_filters_docs] available for common use
 In the exercise below, we will use the built-in filter [`has_metrics`][has_metrics_docs] to ensure that only events with a `metrics` property are processed by the handler.
 
 
-## EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database
+### EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database
 
-### Scenario
+#### Scenario
 
 You want to store metrics data in a time-series database like [Prometheus] or [InfluxDB].
 
-### Solution
+#### Solution
 
 To accomplish this we will use the [sensu-influxdb-handler][sensu_influxdb_handler].
 The handler sends metrics which are contained in events to an [InfluxDB] instance.
 
-### Steps
+#### Steps
 
 1. **Create a YAML file containing the handler configuration.**
 
@@ -211,7 +211,7 @@ The handler sends metrics which are contained in events to an [InfluxDB] instanc
 ## Discussion
 
 In this lesson, we've only scratched the surface of what handlers can do.
-You learned how to create a handler using YAML files, use handler templating to format event data, use built-in filters, use handlers published to Bonsai, and view a list of handler configurations.
+You learned how to create a handler using a YAML file, use handler templating to format event data, use built-in filters, reference assets published to [Bonsai], and view a list of running handler configurations.
 
 ### Where Do Handlers Run?
 
@@ -224,12 +224,12 @@ Because Sensu is [API-based][sensu_api_docs], we were able to create the handler
 We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, authoring the handler configurations with YAML files. 
 We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. 
 
-The the executables are stored as assets in [Bonsai] (or a private asset server), and the secrets are stored in [Vault].
+The executables are stored as assets in [Bonsai] (or a private asset server), and the secrets are stored in [Vault].
 The Sensu backend will automatically download them as needed.
 
 All of this works together to allow you to quickly add, remove, or change handler configurations in a live system at any time, without the need to redeploy.
 
-### Plugin SDK, Templating, and Configuration Overrides
+### Sensu Plugin SDK, Templating, and Configuration Overrides
 
 Handlers developed using the [Sensu Plugin SDK][sensu_plugin_sdk] have built-in support for templating using the [Golang `text/template` package][go_template_package]. 
 This can be used to merge observability data directly into the output, providing meaningful context and actionable alerts.
@@ -296,10 +296,11 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 
 [Share your feedback on Lesson 04](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-04&title=Lesson%2004%20Feedback)
 
-[Lesson 5: Introduction to Events](../05/README.md#readme)
+[Lesson 5: Introduction to Events][next lesson]
 
 <!-- Other lessons -->
 [setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+[next lesson]: ../05/README.md#readme
 <!-- Product Links -->
 [slack]: https://slack.com/
 [rocketchat]: https://rocket.chat/

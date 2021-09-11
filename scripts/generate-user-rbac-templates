@@ -3,9 +3,8 @@
 # Generate Sensu user RBAC templates, including (by default) a dedicated
 # Namespace will full CRUD access (via a Role + RoleBinding), limited
 # ClusterRoleBinding (with access to create but not list or read API keys),
-# and read-only access to the default namespace (to view the instructors
-# environment). To customize these defaults, modify user.yaml.template
-# or provide a custom user template.
+# and read-only access to the default namespace. To customize these defaults, 
+# modify user.yaml.template or provide a custom user template.
 #
 # The script accepts four positional arguments:
 # 1. A "users.json" file containing a list of usernames and password_hash values

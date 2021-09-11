@@ -223,9 +223,8 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
 
 1. Configure environment variables
 
-   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
-   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
-
+   Setup the necessary environment variables by running one of the following commands:
+   
    **Mac and Linux users (`.envrc`):**
 
    ```shell
@@ -281,7 +280,7 @@ _NOTE: dead man's switches are covered in more detail in [Lesson 7: Introduction
    If you expected that Sensu would process this event using that handler, you might have noticed that nothing happened.
 
    > _NOTE: The `curl` commands included in this lesson should generate output that starts with `HTTP/1.1 200 OK`, `HTTP/1.1 201 Created`, or `HTTP/1.1 202 Accepted`.
-   > If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/SETUP.md), and/or ask your instructor for help._
+   > If you do not see this output, or if you received an error message, please ensure that you completed all of the steps in [Setup](/SETUP.md)._
 
 **NEXT:** Let's move on to the next exercise to see how event handling works in practice.
 
@@ -292,8 +291,7 @@ Let's create an event that will be processed using the handler we configured in 
 
 1. **Configure environment variables.**
 
-   _NOTE: instructor-led workshop users may need to download an `.envrc` or `.envrc.ps1` file at this time (if they haven't already);
-   please consult [SETUP.md](/SETUP.md#instructor-led-workshop-setup-for-trainees) for more information._
+   Setup the necessary environment variables by running one of the following commands:
 
    **Mac and Linux users (`.envrc`):**
 
@@ -368,7 +366,8 @@ Let's create an event that will be processed using the handler we configured in 
 
 **NEXT:** Did Sensu create messages in RocketChat?
 If so you're ready to move on to the next step!
-Note: self-guided workshop users can login to the workshop provided Rocketchat instance at `http://127.0.0.1:5000` with `user: trainee` `password: workshop`. 
+
+Note: You can login to the workshop-provided Rocketchat instance at `http://127.0.0.1:5000` with `user: trainee` `password: workshop`. 
 
 ## Learn more
 

@@ -13,13 +13,13 @@
 
 The workshop lessons included with this project are designed to help new Sensu users learn the basic concepts of an [Observability Pipeline](#) and help them get started with Sensu Go.
 
-This project has been designed with both self-guided learning _and_ instructor-led training workshops in mind.
-It's easy to deploy the workshop environment on a laptop for personal use, or to a shared server (or cloud provider) for multiple users.
+This project has been designed for self-guided learning.
+It's easy to deploy the workshop environment on a laptop for personal use.
 See [SETUP.md](/SETUP.md#readme) for more information on setting up the workshop environment.
 
 ## Setup
 
-This workshop is designed to be simple enough for self-guided training, while also providing a tool for trainers to host a workshop for multiple attendees.
+This workshop is designed to be simple enough for self-guided training.
 See [SETUP.md](/SETUP.md#readme) for more details on setting up the workshop environment.
 
 Once you have deployed a workshop environment, you may proceed with the following local workstation setup instructions which will help you install the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.

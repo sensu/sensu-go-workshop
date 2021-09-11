@@ -184,12 +184,11 @@ To resolve this issue, redeploy the workshop environment using `sudo`, or explic
 
 ## Certain `sensuctl` commands produce authorization errors
 
-Trainees in instructor-led workshops may occassional encounter errors with messages like "Error putting resource..." and "unauthorized to perform action".
+Trainees may occassional encounter errors with messages like "Error putting resource..." and "unauthorized to perform action".
 These messages are typically the result of Sensu's role-based access controls (RBAC) working as intended and informing users that they do not have the correct permissions.
 In the sensu-go-workshop environment, the most common reason for these errors is a misconfiguration of `sensuctl`.
 
 Sensu Go is a multi-tenant platform (multi-user, and multi-org), so a user may be authorized to perform a given action in one context, but unauthorized to perform the same action in another context.
-For example, in the sensu-go-workshop environment, trainees in instructor-led workshops have full read/write access to their individual namespaces, and read-only access to the `default` namespace.
 The most common `sensuctl` functions (e.g. `sensuctl event list`) are designed to interact with namespaced resources; if no namespace is explicitly provided (e.g. `sensuctl event list --namespace default`) then `sensuctl` will use the currently configured namespace.
 
 To view the current `sensuctl` configuration, run the following command:
@@ -217,8 +216,6 @@ To update the current configuration, please run the following command:
 ```
 sensuctl config set-namespace trainee
 ```
-
-> _**NOTE:** please use the namespace as provided by your instructure (hint: this is usually the same as the username provided by your instructor)._
 
 ## The sensu-agent reports various "permission denied" errors
 
@@ -314,7 +311,7 @@ sudo journalctl -fu sensu-agent
 
 ### Help installing a Sensu Agent
 
-If you are having trouble installing a Sensu Agent on your workstation or another lab system, you can ask your instructor for assistance, or run an agent in the workshop environment.
+If you are having trouble installing a Sensu Agent on your workstation you can run an agent in the workshop environment.
 
 ```
 sudo docker-compose run --no-deps --rm -d \

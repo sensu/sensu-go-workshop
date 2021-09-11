@@ -3,8 +3,11 @@
 - [Goals](#goals)
 - [Handlers](#handlers)
   - [Pipe Handlers](#pipe-handlers)
-- [EXERCISE 1: Create a Handler to Send Alerts to a Chat App](#exercise-1-create-a-handler-to-send-alerts-to-a-chat-app)
-- [EXERCISE 2: Create a Handler to Send Metrics to a Time-Series Database](#exercise-2-create-a-handler-to-send-metrics-to-a-time-series-database)
+- [EXERCISE 1: Create a Handler that Sends Alerts to a Chat App](#exercise-1-create-a-handler-that-sends-alerts-to-a-chat-app)
+- [Using Handlers to Store Observability Data](#using-handlers-to-store-observability-data)
+  - [Events and Metrics](#events-and-metrics)
+  - [Handler Filters](#handler-filters)
+- [EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database](#exercise-2-create-a-handler-that-stores-metrics-to-a-time-series-database)
 - [Discussion](#discussion)
   - [Where Do Handlers Run?](#where-do-handlers-run)
   - [Monitoring as Code and Sensu’s API-based Architecture](#monitoring-as-code-and-sensus-api-based-architecture)
@@ -24,7 +27,7 @@ Handlers are actions the Sensu backend executes on incoming observability events
 Handler configurations are one of the most important building blocks within Sensu, because they determine what happens to events that flow through the Sensu pipeline.
 
 Handlers can be used to send alerts, store observability data, create and resolve incidents, and trigger automated remediations.
-In the following exercises we will configure handlers that send alerts to a chat app, and store observability data in a time-series database.
+In the following exercises we will configure two handlers; one that send alerts to a chat app, and another that stores metrics to a time-series database.
 
 ### Pipe Handlers
 
@@ -45,7 +48,7 @@ spec:
   command: do_something.sh
 ```
 
-## EXERCISE 1: Create a Handler to Send Alerts to a Chat App
+## EXERCISE 1: Create a Handler that Sends Alerts to a Chat App
 
 ### Scenario
 
@@ -123,11 +126,31 @@ The handler will send event data to a channel in a [RocketChat] instance.
    Do you see the `rocketchat` handler in the output? 
    If so, you've successfully created your first handler.
 
-## EXERCISE 2: Create a Handler to Send Metrics to a Time-Series Database
+## Using Handlers to Store Observability Data
+
+Sensu is designed to be a pipeline for observability events, but does not store the events directly.
+If you want to keep a historical record of the data, a handler can be used. 
+The handler converts incoming events into the required format, then sends it to a database for storage.
+
+### Events and Metrics
+
+In Sensu, all observability data is modelled as [events][events_reference_docs]. 
+Some events contain metrics as part of their payload in the `metrics` property. 
+Learn more about metrics in the [metrics reference docs](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/#metrics-attribute).
+
+### Handler Filters
+
+Handlers can apply a _filter_ to ensure that they only operate on matching events.
+There are some [built-in filters][builtin_filters_docs] available for common use cases, or you can write your own using a JavaScript-based [Sensu Query Expression][sensu_query_expression_docs].
+
+In the exercise below, we will use the built-in filter [`has_metrics`][has_metrics_docs] to ensure that only events with a `metrics` property are processed by the handler.
+
+
+## EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database
 
 ### Scenario
 
-You want to store metrics data in a time-series database like Prometheus or InfluxDB.
+You want to store metrics data in a time-series database like [Prometheus] or [InfluxDB].
 
 ### Solution
 
@@ -280,6 +303,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [rocketchat]: https://rocket.chat/
 [bonsai]: https://bonsai.sensu.io/
 [bonsai_handlers]: https://bonsai.sensu.io/assets?q=handler
+[prometheus]: https://prometheus.io/
 [influxdb]: https://www.influxdata.com/
 [vault]: https://www.vaultproject.io/
 [rundeck]: https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/rundeck/
@@ -313,3 +337,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [servicenow_handler_annotations]: https://bonsai.sensu.io/assets/sensu/sensu-servicenow-handler#annotations
 [supported_integrations_docs]: https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/
 [reduce_alert_fatigue_blogpost]: https://sensu.io/blog/reducing-alert-fatigue-with-goalert
+[builtin_filters_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#built-in-event-filters
+[sensu_query_expressions_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/sensu-query-expressions/
+[events_reference_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/
+

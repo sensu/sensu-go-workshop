@@ -141,7 +141,7 @@ Learn more about metrics in the [metrics reference docs](https://docs.sensu.io/s
 ### Handler Filters
 
 Handlers can apply a _filter_ to ensure that they only operate on matching events.
-There are some [built-in filters][builtin_filters_docs] available for common use cases, or you can write your own using a JavaScript-based [Sensu Query Expression][sensu_query_expression_docs].
+There are some [built-in filters][builtin_filters_docs] available for common use cases, or you can write your own using a JavaScript-based [Sensu Query Expression][sensu_query_expressions_docs].
 
 In the exercise below, we will use the built-in filter [`has_metrics`][has_metrics_docs] to ensure that only events with a `metrics` property are processed by the handler.
 
@@ -219,10 +219,12 @@ Handlers are part of the [process stage][process_stage_docs] of the [observabili
 
 ### Monitoring as Code and Sensu's API-based Architecture
 
-Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers remotely, using `sensuctl` to push the desired configuration to the API.
-We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, storing the handler configurations in local YAML files. 
+Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers using `sensuctl` to push the desired configuration to the backend via the [Handler API][handler_api_docs].
 
-We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. The the executables are stored as assets in [Bonsai], and the secrets are in [Vault].
+We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, storing the handler configurations in local YAML files. 
+We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. 
+
+The the executables are stored as assets in [Bonsai] (or a private asset server), and the secrets are stored in [Vault].
 The Sensu backend will automatically download them as needed.
 
 All of this works together to allow you to quickly add, remove, or change handler configurations in a live system at any time, without the need to redeploy.
@@ -316,7 +318,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [sensu_plugin_sdk]: https://github.com/sensu/sensu-plugin-sdk
 <!-- Sensu Doc Links -->
 [handler_template_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handler-templates/
-[sensu_handler_api_docs]: https://docs.sensu.io/sensu-go/latest/api/handlers/#create-a-new-handler
+[handler_api_docs]: https://docs.sensu.io/sensu-go/latest/api/handlers/#create-a-new-handler
 [has_metrics_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#built-in-filter-has_metrics
 [process_stage_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/
 [observability_pipeline_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/

@@ -1,317 +1,116 @@
-# Lesson 3: Introduction to Sensu Go
-
-- [Web App](#web-app)
-  - [Dashboard](#dashboard)
-  - [Namespaces switcher](#namespaces-switcher)
-  - [Event list & event detail views](#event-list--event-detail-views)
-  - [Entity list & entity detail views](#entity-list--entity-detail-views)
-  - [Silencing](#silencing)
-  - [Configuration](#configuration)
-- [EXERCISE 1: log in to the Sensu web app](#exercise-1-log-in-to-the-sensu-web-app)
-- [Command Line Interface (CLI)](#command-line-interface--cli)
-  - [API client](#api-client)
-  - [Configuration management](#configuration-management)
-  - [Inventory](#inventory)
-  - [Output formats](#output-formats)
-  - [Interactive and non-interactive modes](#interactive-and-non-interactive-modes)
-- [EXERCISE 2: install and configure `sensuctl`](#exercise-2-install-and-configure-sensuctl)
-- [EXERCISE 3: use the `sensuctl --help` command](#exercise-3-use-the-sensuctl---help-command)
-- [EXERCISE 4: inspect an event in JSON format](#exercise-4-inspect-an-event-in-json-format)
-- [EXERCISE 5: explore Sensu resources using `sensuctl`](#exercise-5-explore-sensu-resources-using-sensuctl)
-- [EXERCISE 6: create an API Key for personal use](#exercise-6-create-an-api-key-for-personal-use)
-- [EXERCISE 7: export Sensu resources using `sensuctl dump`](#exercise-7-export-sensu-resources-using-sensuctl-dump)
+# Lesson 3: Using the Sensu CLI
+- [Goals](#goals)
+- [The `sensuctl` Command Line Interface (CLI)](#the-sensuctl-command-line-interface--cli)
+   - [EXERCISE 1: Install the `sensuctl` CLI](#exercise-1-install-the-sensuctl-cli)
+- [Configuration Options](#configuration-options)
+   - [EXERCISE 2: Configure the `sensuctl` CLI](#exercise-2-configure-the-sensuctl-cli)
+- [API Keys](#api-keys)
+   - [EXERCISE 3: Create an API Key](#exercise-3-create-an-api-key)
+- [Listing and Viewing Resources](#listing-and-viewing-resources)
+  - [EXERCISE 4: List Sensu Resources](#exercise-4-list-sensu-resources)
+- [Inventory Management](#inventory-management)
+  - [EXERCISE 5: List an Inventory of Nodes](#exercise-5-list-an-inventory-of-nodes)
+- [Monitoring as Code](#monitoring-as-code)
+  - [EXERCISE 6: Exporting and Updating Resource Configurations](#exercise-6-exporting-and-updating-resource-configurations)
 - [Learn more](#learn-more)
 - [Next steps](#next-steps)
 
-## Web App
+## Goals
 
-The Sensu backend process includes a web app that provides a unified view of your observability data (events, entities, and silences) and monitoring configuration (checks, handlers, etc) with user-friendly tools to reduce alert fatigue.
+In this lesson we will introduce the `sensuctl` command-line tool.
+You will learn how to install and configure the tool, then practice performing some essential operations.
 
-### Dashboard
+This lesson is intended for operators of Sensu and assumes you have [set up a local workshop environment][setup_workshop].
 
-The Sensu web app homepage is a dashboard that provides a high level overview of the overall health of the systems under management by Sensu.
-The dashboard includes a summary of active incidents, a breakdown of incidents by severity, information about entities under management, and a high level overview of the namespaces (tenants).
-This dashboard complies with Sensu RBAC, so individual users will see summary information relevant to their access.
+## The `sensuctl` Command Line Interface (CLI)
 
-![The Sensu dashboard](img/03-01-dashboard.png)
+The `sensuctl` tool, short for _Sensu Control_, gives you full control of your Sensu pipeline from a command-line environment. 
+You can use `sensuctl` interactively in a shell, or script it as part of an automated solution.
 
-_**Figure 1:** the Sensu dashboard._
+The `sensuctl` tool is available for Linux, macOS, and Windows.
 
-### Namespaces switcher
+### EXERCISE 1: Install the `sensuctl` CLI
+#### Scenario
 
-Beyond the overview dashboard, most Sensu data is accessed on a per-namespace basis.
-To select or switch namespaces, press the "Select Namespace" option from the sidebar, or press the `Control + k` keyboard shortcut from anywhere in the Sensu web app.
+You want to view and manage resources in Sensu from a command-line environment or in an automated script.
 
-![The namespace switcher modal](img/03-02-namespace-switcher.png)
+#### Solution
 
-_**Figure 2:** the namespace switcher._
+Install the `sensuctl` CLI tool.
 
-![The "Select Namespace" option in the navigation sidebar](img/03-03-select-namespace.png)
+First, we will configure some helpful environment variables, download the `sensuctl` archive, then unpack that to a standard location on your system.
 
-_**Figure 3:** the "Select Namespace" option in the navigation sidebar._
+#### Steps
 
-### Event list & event detail views
+1. **Configure Environment Variables.**
 
-The default view that will be opened when navigating to a namespace is the event list view.
-A filter is applied to this view by default to show only events with a "non-passing" status (i.e. `event.check.state != 0-`).
-The event list view provides a number of options for filtering and sorting the list by event status, related entities, and more.
-Select one or more events in the event list view to take bulk actions like resolving or silencing the event(s).
+   The [workshop repository] includes platform-specific files that export some environment variables which we will use throughout the workshop.
+   The exercises assume you are in a shell that has these variables configured.
+   
+   When you open a new shell environment, export the variables using one of the following commands:
 
-![The event list view](img/03-04-event-list-view.png)
-
-_**Figure 4:** the event list view.
-Note the default filter applied here (`event.check.state != 0`)._
-
-Selecting an event from the event list view will take you to the event detail view, which provides information about the event including the status, timeline, output, number of occurrences, event metadata (labels and annotations), related check configuration (if the event was produced by a service check), and the associated entity details.
-
-![The event detail view](img/03-05-event-detail-view.png)
-
-_**Figure 5:** the event detail view._
-
-### Entity list & entity detail views
-
-The second most popular view in the Sensu web app is the entity list view, which provides realtime inventory information of endpoints under management by Sensu (for a given namespace).
-Select one or more events in the event list view to take bulk actions like resolving or silencing the event(s).
-
-![The entity list view](img/03-06-entity-list-view.png)
-
-_**Figure 6:** the entity list view._
-
-Selecting an entity from the entity list view will take you to the entity detail view, which provides information about all associated events, system properties (e.g. operating system details and network interfaces), and entity metadata (labels and annotations).
-
-![The entity detail view](img/03-07-entity-detail-view.png)
-
-_**Figure 7:** the entity detail view.
-Note that the "Events" tab is selected by default._
-
-### Silencing
-
-Users can use the Sensu web app to silence individual events (for a single entity), all events produced by a specific check (across multiple entities), or all events for a specific entity.
-Silencing may be applied from various different locations in the Sensu web app, with prompts to configure the silencing rules (which check and/or entity should be silenced), schedule (e.g. to begin immediately, or create a "scheduled maintenance" window), and reason.
-
-![The new silencing entry modal](img/03-08-new-silencing-entry.png)
-
-_**Figure 8:** the "new silencing entry" prompt._
-
-The Silences list view provides access to all active silence entries.
-
-![The silenced list view](img/03-09-silenced-list-view.png)
-
-_**Figure 9:** the silenced list view._
-
-### Configuration
-
-The Sensu web app also provides access to the core monitoring configuration, including Checks, Fitlers, Mutators, and Handlers.
-The configuration views may be accessed from the navigation sidebar.
-Each of the configuration resources provides list + detail views, as well as the ability to create and/or edit configuration resources (e.g. modify check or handler configuration), assuming the user has the appropriate RBAC permissions.
-
-![The configuration navigation](img/03-10-configuration-navigation.png)
-
-_**Figure 10:** monitoring configuration views are accessible via the navigation sidebar._
-
-![The check list view](img/03-11-check-list-view.png)
-
-_**Figure 11:** the check list view.
-A similar view is available for Filters, Mutators, and Handlers._
-
-![The check detail view](img/03-12-check-detail-view.png)
-
-_**Figure 12:** the check detail view.
-A similar view is available for Filters, Mutators, and Handlers._
-
-![The check edit view](img/03-13-check-edit-view.png)
-
-_**Figure 13:** the check edit view.
-A similar editor is available for Filters, Mutators, and Handlers._
-
-## EXERCISE 1: log in to the Sensu web app
-
-1. **Log in to the Sensu web app.**
-
-   Please visit http://127.0.0.1:3000 and login with the default workshop admin username (`sensu`) and password (`sensu`).
-
-   ![](/docs/img/login.png)
-
-   > _TROUBLESHOOTING: if you are unable to reach the login screen, please double-check that you completed all of the steps in [SETUP.md](/SETUP.md) before proceeding._
-
-**NEXT:** if you were able to login you're ready to move on to the next step.
-
-## Command line interface (CLI)
-
-### API client
-
-Sensu's monitoring as code solution is possible thanks to a robust set of APIs.
-The Sensu web app and CLI are effectively just API clients that streamline access to these APIs.
-Sensuctl is available for Linux, macOS, and Windows.
-Because all access to the Sensu APIs requires authentication, the Sensu CLI (`sensuctl`) must be configured with a username and password before you can use it.
-
-```shell
-$ sensuctl configure --api-url http://127.0.0.1:8080
-? Authentication method: username/password
-? Sensu Backend URL: http://127.0.0.1:8080
-? Namespace: default
-? Preferred output format: tabular
-? Username: sensu
-? Password: *****
-```
-
-To learn more about the Sensu APIs, please checkout the [Sensu API Reference Documentation](https://docs.sensu.io/sensu-go/latest/api/) and [Sensu Developer Workshop](/README.md#developer-workshop) (coming soon).
-
-### Configuration management
-
-The primary function of `sensuctl` is to manage Sensu resources.
-It works by calling Sensu's underlying API to create, read, update, and delete (CRUD) resources including events and entities.
-The `sensuctl create` command allows you to idempotently _create or update_ resources by reading from STDIN or a file (via the `sensuctl create -f` flag).
-The create command accepts Sensu resource definitions in `yaml` or `wrapped-json` formats.
-
-All Sensu resource definitions generally have four top-level attributes:
-
-- **`type`:** resource type (e.g. `CheckConfig` or `Handler`)
-- **`api_version`:** resource version (e.g. `core/v2`)
-- **`metadata`:** resource `name`, `namespace`, `labels`, and `annotations`
-- **`spec`:** resource configuration attributes
-
-Example check configuration
-
-```yaml
----
-type: CheckConfig
-api_version: core/v2
-metadata:
-  name: nginx-status
-  namespace: default
-  labels: []
-  annotations: []
-spec:
-  command: check-nginx-status.rb --url http://127.0.0.1:80/nginx_status
-  publish: true
-  subscriptions:
-    - nginx
-  interval: 30
-  timeout: 10
-  handlers:
-    - slack
-```
-
-Most Sensu resources are namespaced – meaning they must be created in a specific namespace.
-If a resource definition does not contain a `namespace` attribute, the namespace is provided by `sensuctl`.
-Sensuctl namespace assignment can happen implicitly (i.e. using the "current" namespace, which can be viewed via the `sensuctl config view` command, and updated via the `sensuctl config set-namespace` command), or explicitly using the `sensuctl create --namespace` flag.
-
-> **PROTIP:** Omitting the `namespace` attribute allows you to easily replicate resources across multiple namespaces without editing configuration templates.
-
-Please visit the Sensu documentation for a [list of supported resource types for `sensuctl create`](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/#sensuctl-create-resource-types).
-Please consult the [reference documentation](https://docs.sensu.io/sensu-go/latest/reference/) for details on how to configure resource definitions.
-
-### Inventory
-
-One of the more popular use cases for `sensuctl` is to manage entity resources, which effectively represent a realtime "inventory" of nodes under management by Sensu.
-For example, the `sensuctl entity list` and `sensuctl entity info <entity_name>` commands may be used to list and inspect entities in a given namespace.
-
-Example output of the `sensuctl entity list` command:
-
-```shell
-$ sensuctl entity list
-        ID         Class      OS                       Subscriptions                              Last Seen
- ──────────────── ─────── ────────── ───────────────────────────────────────────────── ───────────────────────────────
-  0e94f1b82f3b     agent   linux      system/linux,workshop,devel,entity:0e94f1b82f3b   2021-03-22 11:53:00 -0700 PDT
-  775a030edbcc     agent   linux      system/linux,workshop,devel,entity:775a030edbcc   2021-03-22 11:53:03 -0700 PDT
-  911f827c7fb3     agent   linux      system/linux,workshop,devel,entity:911f827c7fb3   2021-03-22 11:53:00 -0700 PDT
-  be180375009e     agent   linux      system/linux,workshop,devel,entity:be180375009e   2021-03-22 11:53:00 -0700 PDT
-  cd27bec9c93c     agent   linux      system/linux,workshop,devel,entity:cd27bec9c93c   2021-03-22 11:53:00 -0700 PDT
-  learn.sensu.io   proxy   Workshop   entity:learn.sensu.io                             N/A
-  server-01        proxy              entity:server-01                                  N/A
-  server-02        proxy              entity:server-02                                  N/A
-  server-03        proxy              entity:server-03                                  N/A
-  server-04        proxy              entity:server-04                                  N/A
-  server-05        proxy              entity:server-05                                  N/A
-  server-06        proxy              entity:server-06                                  N/A
-  server-07        proxy              entity:server-07                                  N/A
-  server-08        proxy              entity:server-08                                  N/A
-  server-09        proxy              entity:server-09                                  N/A
-  server-10        proxy              entity:server-10                                  N/A
-```
-
-Example output of the `sensuctl entity info 0e94f1b82f3b` command:
-
-```shell
-=== 0e94f1b82f3b
-Name:                   0e94f1b82f3b
-Entity Class:           agent
-Subscriptions:          system/linux, workshop, devel, entity:0e94f1b82f3b
-Last Seen:              2021-03-22 11:54:40 -0700 PDT
-Hostname:               0e94f1b82f3b
-OS:                     linux
-Platform:               alpine
-Platform Family:        alpine
-Platform Version:       3.12.3
-Auto-Deregistration:    true
-Deregistration Handler:
-```
-
-These commands can be used in shell scripts for various automation purposes.
-However, for scripting an automation purposes, you may wish to output this information in a structed data format, which capability is discussed below.
-
-### Output Formats
-
-Sensuctl supports the following output formats:
-
-- `tabular`: A user-friendly, columnar format (which is necessarily less verbose)
-- `wrapped-json`: An accepted format for use with `sensuctl create`
-- `yaml`: An accepted format for use with `sensuctl create`
-- `json`: The format used by the Sensu APIs
-
-You may have noticed that we were prompted to select a "Preferred output format" when configuring `sensuctl` (i.e. `sensuctl configure`).
-After you are logged in, you can change the output format with `sensuctl config set-format` or set the output format per command with the `--format` flag (e.g. `sensuctl entity info <entity_name> --format json`).
-
-### Interactive and non-interactive modes
-
-Certain `sensuctl` commands support both interactive and non-interactive modes.
-For example, the `sensuctl configure` command runs in interactive mode by default, and can be run non-interactively using the `-n` or `--non-interactive` flags.
-
-Example non-interactive use of `sensuctl configure` (useful for integrating `sensuctl` with a CI/CD pipeline):
-
-```shell
-$ sensuctl configure -n \
-  --api-url http://127.0.0.1:8080 \
-  --namespace default \
-  --username sensu \
-  --password ${SENSU_PASSWORD} \
-  --format json
-```
-
-## EXERCISE 2: install and configure `sensuctl`
-
-1. **Configure environment variables.**
-
-   Setup the necessary environment variables by running one of the following commands:
-
-   **Mac and Linux users (`.envrc`):**
+   **Mac and Linux:**
 
    ```shell
    source .envrc
-   env | grep SENSU
    ```
 
-   **Windows users (`.envrc.ps1`):**
+   **Windows (Powershell):**
 
    ```powershell
    . .\.envrc.ps1
+   ```
+
+1. **Verify Your Environment.** 
+   
+   The Sensu-specific environment variables are prefixed with `SENSU`. You can verify that you have the Sensu environment variables set up correctly by running one of these commands:
+
+   **Mac and Linux:**
+
+   ```shell
+   env | grep SENSU
+   ```
+
+   **Windows (Powershell):**
+
+   ```powershell
    Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
    ```
 
-   The output should include a value for `SENSU_VERSION` (i.e. a supported Sensu version such as "6.2.7").
+   The output should include a value for `SENSU_VERSION` (i.e. a release version such as `6.2.7`).
 
-1. **Download and install `sensuctl`.**
+   **Example Output:**
 
-   **Mac users:**
+   ```shell
+   SENSU_VERSION=6.2.7
+   SENSU_BUILD=4449
+   SENSU_BACKEND_HOST=127.0.0.1
+   SENSU_NAMESPACE=default
+   SENSU_USER=sensu
+   SENSU_PASSWORD=sensu
+   SENSU_BACKEND_URL=ws://127.0.0.1:8081
+   SENSU_API_URL=http://127.0.0.1:8080
+   ```
+
+1. **Download and Install `sensuctl`.**
+
+   Download the platform-specific archive from Sensu's official release location. Unpack the archive into a standard location.
+
+   **Mac:**
 
    ```shell
    curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz"
    sudo tar -xzf "sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz" -C /usr/local/bin/
-   rm sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
    ```
 
-   **Windows users (Powershell):**
+   **Linux:**
+
+   ```shell
+   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" 
+   tar -xzf "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" -C /usr/local/bin/ 
+   ```
+ 
+   **Windows (Powershell):**
 
    ```powershell
    Invoke-WebRequest `
@@ -323,48 +122,91 @@ $ sensuctl configure -n \
    ${Env:Path} += ";${Env:UserProfile}\Sensu\bin"
    ```
 
-   **Linux users:**
+   > **NOTE:** On Unix-like systems `/usr/local/bin` is the [standard location for binaries shared between multiple users][fhs_usr_local_docs]. 
+   > On macOS, the default permissions for `/usr/local/bin` require the used of `sudo`. 
+   > However, any location that is on your `$PATH` will work (i.e. `~/bin`).
+   > On Windows systems we create a new location specificly for Sensu, then add it to the path.
 
-   ```shell
-   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" && \
-   tar -xzf "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" -C /usr/local/bin/ && \
-   rm "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz"
-   ```
+## Configuration Options
 
-1. **Configure `sensuctl`.**
+### Sensu is an API
 
-   Configure the Sensu CLI to connect to your backend by running the `sensuctl
-   configure` command.
-   Sensuctl will prompt you to provide a Sensu Backend URL,
-   username, password, namespace, and preferred output format.
+Sensu has an [API-based][sensu_api_docs] architecture. 
+Everything that happens on the platform is done by interacting with one or more APIs.
+The primary function of `sensuctl` is to manage Sensu resources.
+It does this by calling Sensu's API to create, read, update, and delete (CRUD) resources like _events_, _checks_, and _handlers_.
+
+Since `sensuctl` is an API client, it requires some configuration settings to get started.
+
+#### Sensu Backend Url
+Sensu's API is provided by a _backend_. 
+The backend URL is the adress and port of the backend you want to manage.
+
+For this workshop, we will be using the URL `http://127.0.0.1:8080`.
+
+#### Authentication Type
+
+Because all access to the Sensu API requires authentication, `sensuctl` must be configured with login credentials.
+Sensu supports both username/password and OIDC-based authentication.
+
+For this workshop, we will be using the username `sensu` and the password `sensu`.
+
+#### Namespaces
+
+Sensu resources can be organized by _namespace_.
+This is helpful in complex infrastructures where there are many systems to observe and manage.
+
+For this workshop, we will be using the `default` namespace.
+
+#### Output Format
+
+Since `sensuctl` can be used both interactively and in automated scripts, there are a variety of output options available.
+The default `tabular` output mode is a compact and human-readable format.
+
+For this workshop, we will be using the `tabular` output mode.
+
+
+### EXERCISE 2: Configure the `sensuctl` CLI
+
+#### Scenario
+
+You've just installed `sensuctl` and need to configure it to interact with a Sensu backend API.
+
+#### Solution
+
+Run the `sensuctl configure` command.
+This interactive command will prompt you for all the necessary configuration variables.
+
+#### Steps
+
+1. **Run the `sensuctl configure` Command.**
+
+   The `sensuctl configure` command will prompt you to provide the preferred authentication method, backend URL, namespace, output format, username, and password.
 
    ```shell
    sensuctl configure
    ```
 
-   For this workshop, we will use the default backend URL (`http://127.0.0.1:8080`), username (`sensu`), and password (`sensu`).
+   For this workshop, we will use the following options:
+   - **Authentication method:** `username/password`
+   - **Sensu Backend URL:** `http://127.0.0.1:8080`
+   - **Namespace:** `default`
+   - **Preferred output format:** `tabular`
+   - **Username:** `sensu`
+   - **Password:** `sensu`
+   
+ 
+1. **Verify the `sensuctl` Configuration.**
 
-   The `sensuctl configure` runs in interactive mode by default and will prompt you for the following settings:
-
-   ```shell
-   ? Authentication method: username/password
-   ? Sensu Backend URL: http://127.0.0.1:8080
-   ? Namespace: default
-   ? Preferred output format: tabular
-   ? Username: sensu
-   ? Password: *****
-   ```
-
-1. **Verify your `sensuctl` configuration.**
-
-   If you do not receive an error message after entering your username and password you should have a successfully configured CLI.
-   To confirm, let's run a `sensuctl` command to verify our configuration:
+   You should now have successfully configured `sensuctl`.
+ 
+   To confirm, run a `sensuctl` command to verify the configuration:
 
    ```shell
    sensuctl config view
    ```
 
-   The output should look something like the following:
+   **Example Output:**
 
    ```
    === Active Configuration
@@ -375,208 +217,446 @@ $ sensuctl configure -n \
    Username:                 sensu
    JWT Expiration Timestamp: 1234567890
    ```
+> **PROTIP:** Certain `sensuctl` commands support a _non-interactive_ mode.
+> This is helpful when using `sensuctl` in an automated context like a CI/CD pipeline.
+> 
+> For example, the `sensuctl configure` command can be run non-interactively using the `-n` option.
+> 
+> 
+> **Example:** Non-interactive use of `sensuctl configure`
+>
+> ```shell
+> $ sensuctl configure -n \
+>   --api-url http://127.0.0.1:8080 \
+>   --namespace default \
+>   --username sensu \
+>   --password ${SENSU_PASSWORD} \
+>   --format json
+> ```
 
-   You should see the default API URL (`http://127.0.0.1:8080`), namespace (`default`), and username (`sensu`).
+## API Keys
 
-**NEXT:** If you see output with a list of one or more namespaces you are ready to continue to the next step!
+Another way to authenticate requests is to use an [api key][api_key_docs]. 
+API keys allow automated components access to the API without the need for usernames and passwords.
 
-## EXERCISE 3: use the `sensuctl --help` command
+Many of the exercises in this workshop will require an API key, so let's create one now.
 
-Sensuctl includes a `--help` flag for getting help with every command and subcommand.
+### EXERCISE 3: Create an API Key
 
-Try running some of the following commands:
+#### Scenario
 
-1. **See all available `sensuctl` commands and global flags:**
+You want to use tools like `curl` and `sensuctl` to create and manage resources, but you do not want to use passwords. 
 
-   ```
-   sensuctl --help
-   ```
+#### Solution
 
-1. **See all of the available subcommands and flags for the `sensuctl check` command:**
+Create an API key using `sensuctl api-key grant`. This will create a user-specific key that can be used in an authorization header of an API request.
 
-   ```
-   sensuctl check --help
-   ```
+This key can also be used with any `sensuctl` command by adding the [`--api-key` option][sensuctl_global_flags_docs].
 
-1. **See all of the available flags for the `sensuctl check create` subcommand:**
+#### Steps
 
-   ```
-   sensuctl check create --help
-   ```
+1. **Create an API Key Using the `sensuctl api-key grant` Command.**
 
-Learning how to navigate the `sensuctl` tool with the assistance of the `--help` flag will make the Sensu CLI much easier to use.
-
-**NEXT:** after you've tried a few `--help` commands you're ready to move on to the next step.
-
-## EXERCISE 4: inspect an event in JSON format
-
-1. **Use the `sensuctl event info` command to get information about an event.**
-
-   ```
-   sensuctl event info learn.sensu.io helloworld
-   ```
-
-   The Sensu CLI will use your default output format (which defaults to "tabular") for displaying information about most resources.
-   The tabular output format is usually easier to read, but doesn't show all of the available properties for a given resource.
-
-   Example tabular output:
-
-   ```shell
-   === learn.sensu.io - helloworld
-   Entity:    learn.sensu.io
-   Check:     helloworld
-   Output:    Hello, workshop world.
-   Status:    1
-   History:
-   Silenced:  false
-   Timestamp: 2021-03-09 22:44:28 -0800 PST
-   UUID:      7d0721c8-d203-4e80-a399-05070a914b20
-   ```
-
-1. **View event information in JSON format.**
-
-   To modify the output format on a per-command basis use the `--format` flag:
-
-   ```shell
-   sensuctl event info learn.sensu.io helloworld --format json
-   ```
-
-   > **NOTE:** the `--output` flag is available for a variety of `sensuctl` commands, which can be quite helpful for writing scripts that leverage data from Sensu APIs.
-
-**NEXT:** If `sensuctl` output a JSON formatted event, you're ready to move on to the next step.
-
-## EXERCISE 5: explore Sensu resources using `sensuctl`
-
-1. **Use the `sensuctl namespace list` command to get a list of namespaces.**
-
-   ```shell
-   sensuctl namespace list
-   ```
-
-   _NOTE: the output of this command is filtered based on RBAC, so different users may see different results._
-
-1. **Use the `sensuctl event list` command to get a list of events.**
-
-   ```shell
-   sensuctl event list
-   ```
-
-1. **Use the `sensuctl entity list` command to get a list of nodes under management.**
-
-   ```shell
-   sensuctl entity list
-   ```
-
-   _NOTE: try adding `--format json` or `--format yaml` to view the list in JSON or YAML format._
-
-1. **Get information about a specific entity using the `sensuctl entity info` command.**
-
-   ```shell
-   sensuctl entity info learn.sensu.io
-   ```
-
-1. **Try exploring some other resources.**
-
-   _NOTE: don't forget to use `--help`; for example, `sensuctl --help` will output a list of "management commands" which are effectively API resources that are accessible via `sensuctl`._
-
-**NEXT:** when you're done exploring `sensuctl` resource list and info commands, you're ready to move on to the next step.
-
-## EXERCISE 6: create an API Key for personal use
-
-1. **Use the `sensuctl api-key grant` command to create an API Key.**
-
-   Grant an api-key for the default user (`sensu`).
+   API keys are user-specfic, so we need to specify the user. 
+   This key will be created for the `sensu` user.
 
    ```shell
    sensuctl api-key grant sensu
    ```
 
-   The output of this command will look like:
+   **Example Output:**
 
    ```shell
    Created: /api/core/v2/apikeys/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-1. **Save the API Key for use in a future exercise.**
+1. **Save the API Key in the `SENSU_API_KEY` Environment Variable.**
 
-   For the purposes of this workshop, we want to capture this API key (the
-   `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output) for use in a future exercise.
-   You can either copy the output from the `sensuctl api-key grant` command manually, like this:
+   For this workshop, we want to save the API key in an environment variable for use in future exercises.
+   
+   1. Copy the `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output onto the clipboard (without the `/api/core/v2/apikeys/` portion).
+   
+   1. Modify the `.envrc` or `.envrc.ps1`, replacing the value for `SENSU_API_KEY` with the key we just copied, then uncomment the line.
+   
+      When complete, your file should have a line like this:
 
-   Modify the provide `.envrc` file using your API Key.
-   Uncomment the line that begins with `# export SENSU_API_KEY` so that it looks like the following example:
+      **Mac and Linux users (`.envrc`):**
 
-   ```shell
-   export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-   ```
+      ```shell
+      export SENSU_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      ```
 
-   Now reload the `.envrc` file into your environment:
+      **Windows users (`.envrc.ps1`):**
+
+      ```powershell
+      ${Env:SENSU_API_KEY}="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      ```
+   
+1. **Reload the Environment Variables.**
+
+   **Mac and Linux:**
 
    ```shell
    source .envrc
    ```
 
-   > **PROTIP:** if you like to automate things like this using shell scripts, you might already be thinking about how to parse the output of the `sensuctl api-key grant` command.
-   > The following example should do the trick for Mac and Linux users:
-   >
-   > ```shell
-   > export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
-   > ```
+   **Windows (Powershell):**
 
-   Verify that you have successfully set an environment variable with your API key:
+   ```powershell
+   . .\.envrc.ps1
+   ```
 
+1. Verify that the `SENSU_API_KEY` environment variable is set:
+
+   **Mac and Linux:**
+ 
    ```shell
    echo $SENSU_API_KEY
-   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-**NEXT:** If you see your API key, you're ready to move on to the next step!
+   **Windows (Powershell):**
 
-## EXERCISE 7: export Sensu resources using `sensuctl dump`
+   ```powershell
+   $env:SENSU_API_KEY
+   ```
 
-The `sensuctl dump` command is a built-in solution for exporting & importing Sensu API resources.
-You can use `sensuctl dump` to output Sensu configuration resources to STDOUT (i.e. for viewing in the terminal), or to a file.
-The `sensuctl dump` command has a wide range of use cases from simple backup and restore, to inspecting configuration resources, scripting maintenance tasks (e.g. bulk deletion of entities), and more.
+> **PROTIP:** If you like to automate things like this using shell scripts, you might already be thinking about how to parse the output of the `sensuctl api-key grant` command.
+>
+> The following example should do the trick for Mac and Linux users:
+>
+> **Example:** Parsing an API key using `awk`
+> ```shell
+> export SENSU_API_KEY=$(sensuctl api-key grant sensu | awk -F "/" '{print $NF}')
+> ```
 
-1. **Export all resources.**
+## Listing and Viewing Resources
+
+One of the common uses of `sensuctl` is to list and view resources like namespaces, users, and entities. 
+
+### EXERCISE 4: List Sensu Resources
+#### Scenario
+
+You want to explore the resources available in Sensu. 
+
+#### Solution
+
+To see a list, use the `sensuctl <resource_type> list` command pattern. 
+The `list` subcommand is available for nearly all resources, including common resources like namespaces, users, and entities.
+
+#### Steps
+
+1. **Use the `sensuctl namespace list` Command to Get a List of Namespaces.**
 
    ```shell
-   sensuctl dump all
+   sensuctl namespace list
    ```
-
-1. **Export resources for a single namespace.**
+   
+   **Example Output:**
+   ```shell
+      Name
+    ─────────
+     default
+     trainee
+   ```
+1. **Use the `sensuctl user list` Command to Get a List of Users.**
 
    ```shell
-   sensuctl dump all --namespace default
+   sensuctl user list
    ```
+   
+   **Example Output:**
+   ```shell
+     Username           Groups            Enabled
+    ────────── ───────────────────────── ─────────
+     agent      system:agents             true
+     sensu      cluster-admins            true
+     trainee    trainee,trainee:trainee   true
+   ```
+>**PROTIP:** Want to explore what `sensuctl` can do? Try using the  `--help` option to show a list of commands. This option is available on all commands and subcommands.
 
-1. **Export specific resources, by type.**
+## Inventory Management
+
+One common use case for `sensuctl` is to manage a real-time "inventory of nodes".
+Nodes are represented as _entities_, and they either have an agent running locally, or are proxying observability data through an agent running elsewhere.
+
+The commands `sensuctl entity list` and `sensuctl entity info <entity_id>` are used to list and inspect entities.
+
+### EXERCISE 5: List an Inventory of Nodes
+#### Scenario
+
+You have a large inventory of nodes and you want to view a real-time list of those entities.
+You also want to automate some tasks based on that list, but need some detailed information about the node in JSON format.
+
+#### Solution
+
+To view a list of nodes, use the `sensuctl entity list` command. 
+Individual node information can be viewed using the `sensuctl entity info <entity_id>` command. 
+In automated scenarios, adding the `--format json` option will output the information in JSON format.
+
+#### Steps
+1. **List Entities Under Management by Sensu.**
+
+   To get a real-time list of entities, run `sensuctl entity list`.
 
    ```shell
-   sensuctl dump checks,handlers
-   sensuctl dump checks > checks.yaml
-   sensuctl dump handlers > handlers.yaml
+   sensuctl entity list
    ```
+ 
+   **Example Output:**
+   ```shell
+              ID         Class      OS                       Subscriptions                              Last Seen
+    ──────────────── ─────── ────────── ───────────────────────────────────────────────── ───────────────────────────────
+     0ed711859366     agent   linux      system/linux,workshop,devel,entity:0ed711859366   2021-09-15 17:18:18 -0700 PDT
+     learn.sensu.io   proxy   Workshop   entity:learn.sensu.io                             N/A
 
-   _NOTE: at this stage in the workshop this command may not generate any output (becase we haven't created any checks or handlers yet)._
+   ```
+  
+1. **Show Detailed Entity Information.**
 
-1. **Get a complete list of resource types supported by `sensuctl dump`.**
+   To get detailed information about an entity, run `sensuctl entity info <entity_id>`.
 
    ```shell
-   sensuctl describe-type all
+   sensuctl entity info learn.sensu.io
    ```
 
-   Notice that some resources have "short names" (e.g. `core/v2.CheckConfig` has the short name `check`).
-   Try exporting a resource by its Fully Qualified Name.
+   **Example Output:**
+   ```shell
+   === learn.sensu.io
+   Name:                   learn.sensu.io
+   Entity Class:           proxy
+   Subscriptions:          entity:learn.sensu.io, workshop-test
+   Last Seen:              N/A
+   Hostname:               learn.sensu.io
+   OS:                     Workshop
+   Platform:               Sensu Go
+   Platform Family:        Training
+   Platform Version:       6.2.7
+   Auto-Deregistration:    true
+   Deregistration Handler: 
+   ```
+
+1. **Output Entity Information in JSON Format.**
+
+   Entity information is commonly used in automation scenarios, such as scripts or CI/CD workflows.
+   In those situations it you may wish to output this information in a structured format like JSON. 
 
    ```shell
-   sensuctl dump core/v2.Entity --format wrapped-json
-   sensuctl dump secrets/v1.Secret --format yaml
+   sensuctl entity info learn.sensu.io --format json
    ```
 
-**NEXT:** once you have exported your secrets you're ready to move on to the next step!
+   **Example Output:**
+   ```json
+   {
+     "entity_class": "proxy",
+     "system": {
+       "hostname": "learn.sensu.io",
+       "os": "Workshop",
+       "platform": "Sensu Go",
+       "platform_family": "Training",
+       "platform_version": "6.2.7",
+       "network": {
+         "interfaces": [
+           {
+             "name": "lo",
+             "mac": "00:00:00:00:00:00",
+             "addresses": [
+               "127.0.0.1/8",
+               "::1/128"
+             ]
+           },
+           {
+             "name": "eth0",
+             "mac": "00:00:00:00:00:00",
+             "addresses": [
+               "10.0.0.1/8"
+             ]
+           }
+         ]
+       },
+       "arch": "arm",
+       "libc_type": "",
+       "vm_system": "",
+       "vm_role": "",
+       "cloud_provider": "",
+       "processes": null
+     },
+     "subscriptions": [
+       "entity:learn.sensu.io",
+       "workshop-test"
+     ],
+     "last_seen": 0,
+     "deregister": true,
+     "deregistration": {},
+     "user": "workshop",
+     "metadata": {
+       "name": "learn.sensu.io",
+       "namespace": "default",
+       "labels": {
+         "app": "workshop"
+       },
+       "created_by": "sensu"
+     },
+     "sensu_agent_version": ""
+   }
+   ```
 
-## Learn more
+## Monitoring as Code
+
+The `sensuctl` monitoring-as-code workflow manages resource configurations using plain-text formats like YAML and JSON.
+
+Managing resources follows these basic steps:
+1. Resource configurations are defined in a YAML or JSON file.
+2. The `sensuctl create` command reads the resource configuration from the file, then pushes that configuration to the backend API where the resource is created.
+3. The file can then be saved to a file within a source code repository. 
+4. Later, the file can be modified and `sensuctl create` is used to update the resource.
+
+You can also use the `sensuctl dump` command to export a resource to a file, or add the `--format` option to a `sensuctl entity info` command to output the resource in a structured format. 
+
+These features together enable Sensu's _monitoring-as-code_ workflow.
+
+### EXERCISE 6: Exporting and Updating Resource Configurations
+#### Scenario
+
+You have an entity in a running Sensu environment but don't have a YAML file that describes it. You'd like to save the resource to a file so you can modify the configuration, and store that configuration to a code repository.
+
+#### Solution
+
+To accomplish this, we will use the `sensuctl entity info` command with the `--format yaml` option to output an existing resource to YAML. 
+Once we have that YAML file, we can modify the configuration, then update the resource configuration using `sensuctl create`.
+
+#### Steps
+1. **Export an Entity Configuration in YAML Format.**
+
+   Use the `sensuctl entity info` command with the `--format yaml` option. 
+   Pipe the output to a file named `entity.yaml`.
+
+   ```shell
+   sensuctl entity info learn.sensu.io --format yaml > entity.yaml
+   ```
+
+   **Example Output:** `entity.yaml`
+   ```yaml
+   type: Entity
+   api_version: core/v2
+   metadata:
+     created_by: sensu
+     labels:
+       app: workshop
+     name: learn.sensu.io
+     namespace: default
+   spec:
+     deregister: true
+     deregistration: {}
+     entity_class: proxy
+     last_seen: 0
+     sensu_agent_version: ""
+     subscriptions:
+     - entity:learn.sensu.io
+     system:
+       arch: arm
+       cloud_provider: ""
+       hostname: learn.sensu.io
+       libc_type: ""
+       network:
+         interfaces:
+         - addresses:
+           - 127.0.0.1/8
+           - ::1/128
+           mac: "00:00:00:00:00:00"
+           name: lo
+         - addresses:
+           - 10.0.0.1/8
+           mac: "00:00:00:00:00:00"
+           name: eth0
+       os: Workshop
+       platform: Sensu Go
+       platform_family: Training
+       platform_version: 6.2.7
+       processes: null
+       vm_role: ""
+       vm_system: ""
+     user: workshop
+   ```
+1. **Modify the Resource Configuration.**
+
+   Using a text editor, change the `subscriptions` list, adding a new item `workshop-test`.
+   
+   **Example:** `entity.yaml`
+   ```yaml
+   type: Entity
+   api_version: core/v2
+   metadata:
+     created_by: sensu
+     labels:
+       app: workshop
+     name: learn.sensu.io
+     namespace: default
+     spec:
+       deregister: true
+       deregistration: {}
+       entity_class: proxy
+       last_seen: 0
+       sensu_agent_version: ""
+       subscriptions:
+       - entity:learn.sensu.ioi
+       - workshop-test
+       system:     
+   [..clipped..]
+   ```
+   
+1. **Update the Running Resource Configuration.**
+
+   Update the running entity configuration using `sensuctl create`. 
+   The `-f` option specifies the YAML file to read from. 
+
+   If the specified resource doesn't exist, the `sensuctl create` command will _create_ it.
+   However, if it already exists, the command will _update_ it.
+
+   ```shell
+   sensuctl create -f entity.yaml
+   ```
+
+1. **Verify the Updated Configuration.**
+
+   View the updated configuration by running `sensuctl entity info`.
+
+   ```shell
+   sensuctl entity info learn.sensu.io
+   ```
+
+   **Example Output:**
+   ```
+   === learn.sensu.io
+   Name:                   learn.sensu.io
+   Entity Class:           proxy
+   Subscriptions:          entity:learn.sensu.io, workshop-test
+   Last Seen:              N/A
+   Hostname:               learn.sensu.io
+   OS:                     Workshop
+   Platform:               Sensu Go
+   Platform Family:        Training
+   Platform Version:       6.2.7
+   Auto-Deregistration:    true
+   Deregistration Handler:
+   ```
+
+   If you now have `workshop-test` listed in the `Subscriptions` value, the update was successful!
+
+# Discussion
+
+In this lesson, you learned how to install and configure the `sensuctl` CLI tool, create an API key, and how to explore and manage resources in Sensu.
+
+### Sensu is an API, `sensuctl` is the Client
+
+At the core of these operations is the [Sensu API][sensu_api_docs]. In fact, `sensuctl` can be thought of as a client for the Sensu API, helping to make it easier to perform common tasks from the command line. These same tasks could have been perfomed with `curl` or any other system that can make HTTP requests.
+
+Sensu's API-based design is key to enabling monitoring-as-code workflows, and allows for extensive customization via scripting and automation.
+
+### Sensu Web App 
+
+For those who prefer a browser-based user experience, the Sensu Web App can perform many of the same tasks. It interacts with the same APIs and gives you some powerful visualization and exploration tools. Learn more about the Sensu Web App in Lesson X.
+
+## Learn More
 
 - [[Documentation] "Sensu CLI" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/)
 - [[Documentation] "Create and manage resources with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/create-manage-resources/)
@@ -585,8 +665,15 @@ The `sensuctl dump` command has a wide range of use cases from simple backup and
 - [[Documentation] "Set environment variables with `sensuctl`" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/sensuctl/environment-variables/)
 - [[Blog Post] "A Primer on Sensu Dashboards" (sensu.io)](https://sensu.io/blog/a-primer-on-sensu-dashboards-eb0940293a)
 
-## Next steps
+## Next Steps
 
 [Share your feedback on Lesson 03](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-03&title=Lesson%2003%20Feedback)
 
-[Lesson 4: Introduction to Handlers & Handler Sets](../04/README.md#readme)
+[Lesson 4: Introduction to Handlers](../04/README.md#readme)
+
+[setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+[fhs_usr_local_docs]: https://www.pathname.com/fhs/pub/fhs-2.3.html#USRLOCALLOCALHIERARCHY
+[sensuctl_global_flags_docs]: https://docs.sensu.io/sensu-go/latest/sensuctl/#global-flags
+[api_key_docs]: https://docs.sensu.io/sensu-go/latest/operations/control-access/use-apikeys/
+[sensu_api_docs]: https://docs.sensu.io/sensu-go/latest/api/
+

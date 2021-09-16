@@ -1,6 +1,6 @@
 # Lesson 3: Using the Sensu CLI
 - [Goals](#goals)
-- [The `sensuctl` Command Line Interface (CLI)](#the-sensuctl-command-line-interface--cli)
+- [The `sensuctl` Command Line Interface (CLI)](#the-sensuctl-command-line-interface-cli)
    - [EXERCISE 1: Install the `sensuctl` CLI](#exercise-1-install-the-sensuctl-cli)
 - [Configuration Options](#configuration-options)
    - [EXERCISE 2: Configure the `sensuctl` CLI](#exercise-2-configure-the-sensuctl-cli)
@@ -12,8 +12,8 @@
   - [EXERCISE 5: List an Inventory of Nodes](#exercise-5-list-an-inventory-of-nodes)
 - [Monitoring as Code](#monitoring-as-code)
   - [EXERCISE 6: Exporting and Updating Resource Configurations](#exercise-6-exporting-and-updating-resource-configurations)
-- [Learn more](#learn-more)
-- [Next steps](#next-steps)
+- [Learn More](#learn-more)
+- [Next Steps](#next-steps)
 
 ## Goals
 
@@ -648,7 +648,7 @@ In this lesson, you learned how to install and configure the `sensuctl` CLI tool
 
 ### Sensu is an API, `sensuctl` is the Client
 
-At the core of these operations is the [Sensu API][sensu_api_docs]. In fact, `sensuctl` can be thought of as a client for the Sensu API, helping to make it easier to perform common tasks from the command line. These same tasks could have been perfomed with `curl` or any other system that can make HTTP requests.
+At the core of these operations is the [Sensu API][sensu_api_docs]. In fact, `sensuctl` can be thought of as a client for the Sensu API, making it easier to perform common tasks from the command line. These same tasks could have been perfomed with `curl` or any other system that can make HTTP requests.
 
 Sensu's API-based design is key to enabling monitoring-as-code workflows, and allows for extensive customization via scripting and automation.
 

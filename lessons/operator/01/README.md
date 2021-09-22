@@ -21,7 +21,7 @@ This lesson is intended for operators of Sensu, or anyone who would like a short
 There as many approaches to monitoring as there are software applications written. 
 Perhaps more. 
 Some are assembled from a mish-mash of glued-together services.
-Others are monolithic commerical platforms that attempt to do everything from polling the kernel, to storing each log line and every millisecond of system metrics, into massive vendor-specific data lakes. 
+Others are monolithic commercial platforms that attempt to do everything from polling the kernel, to storing each log line and every millisecond of system metrics, into massive vendor-specific data lakes. 
 
 Sensu takes a middle path in this milieu by providing a smooth pathway for observations to flow directly from their origins to any number of destinations. 
 Using a flexible API-oriented approach, Sensu pipelines can chain many event-processing components together, in a model similar to UNIX pipes. 
@@ -74,11 +74,11 @@ Sensu is designed specifically to enable this kind of workflow for monitoring.
 
 The Sensu _backend_ is a service that provides the API and performs event processing.
 All aspects of the observability pipeline can be modified at runtime through the API. 
-Operators can add new components, modify the behaviour of filters and handlers, silence noisy streams of data, or add new database sinks *at any time*, without the need to re-deploy.
+Operators can add new components, modify the behavior of filters and handlers, silence noisy streams of data, or add new database sinks *at any time*, without the need to re-deploy.
 
 Components are defined in YAML files, which are pushed to the API to build the pipeline.
-These YAML files can be stored in source-control alongside your application code, and can be tested, versioned, and otherwised managed like any other code file.
-This workflow takes the burden off of system operators, by allowing anyone in the organization to self-service their monitoring configurations on-demand, with security and access controls at every layer.
+These YAML files can be stored in source-control alongside your application code, and can be tested, versioned, and managed like any other code file.
+This workflow takes the burden off of system operators, by allowing engineers to self-service their monitoring configurations, with security and access controls at every layer.
 
 To learn more, please check out our [monitoring as code whitepaper](https://sensu.io/resources/whitepaper/monitoring-as-code-with-sensu).
 
@@ -86,32 +86,33 @@ To learn more, please check out our [monitoring as code whitepaper](https://sens
 
 Another essential component of Sensu is the [Bonsai Asset Repository](https://bonsai.sensu.io/).
 This service delivers binary assets directly to the agents and the backend, based on the configurations defined in YAML.
-This frees up operators and developers to focus only on the YAML configuration, while the binary assets are served directly from Bonsai (or an internal mirror).
+Operators and developers can focus only on the YAML configuration, without worrying about how to securely deliver new executables to the edge.
 
-There are hundreds of open-source plugins available on Bonsai, supporting nearly every integration imaginable. 
+There are hundreds of open-source plugins available on Bonsai, supporting nearly every imaginable integration. 
 [Have a look around](https://bonsai.sensu.io/assets)! 
 If what you need isn't already available, the [Sensu Plugin SDK](https://github.com/sensu/sensu-plugin-sdk) makes it easy to develop and publish new custom plugins.
 
 ## Discussion
 
 In this lesson we covered the basics of Sensu's architecture, data model, and monitoring-as-code workflow. 
-The rest of the workshop is a series of hands-on exercises that walk you through using some of the essential features of Sensu, in a sandboxed environment.
+The rest of the workshop is a series of hands-on exercises that walk you through some of the essential features of Sensu, in a sandboxed environment.
 
 ### All You Have to Think About is `sensuctl` and YAML
 
-While the description above might seem somewhat complicated, the beauty of Sensu is that the majority of the complexity is built into the platform, so you don't have to worry about it. 
+The description above might seem somewhat complicated. 
+But the beauty of Sensu is that these features are built into the platform, so you don't have to worry about them. 
 
-As an operator, the majority of your time will be spent editing YAML, and running high-level commands from a command-line shell.
-The Sensu user-experience is simple, consistent, and makes it easy to manage large complex environments without being overwhelmed with details.
+As an operator, the majority of your time is spent editing YAML, and running high-level commands from a command-line shell.
+The Sensu user-experience is simple, consistent, and makes it easy to manage complex environments without being overwhelmed with details.
 
 ### How Does this Compare to Your Previous Monitoring System?
 
-Sensu was designed to be an ideal balance between flexibilty and structure.
+Sensu is designed to be an ideal balance between flexibility and structure.
 
 As an intellectual exercise, consider the following questions about your previous monitoring system:
-- What monitoring workflows were supported and how were they implemented?
+- What monitoring workflows did it support and how did it implement them?
 - What did it make easy, and what blind-spots did it have?
-- Which of those things are actually important to your organization? 
+- Which of those things are important to your organization? 
 - Why did you switch to Sensu?
 
 ## Learn More

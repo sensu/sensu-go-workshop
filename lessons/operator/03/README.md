@@ -17,14 +17,14 @@
 
 ## Goals
 
-In this lesson we will introduce the `sensuctl` command-line tool.
+In this lesson we will introduce the [`sensuctl` command-line tool](https://docs.sensu.io/sensu-go/latest/sensuctl/).
 You will learn how to install and configure the tool, then practice performing some essential operations.
 
 This lesson is intended for operators of Sensu and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## The `sensuctl` Command Line Interface (CLI)
 
-The `sensuctl` tool, short for _Sensu Control_, gives you full control of your Sensu pipeline from a command-line environment. 
+The `sensuctl` CLI, short for _Sensu Control_, gives you full control of your Sensu pipeline from a command-line environment. 
 You can use `sensuctl` interactively in a shell, or script it as part of an automated solution.
 
 The `sensuctl` tool is available for Linux, macOS, and Windows.
@@ -38,13 +38,13 @@ You want to view and manage resources in Sensu from a command-line environment o
 
 Install the `sensuctl` CLI tool.
 
-First, we will configure some helpful environment variables, download the `sensuctl` archive, then unpack that to a standard location on your system.
+First, we will configure some helpful environment variables, download the `sensuctl` binary, then install it.
 
 #### Steps
 
 1. **Configure Environment Variables.**
 
-   The [workshop repository] includes platform-specific files that export some environment variables which we will use throughout the workshop.
+   The [workshop repository](https://github.com/sensu/sensu-go-workshop) includes platform-specific files that export some environment variables which we will use throughout the workshop.
    The exercises assume you are in a shell that has these variables configured.
    
    When you open a new shell environment, export the variables using one of the following commands:
@@ -125,7 +125,7 @@ First, we will configure some helpful environment variables, download the `sensu
    > **NOTE:** On Unix-like systems `/usr/local/bin` is the [standard location for binaries shared between multiple users][fhs_usr_local_docs]. 
    > On macOS, the default permissions for `/usr/local/bin` require the used of `sudo`. 
    > However, any location that is on your `$PATH` will work (i.e. `~/bin`).
-   > On Windows systems we create a new location specificly for Sensu, then add it to the path.
+   > On Windows systems we create a new location specifically for Sensu, then add it to the path.
 
 ## Configuration Options
 
@@ -245,7 +245,7 @@ Many of the exercises in this workshop will require an API key, so let's create 
 
 #### Scenario
 
-You want to use tools like `curl` and `sensuctl` to create and manage resources, but you do not want to use passwords. 
+You want to use tools like `curl` and `sensuctl` to create and manage resources, but you prefer to use [revocable API keys](https://medium.com/swlh/api-keys-whats-the-point-8f58d7966f9) instead of usernames and passwords. 
 
 #### Solution
 
@@ -336,7 +336,7 @@ One of the common uses of `sensuctl` is to list and view resources like namespac
 ### EXERCISE 4: List Sensu Resources
 #### Scenario
 
-You want to explore the resources available in Sensu. 
+You want to explore the resources under management by Sensu. 
 
 #### Solution
 
@@ -376,7 +376,9 @@ The `list` subcommand is available for nearly all resources, including common re
 
 ## Inventory Management
 
-One common use case for `sensuctl` is to manage a real-time "inventory of nodes".
+One of the use cases for Sensu is _endpoint management_.
+The infrastructure Sensu is monitoring can be listed using `sensuctl`, creating a real-time "inventory of nodes".
+
 Nodes are represented as _entities_, and they either have an agent running locally, or are proxying observability data through an agent running elsewhere.
 
 The commands `sensuctl entity list` and `sensuctl entity info <entity_id>` are used to list and inspect entities.
@@ -499,6 +501,13 @@ In automated scenarios, adding the `--format json` option will output the inform
      "sensu_agent_version": ""
    }
    ```
+
+   > **PROTIP:** The ability to output JSON is especially powerful when combined with tools like [`jq`](https://stedolan.github.io/jq/).
+   > For example, let's try extracting the Sensu version that is running on the system that this event came from:
+   >
+   > ```shell
+   > sensuctl entity info learn.sensu.io --format json | jq .system.platform_version
+   > ```
 
 ## Monitoring as Code
 

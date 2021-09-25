@@ -1,207 +1,153 @@
 # Lesson 5: Introduction to Events
 
-- [Overview](#overview)
-- [Events are observations](#events-are-observations)
-- [Use cases](#use-cases)
-- [EXERCISE 1: create an event using shell commands and the Sensu Events API](#exercise-1-create-an-event-using-shell-commands-and-the-Sensu-Events-API)
-- [EXERCISE 2: create an event that triggers an alert](#exercise-2-create-an-event-that-triggers-an-alert)
-- [Learn more](#learn-more)
-- [Next steps](#next-steps)
+- [Goals](#goals)
+- [Events are Observations](#events-are-observations)
+  - [System Transparency](#system-transparency)
+  - [The Function of Time](#the-function-of-time)
+  - [Structured Data](#structured-data)
+- [Working With Events](#working-with-events)
+  - [Event Data Structure](#event-data-structure) 
+  - [EXERCISE 1: Create an Event Manually](#exercise-1-create-an-event-manually)
+  - [EXERCISE 2: Create an Event that Triggers an Alert](#exercise-2-create-an-event-that-triggers-an-alert)
+- [Discussion](#discussion)
+- [Learn More](#learn-more)
+- [Next Steps](#next-steps)
 
-## Overview
+## Goals
+In this lesson we will take a deeper look at events in Sensu, create an event manually using common shell tools, and show how events can trigger alerts. 
+This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## Events are Observations
 
-Sensu Events are generic containers for all types of observability data.
-In Sensu, every observation is an "event", including metrics (telemetry data).
+We often use the term _observability_ to describe the set of practices around understanding and managing complex software systems.
+But what do we mean by that?
 
-Sensu Events are structed data identified by a timestamp, entity name (e.g. server, cloud compute instance, container, or service), a check/event name, and optional key-value metadata called "labels" and "annotations".
+Observability describes a quality of the system; a measure of how much visibility we have into its state and behaviors.
 
-**Example check structure:**
+The more you _observe_, the richer your knowledge is of the system.
+The richer that knowledge is, the better you can understand and reason about the system.
+
+So what is it that we are observing?
+
+### System Transparency 
+From our vantage point looking at a dashboard, we can only observe what the system shares with us.
+In traditional software development this involved informational output in the form of logs.
+Later, some systems were instrumented to allow on-demand inspection.
+
+It's now commonly understood that there is great value in providing a lot of transparency.
+We design systems to emit or allowing the inspection of as much detail as we can.
+Our data processing and storage systems have evolved past the need to constrain or limit this information.
+
+The more of this data we have available, the better off we are when trying to understand unexpected system behaviors.
+
+### The Function of Time
+
+This model involves two categories of system information; data which is _emitted_, and data which is _queried_.
+Broadly, emitted data is referred to as _logs_ or _events_, and queried or inspected data is known as _metrics_ or _telemetry_.
+These differ primarily in their relationship to time.
+
+Log messages are emitted at irregular and unpredictable times. 
+They are emitted when _something happens_. 
+Metrics however are _polled_, either on an periodic basis, or on-demand when someone is inspecting the system.
+
+The unifying property of these two kinds of information is their _timestamp_.
+
+### Structured Data
+
+Where these two kinds of information differ though, is in structure.
+Logs are presented as text strings, often in a human language. 
+They are intended to be human-readable and have little to no structure.
+Metrics are often presented as measurements in numerical form. 
+They are intended to be machine-readable and are often structured as a key-value pair.
+
+For a long time these two kinds of information were handled separately.
+In Sensu, we have developed a way to bring them together in a unifying structure: the _event_.
+
+## Working With Events
+
+There is a constant stream of these _observations_ in different formats coming from every layer of our systems.
+But we still don't have great tools for correlating this information.
+Often what we are looking for is some kind of obvious change of condition, and the way we detect that change is by comparing measurements over time.
+
+But just because two things happened at the same time, doesn't mean that they are related.
+
+Historically, these two kinds of observation were separate and lacked relational information.
+Metrics were often loose numerical measurements with no additional context, and logs often appeared out of sequence, making it difficult to group them into meaningful units of work.
+There was also generally little forethought put into making sure that the system provided complete, accurate, and actionable information.
+
+
+### Event Data Structure
+
+In Sensu, we have solved part of this problem by unifying all observations into the `event` data structure.
+Sensu operators work with different kinds of observations in the same cognitive space, to find meaningful relationships, define operating thresholds, predict system behaviors, and to discover the meaning within the data.
+
+Sensu _events_ are structured data which include:
+- a standard [UNIX `timestamp`](https://en.wikipedia.org/wiki/Unix_time)
+- an `entity` name indicating the origin (e.g. a server, cloud compute instance, container, or service)
+- a check/event name indicating what kind of event it is
+- an optional `metrics` structure containing one or more `points`
+- an optional `metadata` structure containing key-value pairs, `labels`, and `annotations`
+- a UUID (`id`) used to trace event processing
+
+<details>
+<summary><strong>Example:</strong> Sensu Event Structure</strong></summary>
 
 ```json
 {
+  "timestamp": 1234567890,
+  "entity": {},
+  "check": {},
+  "metrics": {},
   "metadata": {
     "labels": {},
     "annotations": {}
   },
-  "entity": {},
-  "check": {},
-  "metrics": {},
-  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-  "timestamp": 0123456789
-}
-```
-
-A single Sensu Event payload may include one or more metric `points`, represented as a JSON object containing a `name`, `tags` (key/value pairs), `timestamp`, and `value` (always a float).
-
-<details>
-<summary><strong>Example event with check + metric data:</strong></summary>
-
-```json
-{
-  "type": "Event",
-  "api_version": "core/v2",
-  "metadata": {
-    "namespace": "default"
-  },
-  "spec": {
-    "check": {
-      "command": "wget -q -O- http://127.0.0.1:9099/metrics",
-      "duration": 0.060790838,
-      "executed": 1552506033,
-      "handlers": [],
-      "history": [
-        {
-          "executed": 1552505833,
-          "status": 0
-        },
-        {
-          "executed": 1552505843,
-          "status": 0
-        }
-      ],
-      "interval": 10,
-      "is_silenced": false,
-      "issued": 1552506033,
-      "last_ok": 1552506033,
-      "low_flap_threshold": 0,
-      "metadata": {
-        "name": "curl_timings",
-        "namespace": "default"
-      },
-      "occurrences": 1,
-      "occurrences_watermark": 1,
-      "output": "api_http_requests_total{service='example', region='us-west-1'} 42\napi_request_duration_seconds{service='example', region='us-west-1'} 0.8273645",
-      "output_metric_format": "graphite_plaintext",
-      "output_metric_handlers": [
-        "influx-db"
-      ],
-      "output_metric_tags": [
-         {
-            "name": "region",
-            "value": "{{ .labels.region }}"
-         }
-      ],
-      "proxy_entity_name": "",
-      "publish": true,
-      "round_robin": false,
-      "runtime_assets": [],
-      "state": "passing",
-      "status": 0,
-      "stdin": false,
-      "subdue": null,
-      "subscriptions": [
-        "app:example"
-      ],
-      "timeout": 0,
-      "total_state_change": 0,
-      "ttl": 0
-    },
-    "entity": {
-      "deregister": false,
-      "deregistration": {},
-      "entity_class": "agent",
-      "last_seen": 1552495139,
-      "metadata": {
-        "name": "i-424242",
-        "namespace": "default",
-        "labels": {
-           "region": "us-west-1"
-        }
-      },
-      "redact": [
-        "password",
-        "passwd",
-        "pass",
-        "api_key",
-        "api_token",
-        "access_key",
-        "secret_key",
-        "private_key",
-        "secret"
-      ],
-      "subscriptions": [
-        "app:example",
-        "entity:i-424242"
-      ],
-      "system": {
-        "arch": "amd64",
-        "hostname": "i-424242",
-        "network": {
-          "interfaces": [
-            {
-              "addresses": [
-                "127.0.0.1/8",
-                "::1/128"
-              ],
-              "name": "lo"
-            },
-            {
-              "addresses": [
-                "10.0.2.15/24",
-                "fe80::5a94:f67a:1bfc:a579/64"
-              ],
-              "mac": "08:00:27:8b:c9:3f",
-              "name": "eth0"
-            }
-          ]
-        },
-        "os": "linux",
-        "platform": "centos",
-        "platform_family": "rhel",
-        "platform_version": "7.5.1804",
-        "processes": null
-      },
-      "user": "agent"
-    },
-    "metrics": {
-      "handlers": [
-        "influxdb"
-      ],
-      "points": [
-        {
-          "name": "api_http_requests.total",
-          "tags": [
-            {
-              "name": "service",
-              "value": "example"
-            },
-            {
-              "name": "region",
-              "value": "us-west-1"
-            }
-          ],
-          "timestamp": 1552506033,
-          "value": 42.0
-        },
-        {
-           "name": "api_request_duration.seconds",
-           "tags": [
-             {
-               "name": "service",
-               "value": "example"
-             },
-             {
-               "name": "region",
-               "value": "us-west-1"
-             }
-           ],
-           "timestamp": 1552506033,
-           "value": 0.8273645
-        }
-      ]
-    },
-    "timestamp": 1552506033,
-    "id": "431a0085-96da-4521-863f-c38b480701e9",
-    "sequence": 1
-  }
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 }
 ```
 
 </details>
 
-## Use cases
+This generic container provides a tremendous amount of flexibility in terms of the types of observations that can be collected.
+For all the details on what kind of data events can hold, read the [Events reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/). 
+
+Let's try making an event manually, using some common command-line tools.
+
+## EXERCISE 1: Create an Event Manually
+### Scenario
+### Solution
+### Steps
+
+## EXERCISE 2: Create an Event that Triggers an Alert
+### Scenario
+### Solution
+### Steps
+
+## Discussion
+<!-- Summary --> 
+
+### Use Cases
+<!-- service health, metrics, endpoint discovery, deadman's switch) -->
+
+## Learn More
+
+- [[Documentation] "Sensu Events Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
+- [[Documentation] "Sensu Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/api/events/)
+- [[Documentation] "Sensu Agent Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
+- [[Blog Post] "Filling gaps in Kubernetes observability with the Sensu Kubernetes Events integration" (sensu.io)](https://sensu.io/blog/filling-gaps-in-kubernetes-observability-with-the-sensu-kubernetes-events-integration)
+
+## Next Steps
+
+[Share your feedback on Lesson 05](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-05&title=Lesson%2005%20Feedback)
+
+[Lesson 6: Introduction to Filters](../06/README.md#readme)
+
+
+[setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+
+<!--  ------ OLD ------- DELETE BELOW THIS LINE ----------------------
+
+# Use cases
 
 Events must reference an `entity` and contain one or both of the `metrics` and service health information objects (i.e. `check` data); e.g. an event that only has `entity` and `metrics` objects (and no `check` object) is a valid Sensu event.
 
@@ -369,15 +315,4 @@ If so you're ready to move on to the next step!
 
 Note: You can login to the workshop-provided Rocketchat instance at `http://127.0.0.1:5000` with `user: trainee` `password: workshop`. 
 
-## Learn more
-
-- [[Documentation] "Sensu Events Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
-- [[Documentation] "Sensu Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/api/events/)
-- [[Documentation] "Sensu Agent Events API Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api)
-- [[Blog Post] "Filling gaps in Kubernetes observability with the Sensu Kubernetes Events integration" (sensu.io)](https://sensu.io/blog/filling-gaps-in-kubernetes-observability-with-the-sensu-kubernetes-events-integration)
-
-## Next steps
-
-[Share your feedback on Lesson 05](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-05&title=Lesson%2005%20Feedback)
-
-[Lesson 6: Introduction to Filters](../06/README.md#readme)
+-->

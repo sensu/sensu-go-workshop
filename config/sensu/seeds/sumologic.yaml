@@ -5,7 +5,7 @@ metadata:
   name: sumologic_url
 spec:
   provider: env
-  id: SENSU_SUMOLOGIC_HTTP_COLLECTOR_URL
+  id: SUMOLOGIC_HTTP_SOURCE_URL
 ---
 type: Asset
 api_version: core/v2

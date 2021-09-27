@@ -3,6 +3,7 @@
 How to configure your Sumo Logic account for use with Sensu Go.
 
 - [HTTP Logs and Metrics Source](#http-logs-and-metrics-source)
+- [Update the Sumo Logic secret in the workshop](#update-the-sumo-logic-secret-in-the-workshop)
 - [Sensu Dashboards](#sensu-dashboards)
 
 ## HTTP Logs and Metrics Source
@@ -49,6 +50,45 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
 
 
 _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["Collection" tab][collection] in Sumo Logic and click "Show URL" next to the `sensu-http` source._
+
+## Update the Sumo Logic secret in the workshop
+
+Follow these steps to update the Sumo Logic HTTP source secret in Sensu.
+
+1. **Edit the `.env` file**
+
+   Replace the line with the example `SUMOLOGIC_HTTP_SOURCE_URL` environment variable
+
+   ```
+   SUMOLOGIC_HTTP_SOURCE_URL=https://endpointX.collection.sumologic.com/receiver/v1/http/xxxxxxxxxxxxxxxxxxxx
+   ```
+
+   Replace this value with the URL you obtained in the last step when created you [HTTP Logs and Metrics Source](#http-logs-and-metrics-source) (above).
+
+2. **Reload the workshop**
+
+   To "deploy" this environment variable and make it available in the workshop, please run the following command:
+
+   ```shell
+   sudo docker-compose up -d
+   ```
+
+   The output should look something like this:
+
+   ```
+   $ sudo docker-compose up -d
+   workshop_vault_1 is up-to-date
+   workshop_mongo_1 is up-to-date
+   workshop_sensu-agent_1 is up-to-date
+   workshop_sensu-assets_1 is up-to-date
+   workshop_sensu-assets-smb_1 is up-to-date
+   Recreating workshop_sensu-backend_1 ...
+   Recreating workshop_sensu-backend_1 ... done
+   Recreating workshop_sensuctl_1      ... done
+   Recreating workshop_configurator_1  ... done
+   ```
+
+   If you see `Recreating workshop_sensu-backend_1 ... done`, then you're all set!
 
 ## Sensu Dashboards
 
@@ -391,7 +431,8 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
    Success!
 
 
-[links]: #
+
+<!-- Links -->
 [http-source]: https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source
 [collection]: https://service.sumologic.com/ui/#/collection/collection
 [home]: https://service.sumologic.com/ui/#/home

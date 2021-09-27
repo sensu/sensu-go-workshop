@@ -2,7 +2,10 @@
 
 How to configure your Sumo Logic account for use with Sensu Go.
 
-## HTTP Logs and Metrics Collector
+- [HTTP Logs and Metrics Source](#http-logs-and-metrics-source)
+- [Sensu Dashboards](#sensu-dashboards)
+
+## HTTP Logs and Metrics Source
 
 Follow these instructions to configure a [HTTP Logs and Metrics Source][http-source] for collecting observability data from Sensu.
 
@@ -25,7 +28,7 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
 
 _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["Collection" tab][collection] in Sumo Logic and click "Show URL" next to the `sensu-http` source._
 
-## Dashboards
+## Sensu Dashboards
 
 Follow these instructions to configure a Sensu Overview dashboard (hostmaps), and Sensu Entity Detail dashboard.
 

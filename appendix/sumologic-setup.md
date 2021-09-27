@@ -9,7 +9,7 @@ How to configure your Sumo Logic account for use with Sensu Go.
 
 Follow these instructions to configure a [HTTP Logs and Metrics Source][http-source] for collecting observability data from Sensu.
 
-1. Create a new Hosted Collector.
+1. **Create a new Hosted Collector.**
 
    - Navigate to the ["Collection" tab][collection] in Sumo Logic
    - Click "add collector"
@@ -17,7 +17,7 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
    - Name the hosted collector "sensu"
    - Save the hosted collector
 
-2. Add a Data Source to the Hosted Collector.
+2. **Add a Data Source to the Hosted Collector.**
 
    - When prompted to "add a data source to your new collector", choose "OK"; alternatively, navigate back to the  click "add source" next to your new `sensu` Hosted Collector
    - Select "HTTP Logs & Metrics" under "Cloud APIs"
@@ -32,15 +32,15 @@ _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["C
 
 Follow these instructions to configure a Sensu Overview dashboard (hostmaps), and Sensu Entity Detail dashboard.
 
-1. Navigate to your [Sumo Logic home page][home]
-2. Browse to a folder where you want to import content and choose import
+1. **Navigate to your [Sumo Logic home page][home]**
+2. **Browse to a folder where you want to import content and choose import**
 
    _NOTE: see ["Import Content in the Library"][import] for more information._
 
-3. Name your content "Sensu"
-4. Copy and paste the following JSON configuration into the "Import Content" dialog
+3. **Name your content "Sensu"**
+4. **Copy and paste the following JSON configuration into the "Import Content" dialog**
 
-   **Sensu Dashboards JSON**
+   Sensu Dashboards JSON
 
    <details>
 
@@ -346,8 +346,8 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
    ```
 
    </details>
-5. Click "Import" to import the dashboard
-6. If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser
+5. **Click "Import" to import the dashboard**
+6. **If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser**
 
 
 [links]: #

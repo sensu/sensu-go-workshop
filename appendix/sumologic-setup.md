@@ -13,18 +13,40 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
 
    - Navigate to the ["Collection" tab][collection] in Sumo Logic
    - Click "add collector"
+
+     ![](img/add-collector-02.png)
+
+
    - Choose a "Hosted Collector"
+
+     ![](img/add-collector-03.png)
+
    - Name the hosted collector "sensu"
+
+     ![](img/add-collector-04.png)
+
    - Save the hosted collector
 
 2. **Add a Data Source to the Hosted Collector.**
 
    - When prompted to "add a data source to your new collector", choose "OK"; alternatively, navigate back to the ["Collection" tab][collection] and click "add source" next to your new `sensu` Hosted Collector
+
+     ![](img/add-collector-05.png)
+
    - Select "HTTP Logs & Metrics" under "Cloud APIs"
+
+     ![](img/add-collector-06.png)
+
    - Name the source `sensu-http`
+
+     ![](img/add-collector-07.png)
+
    - Set the source category to `sensu-events`
    - Save the source
    - When prompted, copy the "HTTP Source Address"
+
+     ![](img/add-collector-08.png)
+
 
 _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["Collection" tab][collection] in Sumo Logic and click "Show URL" next to the `sensu-http` source._
 
@@ -33,11 +55,24 @@ _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["C
 Follow these instructions to configure a Sensu Overview dashboard (hostmaps), and Sensu Entity Detail dashboard.
 
 1. **Navigate to your [Sumo Logic home page][home]**
+
 2. **Browse to a folder where you want to import content and choose import**
+
+   Click the options menu.
+
+   ![](img/add-dashboards-00.png)
+
+   Select "Import".
+
+   ![](img/add-dashboards-01.png)
+
 
    _NOTE: see ["Import Content in the Library"][import] for more information._
 
 3. **Name your content "Sensu"**
+
+   ![](img/add-dashboards-02.png)
+
 4. **Copy and paste the following JSON configuration into the "Import Content" dialog**
 
    Sensu Dashboards JSON
@@ -346,8 +381,14 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
    ```
 
    </details>
+
 5. **Click "Import" to import the dashboard**
+
 6. **If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser**
+
+   ![](img/add-dashboards-04.png)
+
+   Success!
 
 
 [links]: #

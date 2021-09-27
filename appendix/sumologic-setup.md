@@ -33,8 +33,10 @@ _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["C
 Follow these instructions to configure a Sensu Overview dashboard (hostmaps), and Sensu Entity Detail dashboard.
 
 1. Navigate to your [Sumo Logic home page][home]
-2. Name your content "Sensu"
-3. Copy and paste the following JSON configuration into the "Import Content" dialog
+2. Browse to a folder where you want to import content and choose import
+   _NOTE: see ["Import Content in the Library"][import] for more information._
+3. Name your content "Sensu"
+4. Copy and paste the following JSON configuration into the "Import Content" dialog
 
    **Sensu Dashboards JSON**
 
@@ -342,11 +344,12 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
    ```
 
    </details>
-4. Click "Import" to import the dashboard
-5. If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser
+5. Click "Import" to import the dashboard
+6. If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser
 
 
 [links]: #
 [http-source]: https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source
 [collection]: https://service.sumologic.com/ui/#/collection/collection
 [home]: https://service.sumologic.com/ui/#/home
+[import]: https://help.sumologic.com/01Start-Here/Library/Export-and-Import-Content-in-the-Library#import-content-in-the-library

@@ -36,6 +36,7 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
    **Sensu Dashboards JSON**
 
    <details>
+
    ```json
    {
      "type": "FolderSyncDefinition",
@@ -336,6 +337,7 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
      ]
    }
    ```
+
    </details>
 4. Click "Import" to import the dashboard
 5. If the new dashboards aren't immediately visible in Sumo Logic, you may need to refresh your browser

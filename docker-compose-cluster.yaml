@@ -21,6 +21,7 @@ services:
     - SENSU_TIMESCALEDB_DSN
     - SENSU_ETCD_CLIENT_URLS
     - SENSU_NO_EMBED_ETCD=true
+    - SUMOLOGIC_HTTP_SOURCE_URL
     volumes:
     - type: volume
       source: sensu_data

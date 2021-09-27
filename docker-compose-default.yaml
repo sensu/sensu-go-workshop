@@ -19,6 +19,7 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_WORKSHOP_ENV_SECRET
+    - SUMOLOGIC_HTTP_SOURCE_URL
     volumes:
     - type: volume
       source: sensu_data

@@ -34,7 +34,9 @@ Follow these instructions to configure a Sensu Overview dashboard (hostmaps), an
 
 1. Navigate to your [Sumo Logic home page][home]
 2. Browse to a folder where you want to import content and choose import
+
    _NOTE: see ["Import Content in the Library"][import] for more information._
+
 3. Name your content "Sensu"
 4. Copy and paste the following JSON configuration into the "Import Content" dialog
 

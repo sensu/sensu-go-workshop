@@ -7,7 +7,7 @@
 - [Using Handlers to Store Observability Data](#using-handlers-to-store-observability-data)
   - [Events and Metrics](#events-and-metrics)
   - [Handler Filters](#handler-filters)
-  - [EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database](#exercise-2-create-a-handler-that-stores-metrics-to-a-time-series-database)
+  - [EXERCISE 2: Create a Handler that Stores Metrics](#exercise-2-create-a-handler-that-stores-metrics)
 - [Discussion](#discussion)
   - [Where Do Handlers Run?](#where-do-handlers-run)
   - [Monitoring as Code and Sensu’s API-based Architecture](#monitoring-as-code-and-sensus-api-based-architecture)
@@ -18,10 +18,10 @@
 
 ## Goals
 
-In this lesson we will introduce Sensu Handlers, and show how to configure an alert handler and a metrics handler. 
+In this lesson we will introduce Sensu Handlers, and show how to configure an alert handler and a metrics handler.
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
-## Handlers 
+## Handlers
 
 Handlers are actions the Sensu backend executes on incoming observability events.
 Handler configurations are one of the most important building blocks within Sensu, because they determine what happens to events that flow through the Sensu pipeline.
@@ -31,10 +31,10 @@ In the following exercises we will configure two handlers; one that send alerts 
 
 ### Pipe Handlers
 
-The most common type of handler is a _pipe handler_. 
-A pipe handler can be any program that accepts event data as JSON input to `STDIN`, even a shell script. 
+The most common type of handler is a _pipe handler_.
+A pipe handler can be any program that accepts event data as JSON input to `STDIN`, even a shell script.
 There are many existing handlers [available in Bonsai][bonsai_handlers].
- 
+
 **Example pipe handler:**
 
 ```yaml
@@ -95,12 +95,12 @@ The handler will send event data to a channel in a [RocketChat] instance.
      - name: ROCKETCHAT_PASSWORD
        secret: rocketchat_password
    ```
-   
+
    > **Understanding the YAML:**
-   > - The asset identifier `sensu/sensu-rocketchat-handler:0.1.0` instructs the backend to download the handler executable from [Bonsai]. 
+   > - The asset identifier `sensu/sensu-rocketchat-handler:0.1.0` instructs the backend to download the handler executable from [Bonsai].
    > - The `--description-template` option uses a [handler template][handler_template_docs] to format the event into a message string.
    > - The handler is configured using environment variables and secrets available to the Sensu backend.
-   
+
 1. **Create the Handler Using the `sensuctl create` Command**
 
    ```shell
@@ -123,19 +123,19 @@ The handler will send event data to a channel in a [RocketChat] instance.
     rocketchat   pipe     10   is_incident           RUN:  sensu-rocketchat-handler                      sensu/sensu-rocketchat-handler:0.1.0
    ```
 
-   Do you see the `rocketchat` handler in the output? 
+   Do you see the `rocketchat` handler in the output?
    If so, you've successfully created your first handler.
 
 ## Using Handlers to Store Observability Data
 
 Sensu is designed to be a pipeline for observability events, but does not store the events directly.
-If you want to keep a historical record of the data, a handler can be used. 
+If you want to keep a historical record of the data, a handler can be used.
 The handler converts incoming events into the required format, then sends it to a database for storage.
 
 ### Events and Metrics
 
-In Sensu, observability data is modelled as [events][events_reference_docs]. 
-Some events contain metrics as part of their payload in the `metrics` property. 
+In Sensu, observability data is modelled as [events][events_reference_docs].
+Some events contain metrics as part of their payload in the `metrics` property.
 Learn more about metrics in the [metrics reference docs](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/#metrics-attribute).
 
 ### Handler Filters
@@ -146,57 +146,75 @@ There are some [built-in filters][builtin_filters_docs] available for common use
 In the exercise below, we will use the built-in filter [`has_metrics`][has_metrics_docs] to ensure that only events with a `metrics` property are processed by the handler.
 
 
-### EXERCISE 2: Create a Handler that Stores Metrics to a Time-Series Database
+### EXERCISE 2: Create a Handler that Stores Metrics
 
 #### Scenario
 
-You want to store metrics data in a time-series database like [Prometheus] or [InfluxDB].
+You want to store metrics and other observability data in a data platform like [Sumo Logic][sumologic], [Prometheus][prometheus], or [InfluxDB].
 
 #### Solution
 
-To accomplish this we will use the [sensu-influxdb-handler][sensu_influxdb_handler].
-The handler sends metrics which are contained in events to an [InfluxDB] instance.
+To accomplish this we will use the [sensu-sumologic-handler][sensu_sumologic_handler].
+The Sumo Logic handlers send metrics and other observability data to your [Sumo Logic][sumologic] account.
 
 #### Steps
 
 1. **Create a YAML file containing the handler configuration.**
 
-   Copy and paste the following contents to a file named `influxdb.yaml`:
+   Copy and paste the following contents to a file named `sumologic.yaml`:
 
    ```yaml
+   ---
    type: Handler
    api_version: core/v2
    metadata:
-     name: influxdb
+     name: sumologic-metrics
    spec:
      type: pipe
      command: >-
-       sensu-influxdb-handler
+       sensu-sumologic-handler
+       --send-metrics
+       --source-host "{{ .Entity.Name }}"
+       --source-name "{{ .Check.Name }}"
      runtime_assets:
-     - sensu/sensu-influxdb-handler:3.5.0
-     timeout: 10
+     - sensu/sensu-sumologic-handler:0.2.0
      secrets:
-     - name: INFLUXDB_ADDR
-       secret: influxdb_addr
-     - name: INFLUXDB_HOST
-       secret: influxdb_host
-     - name: INFLUXDB_PORT
-       secret: influxdb_port
+     - name: SUMOLOGIC_URL
+       secret: sumologic_url
+     timeout: 10
      filters:
      - has_metrics
-     mutator: ""
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: sumologic-events
+   spec:
+     type: pipe
+     command: >-
+       sensu-sumologic-handler
+       --send-log
+       --log-fields "entity={{ .Entity.Name }},namespace={{ .Namespace }}"
+       --source-host "{{ .Entity.Name }}"
+       --source-name "{{ .Check.Name }}"
+       --source-category "sensu-event"
+     runtime_assets:
+     - sensu/sensu-sumologic-handler:0.2.0
+     secrets:
+     - name: SUMOLOGIC_URL
+       secret: sumologic_url
+     timeout: 10
    ```
-   
+
    > **Understanding the YAML:**
-   > - The asset identifier `sensu/sensu-influxdb-handler:3.5.0` instructs the backend to download the handler executable from [Bonsai]. 
+   > - The asset identifier `sensu/sensu-sumologic-handler:0.2.0` instructs the backend to download the handler executable from [Bonsai][bonsai].
    > - The built-in filter [`has_metrics`][has_metrics_docs] is used to ensure that only events with metrics are processed by the handler.
    > - The handler is configured using environment variables and secrets available to the Sensu backend.
-   
 
 1. **Create the Handler Using the `sensuctl create` command.**
 
    ```shell
-   sensuctl create -f influxdb.yaml
+   sensuctl create -f sumologic.yaml
    ```
 
 1. **Verify that the handler was created.**
@@ -205,7 +223,7 @@ The handler sends metrics which are contained in events to an [InfluxDB] instanc
    sensuctl handler list
    ```
 
-   Do you see the `influxdb` handler in the output?
+   Do you see the `sumologic-metrics` handler in the output?
    If so, you've successfully created the handler!
 
 ## Discussion
@@ -215,14 +233,14 @@ You learned how to create a handler using a YAML file, use handler templating to
 
 ### Where Do Handlers Run?
 
-Handlers are part of the [process stage][process_stage_docs] of the [observability pipeline][observability_pipeline_docs]. That means all of this happens on the Sensu backend, running the handlers in the same place where agents and checks send their observability data. 
+Handlers are part of the [process stage][process_stage_docs] of the [observability pipeline][observability_pipeline_docs]. That means all of this happens on the Sensu backend, running the handlers in the same place where agents and checks send their observability data.
 
 ### Monitoring as Code and Sensu's API-based Architecture
 
 Because Sensu is [API-based][sensu_api_docs], we were able to create the handlers remotely, using `sensuctl` to push the desired configuration to the backend via the [Handler API][handler_api_docs].
 
-We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, authoring the handler configurations with YAML files. 
-We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo. 
+We used a [Monitoring as Code][monitoring_as_code_blog_post] workflow, authoring the handler configurations with YAML files.
+We did not need to send any executable code, environment variables, or secrets along with this configuration. This means you can safely store the YAML configuration files in a git repo.
 
 The executables are stored as assets in [Bonsai] (or a private asset server), and the secrets are stored in [Vault].
 The Sensu backend will automatically download them as needed.
@@ -231,7 +249,7 @@ All of this works together to allow you to quickly add, remove, or change handle
 
 ### Sensu Plugin SDK, Templating, and Configuration Overrides
 
-Handlers developed using the [Sensu Plugin SDK][sensu_plugin_sdk] have built-in support for templating using the [Golang `text/template` package][go_template_package]. 
+Handlers developed using the [Sensu Plugin SDK][sensu_plugin_sdk] have built-in support for templating using the [Golang `text/template` package][go_template_package].
 This can be used to merge observability data directly into the output, providing meaningful context and actionable alerts.
 
 For example, an email handler could use an HTML message template that includes information like the status, number of occurences, or a customized playbook link.
@@ -248,8 +266,8 @@ The playbook for responding to this incident is available at https://{{ .Entity.
 
 Another feature of the SDK is the ability to [override handler configuration][sdk_configuration_options_docs] using metadata embedded in the event.
 
-For example, you may want to send certain events to the `#ops` channel in RocketChat. 
-The channel can be specifed in an annotation like `sensu.io/plugins/rocketchat/config/channel` on a per-check basis. 
+For example, you may want to send certain events to the `#ops` channel in RocketChat.
+The channel can be specifed in an annotation like `sensu.io/plugins/rocketchat/config/channel` on a per-check basis.
 
 **Example: Check Configuration Using Annotations to Override Destination Channel**
 
@@ -302,6 +320,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
 [next lesson]: ../05/README.md#readme
 <!-- Product Links -->
+[sumologic]: https://sumologic.com
 [slack]: https://slack.com/
 [rocketchat]: https://rocket.chat/
 [bonsai]: https://bonsai.sensu.io/
@@ -315,6 +334,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [jira]: https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/jira/
 <!-- GitHub Projects -->
 [sensu_rocketchat_handler]: https://github.com/sensu/sensu-rocketchat-handler
+[sensu_sumologic_handler]: https://github.com/sensu/sensu-sumologic-handler
 [sensu_influxdb_handler]: https://github.com/sensu/sensu-influxdb-handler
 [sensu_plugin_sdk]: https://github.com/sensu/sensu-plugin-sdk
 <!-- Sensu Doc Links -->

@@ -20,10 +20,6 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_WORKSHOP_ENV_SECRET
-    - SENSU_INFLUXDB_ADDR
-    - SENSU_INFLUXDB_DB
-    - SENSU_INFLUXDB_USER
-    - SENSU_INFLUXDB_PASSWORD
     volumes:
     - type: volume
       source: sensu_data
@@ -343,7 +339,7 @@ services:
       retries: 6
     command: mongod --smallfiles --oplogSize 128 --replSet rs01
 
-  # Workstation
+  # Sensu CLI
   #
   # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
   # pre-installed in case the trainee workstation is missing a required
@@ -401,7 +397,7 @@ services:
 
   # Configurator
   #
-  # Configuration automation for user profile generation using 
+  # Configuration automation for user profile generation using
   # a super light-weight "configuration management" stack:
   #
   # - curl

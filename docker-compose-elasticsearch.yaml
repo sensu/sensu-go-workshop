@@ -295,7 +295,7 @@ services:
       retries: 6
     command: mongod --smallfiles --oplogSize 128 --replSet rs01
 
-  # Workstation
+  # Sensu CLI
   #
   # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
   # pre-installed in case the trainee workstation is missing a required
@@ -353,7 +353,7 @@ services:
 
   # Configurator
   #
-  # Configuration automation for user profile generation using 
+  # Configuration automation for user profile generation using
   # a super light-weight "configuration management" stack:
   #
   # - curl

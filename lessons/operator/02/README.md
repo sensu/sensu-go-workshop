@@ -11,7 +11,7 @@
 
 ## Goals
 
-In this lesson we will setup a local multi-node Sensu environment for use during the workshop.
+In this lesson we will setup a local Sensu development environment for use during the workshop.
 This lesson is intended for operators of Sensu or anyone who would like to explore Sensu from a technical perspective.
 
 ## Prerequisites
@@ -97,7 +97,7 @@ The `docker-compose-default.yaml` defines the configuration of the following con
 ## How It All Works Together
 
 The basic flow of information in this environment looks something like this:
-- The _agent_ container simulates a web application node, with the Sensu agent running on it. 
+- The _agent_ container simulates an application server, with the Sensu agent running on it.
 - The agent observes the application and generates _events_, which are sent to the _backend_ container.
 - The backend will make decisions about the _event_ based on the user defined configuration.
 
@@ -200,7 +200,7 @@ The installation and configuration is automated for you, so you can start using 
 
       > **TROUBLESHOOTING:**
       > 
-      > If any containers have completed with the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the `sensu-backend` container was slow to start). Re-running the `sudo docker-compose up -d` command will resolve the issue.
+      > If any containers have completed with the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the `sensu-backend` container was slow to start). Re-running the `sudo docker-compose up -d` command will likely resolve the issue.
 
    1. **Check that the Sensu Web UI is Running**
 
@@ -212,8 +212,58 @@ The installation and configuration is automated for you, so you can start using 
       The Rocket.Chat app should be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
       Login with the user `sensu` and password `sensu`.
 
+1. **Configure Environment Variables.** <a name="configure-environment-variables"></a>
 
-**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Rocket.Chat](http://127.0.0.1:5000) apps, then you're ready to start the workshop!
+   The [workshop repository](https://github.com/sensu/sensu-go-workshop) includes platform-specific files that export some environment variables which we will use throughout the workshop.
+   The exercises assume you are in a shell that has these variables configured.
+   
+   When you open a new shell environment, export the variables using one of the following commands:
+
+   **Mac and Linux:**
+
+   ```shell
+   source .envrc
+   ```
+
+   **Windows (PowerShell):**
+
+   ```powershell
+   . .\.envrc.ps1
+   ```
+
+1. **Verify Your Environment.** 
+   
+   The Sensu-specific environment variables are prefixed with `SENSU`. You can verify that you have the Sensu environment variables set up correctly by running one of these commands:
+
+   **Mac and Linux:**
+
+   ```shell
+   env | grep SENSU
+   ```
+
+   **Windows (Powershell):**
+
+   ```powershell
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include a value for `SENSU_VERSION` (i.e. a release version such as `6.2.7`).
+
+   **Example Output:**
+
+   ```shell
+   SENSU_VERSION=6.2.7
+   SENSU_BUILD=4449
+   SENSU_BACKEND_HOST=127.0.0.1
+   SENSU_NAMESPACE=default
+   SENSU_USER=sensu
+   SENSU_PASSWORD=sensu
+   SENSU_BACKEND_URL=ws://127.0.0.1:8081
+   SENSU_API_URL=http://127.0.0.1:8080
+   ```
+
+
+**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Rocket.Chat](http://127.0.0.1:5000) apps, and your environment variables are all set, then you're ready to start the workshop!
 
 ## Discussion
 
@@ -229,6 +279,45 @@ We've collected a short [Troubleshooting Guide](https://github.com/sensu/sensu-g
 
 If you can't find your answer there, please reach out by [filing a GitHub Issue](https://github.com/sensu/sensu-go-workshop/issues) or asking a question in the [Sensu Discourse Forum](https://discourse.sensu.io/).
 
+#### Need to Stop the Workshop Environment and Resume Later?
+
+No problem! The workshop can be stopped without losing your progress by running the following command:
+
+**Mac and Linux Users:**
+
+```
+sudo docker-compose down
+```
+
+**Windows Users (PowerShell):**
+
+```
+docker-compose down
+```
+
+> _**NOTE:** Running `docker-compose down` with the `-v` flag instructs Docker to also remove the container volumes, which will reset the workshop's saved information. This is helpful if you want to start over completely._
+
+When you're ready to start again, just run `docker-compose up -d` again.
+
+#### Viewing Docker Processes and Logs
+
+If you're running into problems, or just curious, you can view the running containers with `docker-compose ps`. 
+You can view the log output for any container with `docker-compose logs <container_name>`.
+
+1. Check that Docker containers are running:
+
+   **All Platforms:**
+   ```shell
+   docker-compose ps 
+   ```
+
+1. View logs for `sensu-backend` container.
+
+   **All Platforms:**
+   ```shell
+   docker-compose logs sensu-backend
+   ```
+
 #### Double Check Your Environment
 
 It's common for trainees to do a few exercises in the workshop, pause, and then come back to it later.
@@ -236,10 +325,17 @@ If you do that, you might need to restart Docker or reload some exported environ
 
 If something's not working right, the first thing to check is that Docker and the workshop containers are running, and that you have the expected environment variables set.
 
-#### Viewing Docker Processes and Logs
+2. Check environment variables:
 
-If you're running into problems, or just curious, you can view the running containers with `docker-compose ps`. 
-You can view the log output for any container with `docker-compose logs <container_name>`.
+   **Mac and Linux:**
+   ```shell
+   env | grep SENSU
+   ```
+
+   **Windows (PowerShell):**
+   ```shell
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
 
 ### The Workshop Repository
 

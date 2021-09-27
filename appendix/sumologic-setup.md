@@ -17,7 +17,6 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
 
      ![](img/add-collector-02.png)
 
-
    - Choose a "Hosted Collector"
 
      ![](img/add-collector-03.png)
@@ -47,7 +46,6 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
    - When prompted, copy the "HTTP Source Address"
 
      ![](img/add-collector-08.png)
-
 
 _NOTE: to retrieve this HTTP Source Address at a later time, navigate to the ["Collection" tab][collection] in Sumo Logic and click "Show URL" next to the `sensu-http` source._
 

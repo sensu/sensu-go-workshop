@@ -19,7 +19,7 @@ Follow these instructions to configure a [HTTP Logs and Metrics Source][http-sou
 
 2. **Add a Data Source to the Hosted Collector.**
 
-   - When prompted to "add a data source to your new collector", choose "OK"; alternatively, navigate back to the  click "add source" next to your new `sensu` Hosted Collector
+   - When prompted to "add a data source to your new collector", choose "OK"; alternatively, navigate back to the ["Collection" tab][collection] and click "add source" next to your new `sensu` Hosted Collector
    - Select "HTTP Logs & Metrics" under "Cloud APIs"
    - Name the source `sensu-http`
    - Set the source category to `sensu-events`

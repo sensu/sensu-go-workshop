@@ -5,20 +5,20 @@
 - [How Does Sensu Work?](#how-does-sensu-work)
   - [Sensu Data Model](#sensu-data-model)
 - [Monitoring As Code](#monitoring-as-code)
-  - [Sensu is an API, Configurations are YAML](#sensu-is-an-api-configurations-are-yaml)
+  - [Sensu is an API, Configurations are Code](#sensu-is-an-api-configurations-are-code)
   - [Bonsai Asset Repository](#bonsai-asset-repository)
 - [Discussion](#discussion)
 - [Learn More](#learn-more)
 - [Next Steps](#next-steps)
 
 ## Goals
-In this lesson we will introduce the Sensu observability pipeline. You will learn about Sensu's architecture, its underlying data model, and how its unique set of features can be used to implement a monitoring-as-code solution.
+In this lesson we will introduce the Sensu observability pipeline. You will learn about Sensu's architecture, its underlying data model, and how its unique set of features can be used to implement a monitoring-as-code workflow within your organization.
 
 This lesson is intended for operators of Sensu, or anyone who would like a short semi-technical introduction to Sensu.
 
 ## Observability Pipeline
 
-There as many approaches to monitoring as there are software applications written. 
+There as many approaches to observability as there are software applications written. 
 Perhaps more. 
 Some are assembled from a mish-mash of glued-together services.
 Others are monolithic commercial platforms that attempt to do everything from polling the kernel, to storing each log line and every millisecond of system metrics, into massive vendor-specific data lakes. 
@@ -42,7 +42,7 @@ Most importantly it uses the same kinds of conditional logic that you do.
 ### Sensu Data Model
 
 Sensu provides an _integrated_ pipeline with a _consistent_ data model. 
-Operating like a control-plane, Sensu gives you a flexible means by which to direct multiple streams of observations and metrics to whatever destination you need them to go, and transforms them into whatever shape they need to be along the way.
+Operating like a [control-plane](https://en.wikipedia.org/wiki/Control_plane), Sensu's [event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) gives you a flexible means by which to direct multiple streams of observations and metrics to whatever destination you need them to go, and transforms them into whatever shape they need to be along the way.
 
 It can do this because every observation in Sensu is contained in a single flexible data structure; the _event_.
 
@@ -58,10 +58,10 @@ It can do this because every observation in Sensu is contained in a single flexi
 }
 ```
 
-Events can contain numeric metrics, dictionaries of metadata, labels, and annotations, as well as any other payload of information that is meaningful to your system.
+Events can contain numeric metrics, key-value metadata, labels, and annotations, as well as any other payload of information that is meaningful to your system.
 Each component in the pipeline expects a stream of events as input and outputs a stream to the next component.
 
-Learn more about the event data structure in the [events reference docs](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/)
+Learn more about the event data structure in the [events reference docs](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/).
 
 ## Monitoring as Code
 
@@ -70,23 +70,25 @@ Collectively these are referred to as "everything-as-code" methods.
 
 Sensu is designed specifically to enable this kind of workflow for monitoring.
 
-### Sensu is an API, Configurations are YAML
+### Sensu is an API, Configurations are Code
 
-The Sensu _backend_ is a service that provides the API and performs event processing.
+The [Sensu _backend_](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/backend/) is a service that provides the API and performs event processing.
 All aspects of the observability pipeline can be modified at runtime through the API. 
-Operators can add new components, modify the behavior of filters and handlers, silence noisy streams of data, or add new database sinks *at any time*, without the need to re-deploy.
+Operators can add new service monitors, modify the behavior of filters and handlers, silence noisy streams of data, or add new data-platform [sinks](https://en.wikipedia.org/wiki/Sink_(computing)) *at any time*, without the need to re-deploy.
 
-Components are defined in YAML files, which are pushed to the API to build the pipeline.
-These YAML files can be stored in source-control alongside your application code, and can be tested, versioned, and managed like any other code file.
+Monitoring configurations are defined in either YAML or JSON files, which are pushed to the API to build the pipeline.
+These configuration files can be stored in source-control alongside your application code, and can be tested, versioned, and managed like any other code file.
 This workflow takes the burden off of system operators, by allowing engineers to self-service their monitoring configurations, with security and access controls at every layer.
 
 To learn more, please check out our [monitoring as code whitepaper](https://sensu.io/resources/whitepaper/monitoring-as-code-with-sensu).
 
-### Bonsai Asset Repository
+### Runtime Assets and the Bonsai Asset Repository
 
-Another essential component of Sensu is the [Bonsai Asset Repository](https://bonsai.sensu.io/).
-This service delivers binary assets directly to the agents and the backend, based on the configurations defined in YAML.
-Operators and developers can focus only on the YAML configuration, without worrying about how to securely deliver new executables to the edge.
+Another essential component of Sensu is the [runtime asset](https://docs.sensu.io/sensu-go/latest/plugins/assets/) – shareable, reusable packages that make it easy to dynamically deploy monitoring plugins.
+
+Sensu hosts a public repository of commercially- and community-supported assets called [Bonsai](https://bonsai.sensu.io).
+This service provides real-time distribution of assets to agents and backends based on the monitoring configuration.
+Operators and developers can stay focused on the monitoring configurations, without worrying about how to securely deliver monitoring plugins to the edge.
 
 There are hundreds of open-source plugins available on Bonsai, supporting nearly every imaginable integration. 
 [Have a look around](https://bonsai.sensu.io/assets)! 
@@ -97,12 +99,12 @@ If what you need isn't already available, the [Sensu Plugin SDK](https://github.
 In this lesson we covered the basics of Sensu's architecture, data model, and monitoring-as-code workflow. 
 The rest of the workshop is a series of hands-on exercises that walk you through some of the essential features of Sensu, in a sandboxed environment.
 
-### All You Have to Think About is `sensuctl` and YAML
+### All You Have to Think About is `sensuctl` and Config Files
 
 The description above might seem somewhat complicated. 
 But the beauty of Sensu is that these features are built into the platform, so you don't have to worry about them. 
 
-As an operator, the majority of your time is spent editing YAML, and running high-level commands from a command-line shell.
+As an operator, the majority of your time interacting with Sensu is spent editing YAML/JSON configs, and running high-level commands from a command-line shell.
 The Sensu user-experience is simple, consistent, and makes it easy to manage complex environments without being overwhelmed with details.
 
 ### How Does this Compare to Your Previous Monitoring System?

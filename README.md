@@ -14,8 +14,8 @@ The Sensu Go Workshop is a collection of learning resources designed to help new
 The project includes the following resources:
 
 1. Interactive lessons designed for self-guided learning
-2. Instructions for Mac, Windows, and Linux workstations
-3. A local sandbox environment for use with the workshop
+2. Detailed instructions for Mac, Windows, and Linux workstations
+3. A local sandbox environment for use with the workshop (via Docker Compose or Vagrant)
 
 Additional workshop materials are also available for advanced use cases, including instructor-led workshops (with multi-tenant sandbox environment), and alternative sandbox environments based on popular Sensu reference architectures (e.g. Sensu w/ [InfluxDB][influxdb], [TimescaleDB][timescaledb], [Elasticsearch][elasticsearch], [Prometheus][prometheus], and more).
 

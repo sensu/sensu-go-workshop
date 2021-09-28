@@ -1,53 +1,66 @@
 # Lesson 6: Introduction to Filters
 
-- [Overview](#overview)
-- [Use Cases](#use-cases)
-- [Filter execution environment & built-in helper functions](#filter-execution-environment--built-in-helper-functions)
-- [Filter plugins](#filter-plugins)
-- [EXERCISE 1: using built-in event filters](#exercise-1-using-built-in-event-filters)
-- [EXERCISE 2: create a custom event filter](#exercise-2-create-a-custom-event-filter)
-- [EXERCISE 3: using custom event filters](#exercise-3-using-custom-event-filters)
-- [Learn more](#learn-more)
-- [Next steps](#next-steps)
+- [Goals](#goals)
+- [Filters and Handlers](#filters-and-handlers)
+- [Sensu Query Expressions (SQEs)](#sensu-query-expressions-sqes)
+- [Built-in Filters and Helper Functions](#built-in-filters-and-helper-functions)
+- [EXERCISE 1: Use a Built-in Filter to Only Alert on Problems](#exercise-1-use-a-built-in-filter-to-only-alert-on-problems)
+- [EXERCISE 2: Create a Custom Filter to Prevent Repeated Alerts](#exercise-2-create-a-custom-filter-to-prevent-repeated-alerts)
+- [EXERCISE 3: Using a Custom Filter in a Handler](#exercise-3-using-a-custom-filter-in-a-handler)
+- [Discussion](#discussion)
+- [Learn More](#learn-more)
+- [Next Steps](#next-steps)
 
-## Overview
+## Goals
 
-Sensu event filters provide control over which events (observability data) get processed by Sensu event handlers.
-Event filters apply various conditions (Sensu Query Expressions, or SQEs) to incoming events in realtime to determine whether they should be "allowed" (inclusive filtering) or "denied" (exlusive filtering).
-Sensu processes all events with a configured event handler by default; in practice this means that almost all event handlers should be configured with one or more event filters to manage which events are allowed through the pipeline.
+In this lesson we will discuss using _filters_ in the observability pipeline. In the hands-on exercises you will use the built-in filters, then create and apply a custom filter. This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
-## Use Cases
+## Filters and Handlers
 
-Sensu event filters provide a realtime detection and analysis engine for the Sensu observability pipeline.
-Some example use cases include:
+Sensu filters provide control over which events get processed by downstream handlers.
+The filter applies conditionals to an event stream in realtime using Sensu Query Expressions (SQEs).
 
-- **Eliminating alert fatigue** by deduplicating incoming events and limiting repeat processing to predefined conditions (e.g. only alert once per hour per incident)
-- **Optimizing metrics processing** by dropping events that do not contain metric data, or sampling metrics to reduce storage costs
-- **Orchestrating event processing** via occurrence filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
-- **Configuring conditional triggers** by evaluating incoming events to determine which event handler to use (e.g. notify developers via RocketChat, but send all incidents assigned to operations via Pagerduty using a handler set and corresponding filters)
+By default, a Sensu handler will process all events sent to it. 
+This is rarely desired behavior, so most handlers will have event filters applied to limit which events it processes.
 
-## Filter execution environment & built-in helper functions
+## Sensu Query Expressions (SQEs)
 
-SQEs are Javascript expressions, executed in a sandboxed EMCAScript 5 Javascript virtual machine.
-SQEs are valid EMCAScript 5 Javascript expression that return either `true` or `false` (all other return values will result in an error).
-SQEs can be as simple as basic comparison operations – "less than" (`<`) or "greater than" (`>`) "equal to" (`==`) or "not equal" (`!=`) – or as complex as small Javascript programs.
-You can even package filter logic as Javascript libraries and import them into the sandbox environment using Dynamic Runtime Assets!
+Filters are written using simple JavaScript, known as [Sensu Query Expressions (SQEs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/sensu-query-expressions/).
+SQEs are EMCAScript 5 expressions that return either `true` or `false`.
 
-_NOTE: Dynamic Runtime Assets are covered in greater detail in [Lesson 10: introduction to Assets](/lessons/operator/10/README.md#readme)._
+SQEs can be as simple as basic comparison operations – "less than" (`<`) or "greater than" (`>`) "equal to" (`==`) or "not equal" (`!=`) – or as complex as small JavaScript programs.
+You can even package filter logic as JavaScript libraries and import them into the sandbox environment using Dynamic Runtime Assets!
 
-Sensu includes built-in event helper functions and event filters to help you customize event pipelines for metrics and alerts, including:
+_NOTE: Dynamic Runtime Assets are covered in greater detail in [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme)._
 
-- **`is_incident` (built-in filter):** only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
-- **`not_silenced` (built-in filter):** prevents processing of events that include the `silenced` attribute.
-- **`has_metrics` (built-in filter):** only process events containing Sensu Metrics.
-- **`hour()` (helper function):** a custom SQE function that returns the hour of a UNIX epoch timestamp in UTC and 24-hour time notation (e.g. `hour(event.timestamp) >= 17`)
-- **`weekday()` (helper function):** a custom SQE function that returns a number that represents the day of the week of a UNIX epoch timestamp (Sunday is `0`; e.g. `weekday(event.timestamp) == 0`)
+## Built-in Filters and Helper Functions
 
-## Filter plugins
+Sensu includes built-in event filters and helper functions to customize event pipelines for metrics and alerts.
 
-TODO (coming soon).
+**Built-In Filters**
 
-## EXERCISE 1: using built-in event filters
+- **`is_incident`:** only process warnings (`"status": 1`), critical (`"status": 2`), other (unknown or custom status), and resolution events.
+- **`not_silenced`:** prevents processing of events that include the `silenced` attribute.
+- **`has_metrics`:** only process events containing Sensu Metrics.
+
+**Helper Functions**
+
+- **`hour()`:** a custom SQE function that returns the hour of a UNIX epoch timestamp in UTC and 24-hour time notation (e.g. `hour(event.timestamp) >= 17`)
+- **`weekday()`:** a custom SQE function that returns a number that represents the day of the week of a UNIX epoch timestamp (Sunday is `0`; e.g. `weekday(event.timestamp) == 0`)
+
+## EXERCISE 1: Use a Built-in Filter to Only Alert on Problems
+### Scenario
+
+You want to reduce the amount of alerts that are going to your chat-ops channel. 
+You'd like to only get ones that indicate there's some kind of problem or possible incident.
+
+### Solution
+
+To accomplish this, we'll put a filter in front of the Rocket.Chat handler.
+We will use the built-in filter `is_incident` on the `rocketchat` handler.
+This filter will only let events be processed by the handler if they have a non-zero exit status.
+
+### Steps
 
 Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme).
 
@@ -60,39 +73,17 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    - is_incident
    ```
 
-1. **Update the handler using `sensuctl create -f`.**
+1. **Update the handler using `sensuctl create`.**
 
    ```shell
    sensuctl create -f rocketchat.yaml
    ```
 
-   Now verify that the handler configuration was updated by viewing the handler using `sensuctl` or the Sensu web app.
+   Now verify that the handler configuration was updated by viewing the handler info.
 
    ```shell
    sensuctl handler info rocketchat --format yaml
    ```
-
-1. **Configure environment variables.**
-
-   Setup the necessary environment variables by running one of the following commands:
-   
-   **Mac and Linux users (`.envrc`):**
-
-   ```shell
-   source .envrc
-   env | grep SENSU
-   ```
-
-   **Windows users (`.envrc.ps1`):**
-
-   ```powershell
-   . .\.envrc.ps1
-   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
-   ```
-
-   The output should include the expected values for `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY`.
-
-   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
 1. **Test the filter.**
 
@@ -101,7 +92,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be filtered:
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -110,7 +101,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -123,7 +114,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be processed:
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -132,7 +123,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -143,23 +134,54 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-   Try running these commands multiple times in different combinations and observing the behavior.
+   Try running these commands multiple times in different combinations and observing the behavior in your local [Rocket.Chat instance](https://127.0.0.1:5000).
+
    The first occurrence of a `"status": 0` event following an active incident is treated as a "resolution" event, and will be processed; but subsequent occurrences of the `"status": 0` event will be filtered.
-   Every occurrence of the `"status": 1` event will be processed, but we wouldn't typically want that to happen (because "alert fatigue"), so let's move on to the next exercise to learn how to modify that behavior.
 
-**NEXT:** If you have have applied the built-in `is_incident` filter and observed it working as described above, then you're ready to move on to the next exercise.
+   Every occurrence of the `"status": 1` event will be processed, but we wouldn't typically want that to happen (because "alert fatigue").
+   Let's move on to the next exercise to learn how to modify that behavior.
 
-## EXERCISE 2: create a custom event filter
+**NEXT:** If you have applied the built-in `is_incident` filter and observed it working as described above, then you're ready to move on to the next exercise.
+
+## EXERCISE 2: Create a Custom Filter to Prevent Repeated Alerts
+### Scenario
+
+After applying the built-in `is_incident` feature, you now notice that during incidents you get repeated error messages in chat.
+You want to reduce the alert fatigue so that you only get one error messages when the incident starts, then get another when it's over.
+
+### Solution
+
+To accomplish this we will write a custom filter using JavaScript.
+Internally, Sensu maintains a counter on events which tracks how many times the event has been triggered.
+We can use that in our filter to let only the first instance of the event through to the handler. 
+
+### Steps
 
 1. **Configure a filter to reduce alert fatigue.**
 
-   The Sensu observability pipeline uses a series of event counters that are quite effective for managing alert frequency.
+   The backend maintains a series of event counters that are effective for managing alert frequency.
    These counters include the `occurrences` counter, and the `occurrences_watermark` counter.
-   The occurrences property is visible in the Sensu web app event detail view (see below for example).
+   The `occurrences` property is visible in the event detail output from a `sensuctl event info` command:
 
-   ![](/docs/img/app-occurrences.png)
+   **Mac and Linux** 
+   
+   ```shell
+   sensuctl event info learn.sensu.io helloworld --format json | grep occurrences
+   ```
 
-   Let's configure a filter template to so that it only processes the first occurrence of an incident, and then again only once every hour.
+   **Windows (PowerShell)**
+   ```powershell
+   sensuctl event info learn.sensu.io helloworld --format json | Select-String "occurrences"
+   ```
+
+   **Example Output:**
+
+   ```json
+   "occurrences": 8,
+   "occurrences_watermark": 8,   
+   ```
+
+   Let's create a filter that only processes the first occurrence of an incident, and then again only once every hour.
 
    Copy the following contents to a file named `filter-repeated.yaml`:
 
@@ -177,7 +199,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    _NOTE: for more information on this filter expression – specifically including the modulo operator (`%`) or "remainder" calculation – please visit the [sensu/catalog project on GitHub](https://github.com/sensu/catalog/blob/main/shared/filters/filter-repeated-hourly.yaml)._
 
-1. **Create the "fitler-repeated" filter using `sensuctl`.**
+1. **Create the `filter-repeated` filter using `sensuctl`.**
 
    ```shell
    sensuctl create -f filter-repeated.yaml
@@ -189,15 +211,33 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    sensuctl filter list
    ```
 
+   **Example Output:**
+   ```
+             Name         Action                                            Expressions
+    ───────────────── ──────── ────────────────────────────────────────────────────────────────────────────────────────────────
+     filter-repeated   allow    (event.check.occurrences == 1 || event.check.occurrences % (3600 / event.check.interval) == 0)
+   ```
    Our custom `filter-repeated` filter is now available to use with handlers!
 
 **NEXT:** If you see your `filter-repeated` filter, you're ready to move on to the next exercise.
 
-## EXERCISE 3: using custom event filters
+## EXERCISE 3: Using a Custom Filter in a Handler
 
-1. **Modify a handler configuration template to use a custom filter.**
+### Scenario
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `rocketchat.yaml`), and update the `filters` field with the following:
+You just created a custom filter and now you want to update your chat handler to use it.
+
+### Solution
+
+Handlers can have multiple filters stacked in order. 
+Combining the built-in `is_incident` filter with the custom `filter-repeated` filter we just made, will result in only the first failure event showing up in chat.
+To add this, we will edit our handler configuration to add `filter-repeated` to the `filters` property.
+
+### Steps
+
+1. **Modify the Rocket.Chat handler configuration to use a custom filter.**
+
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme), `rocketchat.yaml`, and add `filter-repeated` to the `filters` field:
 
    ```yaml
    filters:
@@ -205,39 +245,17 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    - filter-repeated
    ```
 
-1. **Update the handler using `sensuctl create -f`.**
+1. **Update the handler using `sensuctl create`.**
 
    ```shell
    sensuctl create -f rocketchat.yaml
    ```
 
-   Now verify that the handler configuration was updated by viewing the handler using `sensuctl` or the Sensu web app.
+   Now verify that the handler configuration was updated by viewing the handler configration using `sensuctl handler info`
 
    ```shell
    sensuctl handler info rocketchat --format yaml
    ```
-
-1. **Configure environment variables.**
-
-   Setup the necessary environment variables by running one of the following commands:
-
-   **Mac and Linux users (`.envrc`):**
-
-   ```shell
-   source .envrc
-   env | grep SENSU
-   ```
-
-   **Windows users (`.envrc.ps1`):**
-
-   ```powershell
-   . .\.envrc.ps1
-   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
-   ```
-
-   The output should include the expected values for `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY`.
-
-   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
 1. **Test the filter.**
 
@@ -246,7 +264,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be _processed_ (the first occurrence of a critical severity event):
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -255,7 +273,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -268,7 +286,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be _filtered_ (the second occurrence of a critical severity event):
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -277,7 +295,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -290,7 +308,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be _processed_ (the first occurrence of a recovery event):
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -299,7 +317,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -312,7 +330,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
    The following event will be _filtered_ (a repeat occurrence of a healthy event):
 
-   **Mac and Linux users:**
+   **Mac and Linux:**
 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
@@ -321,7 +339,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    Invoke-RestMethod `
@@ -333,12 +351,33 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```
 
    Try running these commands multiple times in different combinations and observing the behavior.
-   The `is_incident` and an occurrence-based filter like `filter-repeated` work very well together for reducing alert fatigue (i.e. with alert and incident management handlers).
-   These few examples are just a small preview of Sensu's flexible filtering system, which makes it easy to customize how and when observability events will be processed by the observability pipeline.
+   The `is_incident` and an occurrence-based filter like `filter-repeated` work very well together for reducing alert fatigue.
 
 **NEXT:** if you have successfully applied your filter and observed it working as described above, then you're ready to move on to the next lesson!
 
-## Learn more
+## Discussion
+
+In this lesson we learned how to apply filters to control the behavior of handlers. 
+We also learned how to solve complex problems by authoring custom filters using JavaScript expressions.
+
+These examples demonstrate Sensu's flexible filtering system, which allows you to customize how and when events will be processed by the Sensu pipeline.
+
+### Use Cases
+
+Event filters provide a real-time detection and analysis engine for the Sensu observability pipeline.
+
+Some example use cases include:
+
+- **Reduce alert fatigue** by deduplicating incoming events and limiting repeat processing (e.g. only alert once per hour per incident)
+- **Optimize metrics processing** by dropping empty events, or sampling metrics to reduce storage costs
+- **Orchestrate remediations** via [_occurrence_](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/#occurrences-and-occurrences-watermark) filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
+- **Configure conditional triggers** by determining which event handler to use (e.g. notify developers via Rocket.Chat, but send all incidents assigned to operations to Pagerduty)
+
+### Filter Execution Environment
+
+The expressions are executed in a sandboxed EMCAScript 5 compatible JavaScript virtual machine called [Otto](https://github.com/robertkrimen/otto).
+
+## Learn More
 
 - [[Documentation] "Event Filters Overview" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/)
 - [[Documentation] "Event Filters Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/)
@@ -353,8 +392,12 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 - [[Blog Post] "Alert fatigue, part 4: alert consolidation" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-4-alert-consolidation)
 - [[Blog Post] "Alert fatigue, part 5: fine-tuning & silencing" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-5-fine-tuning-silencing)
 
-## Next steps
+## Next Steps
 
 [Share your feedback on Lesson 06](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-06&title=Lesson%2006%20Feedback)
 
 [Lesson 7: Introduction to Agents & Entities](../07/README.md#readme)
+
+[setup_workshop]: ../02/README.md#readme
+
+

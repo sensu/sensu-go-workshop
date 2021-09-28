@@ -1,144 +1,21 @@
-# Sensu Go Workshop
+# Customizing the Workshop
 
-- [Setup](#setup)
-  - [Self-guided workshop setup](#self-guided-workshop-setup)
-- [References](#references)
-  - [Workshop contents](#workshop-contents)
-  - [Customization](#customization)
+- [Workshop Settings](#workshop-settings)
+- [Sensu Backend Settings](#sensu-backend-settings)
+- [Sensu Agent Settings](#sensu-agent-settings)
+- [Sensu CLI Settings](#sensu-cli-settings)
+- [Vault Settings](#vault-settings)
+- [Etcd Settings](#etcd-settings)
+- [Postgres Settings](#postgres-settings)
+- [Nginx Settings](#nginx-settings)
+- [Grafana Settings](#grafana-settings)
+- [InfluxDB Settings](#influxdb-settings)
+- [TimescaleDB Settings](#timescaledb-settings)
+- [Prometheus Settings](#prometheus-settings)
 
-## Setup
+## Workshop Settings
 
-### Self-guided workshop setup
-
-1. **Prerequisites.**
-
-   The Sensu Go Workshop was designed with modern IT operations, DevOps, and SRE tooling in mind, so we would expect that most users should already have everything they need to complete the workshop.
-   In general, any laptop or other workstation with a `git` client, Docker, text editor, and a modern web browser will work great.
-   Please note the following details for more information:
-
-    1. **Workstation**.
-       Workshop users will need a workstation running a recent version of MacOS, Windows, or Linux to participate in this workshop.
-    1. **Docker.**
-       - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
-       - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
-       - Linux users should following the [Docker CE installation guide](https://docs.docker.com/install/) instructions.
-	  1. **Docker Compose (`docker-compose`).**
-       Please refer to the ["Install Docker Compose"](https://docs.docker.com/compose/install/) documentation for more information.
-    1. **Git client (`git`).**
-       Please refer to the [`git` downloads](https://git-scm.com/downloads) page for more information.
-    1. **Supported web browser.**
-       The Sensu Go web app is supported on the latest versions of Chrome, Safari, Firefox, and the Microsoft Edge browser.
-    1. **Compatible text editor.**
-       This workshop requires creation and editing of various configuration files and monitoring code templates.
-       Trainees are encouraged to use a featureful text editor such as [Microsoft Visual Studio Code](https://visualstudio.microsoft.com), [Atom](https://atom.io), or [Sublime Text](https://www.sublimetext.com) (or if you're a `vim` or `emacs` fan, that's fine too).
-       _NOTE: Windows users should avoid using Notepad.exe which can save edited files in incompatible encodings for use with Sensu Go._
-    1. **Optional CLI tools.**
-       The workshop may include examples using certain CLI utilties that trainees may wish to install for convenience (though not required):
-       - `jq` ([website](https://stedolan.github.io/jq/), [downloads](https://stedolan.github.io/jq/download/)).
-
-1. **Clone this repository.**
-
-   ```shell
-   git clone https://github.com/sensu/sensu-go-workshop.git
-   cd sensu-go-workshop/
-   ```
-
-   _NOTE: if you are following instructions in a non-default branch of the workshop you may also need to change branches using a command like `git checkout <branch-name>`._
-
-1. **Configure secrets.**
-
-   This workshop environment includes a Hashicorp Vault server running in ["dev server mode"](https://www.vaultproject.io/docs/concepts/dev-server).
-   To configure the Vault secrets that you'll need access to during the workshop (e.g. Pagerduty API Token and Slack Webhook URL), please modify the files in `/config/vault/secrets`.
-   Additional secrets may be added to Vault by creating JSON files in `/config/vault/secrets` (e.g. `/config/vault/secrets/servicenow.json`), but corresponding Sensu Secrets will need to be configured in order to make these secrets available in Sensu.
-
-1. **Docker Compose initialization.**
-
-   Deploy the workshop environment with the `docker-compose up` command!
-
-   ```shell
-   sudo docker-compose up -d
-   ```
-
-   The output should look like this:
-
-   ```shell
-   Creating network "workshop_default" with the default driver
-   Creating volume "workshop_sensuctl_data" with local driver
-   Creating volume "workshop_sensu_data" with local driver
-   Creating volume "workshop_timescaledb_data" with local driver
-   Creating volume "workshop_grafana_data" with local driver
-   Creating volume "workshop_artifactory_data" with local driver
-   Creating workshop_vault_1         ... done
-   Creating workshop_grafana_1       ... done
-   Creating workshop_sensuctl_1      ... done
-   Creating workshop_sensu-backend_1 ... done
-   Creating workshop_artifactory_1   ... done
-   Creating workshop_timescaledb_1   ... done
-   Creating workshop_sensu-agent_1   ... done
-   Creating workshop_configurator_1  ... done
-   ```
-
-   > **PROTIP:** To prefetch and/or prebuild the workshop container images (e.g. for offline use), please run the following commands:
-   >
-   > ```shell
-   > sudo docker-compose pull && sudo docker-compose build
-   > ```
-
-   > _NOTE: the first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images, this process shouldn't take more than 2-3 minutes, depending on your system._
-
-3. **Verify your workshop installation.**
-
-   ```shell
-   sudo docker-compose ps
-   ```
-
-   The output should indicate that all of the services are `Up (healthy)` or "completed" (`Exit 0`).
-
-   ```shell
-                Name                        Command                       State                                                         Ports
-   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   workshop_configurator_1    seed-workshop-resources          Exit 0
-   workshop_grafana_1         /run.sh                          Up (healthy)            0.0.0.0:3001->3000/tcp
-   workshop_influxdb_1        /entrypoint.sh influxd           Up (healthy)            0.0.0.0:8086->8086/tcp
-   workshop_sensu-agent_1     sensu-agent start --log-le ...   Up (healthy)            2379/tcp, 2380/tcp, 3000/tcp, 0.0.0.0:49221->3031/tcp, 8080/tcp, 8081/tcp, 0.0.0.0:49220->8125/udp
-   workshop_sensu-backend_1   sensu-backend start --log- ...   Up (healthy)            2379/tcp, 2380/tcp, 0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp, 0.0.0.0:8081->8081/tcp
-   workshop_sensuctl_1        wait-for-sensu-backend sen ...   Exit 0
-   workshop_vault_1           docker-entrypoint.sh vault ...   Up (healthy)            0.0.0.0:8200->8200/tcp
-   ```
-
-   > _NOTE: every container should show a status of `Up (healthy)` or `Exit 0`; if any containers have the status `Up` or `Up (health: starting)`, please wait a few seconds and retry the `sudo docker-compose ps` command.
-   > If any containers have completed with the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the sensu-backend container was slow to start) and re-running the `sudo docker-compose up -d` command will resolve the issue._
-
-**NEXT:** if all of the containers show a `Up (healthy)` or `Exit 0` state, then you're ready to start the workshop!
-
-## References
-
-### Workshop contents
-
-1. A Docker Compose environment file (`.env`) for customizing the workshop environment
-
-2. A `docker-compose.yaml` for provisioning a simple Sensu Go workshop environment, including:
-
-   - A Sensu Go backend, API, and dashboard (`sensu-backend`)
-   - A Sensu Go agent (`sensu-agent`)
-   - A telemetry stack, including:
-     - InfluxDB for storage
-     - Grafana for visualization
-   - A Vault server, for secrets management
-
-   Coming soon:
-
-   - A Vagrantfile wrapper to run the workshop in a VM
-   - Deployment templates for [AWS Fargate](https://www.docker.com/blog/from-docker-straight-to-aws/)
-   - Alternate reference architectures (e.g. Elasticsearch or Splunk for metric storage instead of Timescale)
-
-3. Configuration files for all components of the workshop environment
-
-4. Dockerfiles templates for building custom Sensu Docker images
-
-### Customization
-
-Please note the following configuration parameters:
+Please note the following `.env` file configuration parameters for the Workshop:
 
 - `WORKSHOP_SENSU_VERSION`
 
@@ -164,6 +41,10 @@ Please note the following configuration parameters:
 
   The Docker Compose template to use; defaults to `docker-compose-default.yaml`.
   Change this value to deploy an alternate workshop environment (e.g. using a different reference architecture).
+
+## Sensu Backend Settings
+
+Please note the following `.env` file configuration parameters for the Sensu backend:
 
 - `SENSU_BACKEND_VERSION`
 
@@ -222,6 +103,10 @@ Please note the following configuration parameters:
   This variable is used for configuring a Sensu Secret with the `env` provider.
   Modifying this value may break certain exercises, so proceed with caution when making changes.
 
+## Sensu Agent Settings
+
+Please note the following `.env` file configuration parameters for the Sensu Agent:
+
 - `SENSU_AGENT_VERSION`
 
   The Sensu Agent (`sensu-agent`) version to use.
@@ -275,6 +160,10 @@ Please note the following configuration parameters:
   This variable is used for configuring Sensu Agents in the workshop environment.
   Modifying this value may break certain exercises, so proceed with caution when making changes.
 
+## Sensu CLI Settings
+
+Please note the following `.env` file configuration parameters for `sensuctl`:
+
 - `SENSU_CLI_VERSION`
 
   The Sensu CLI (`sensuctl`) version to use.
@@ -306,68 +195,9 @@ Please note the following configuration parameters:
   This environment variable is not yet supported by `sensuctl`, but may be in a future release.
   In the interim, setting this variable is useful in the context of custom `sensuctl` wrapper scripts (see `/scripts/sensuctl`) or for passing on the command line (e.g. `sensuctl --config-dir $SENSU_CONFIG_DIR`).
 
-- `GRAFANA_VERSION`
+## Vault Settings
 
-  The Grafana Docker image version to use in the workshop (default: `7.0.0`).
-
-- `GF_AUTH_BASIC_ENABLED`
-
-  Enables Grafana basic auth.
-  See the [Grafana User Authentication documentation](https://grafana.com/docs/grafana/latest/auth/overview/#basic-authentication) for more information.
-
-- `GF_SECURITY_ADMIN_USER`
-
-  The default admin username.
-  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
-
-- `GF_SECURITY_ADMIN_PASSWORD`
-
-  The default admin password.
-  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
-
-- `PROM_PROMETHEUS_VERSION`
-
-  The Prometheus Docker image version to use in the workshop environment (default: `v2.20.0`).
-  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
-
-- `PROM_PUSHGATEWAY_VERSION`
-
-  The Prometheus Pushgateway Docker image version to use in the workshop environment (default: `v1.2.0`).
-  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
-
-- `TIMESCALEDB_VERSION`
-
-  The TimescaleDB Docker image version to use in the workshop environment (default: `1.7.2-pg12`).
-
-- `POSTGRES_PASSWORD`
-
-  The TimescaleDB Postgres database password (for the default `postgres` user).
-
-- `POSTGRES_DB`
-
-  The TimescaleDB Postgres database to connect to.
-  If omitted, the default database will be `postgres`.
-  If a database name is provided for a database that does not exist, it will be created.
-
-- `INFLUXDB_VERSION`
-
-  ==TODO==
-
-- `INFLUXDB_VERSION`
-
-  ==TODO==
-
-- `INFLUXDB_DB`
-
-  ==TODO==
-
-- `INFLUXDB_ADMIN_USER`
-
-  ==TODO==
-
-- `INFLUXDB_ADMIN_PASSWORD`
-
-  ==TODO==
+Please note the following `.env` file configuration parameters for Hashicorp Vault:
 
 - `VAULT_VERSION`
 
@@ -393,13 +223,9 @@ Please note the following configuration parameters:
 
   ==TODO==
 
-- `ARTIFACTORY_VERSION`
+## Etcd Settings
 
-  ==TODO==
-
-- `JFROG_HOME`
-
-  ==TODO==
+Please note the following `.env` file configuration parameters for Etcd:
 
 - `ETCD_VERSION`
 
@@ -413,10 +239,110 @@ Please note the following configuration parameters:
 
   ==TODO==
 
+## Postgres Settings
+
+Please note the following `.env` file configuration parameters for Postgres (only used when `COMPOSE_PROJECT_NAME=docker-compose-cluster.yaml`):
+
 - `POSTGRES_VERSION`
 
   ==TODO==
 
+- `POSTGRES_USER`
+
+  ==TODO==
+
+- `POSTGRES_PASSWORD`
+
+  ==TODO==
+
+- `POSTGRES_DB`
+
+  ==TODO==
+
+## Nginx Settings
+
+Please note the following `.env` file configuration parameters for Nginx (used for hosting Sensu Assets, and an example service to monitor):
+
 - `NGINX_VERSION`
 
   ==TODO==
+
+## Grafana Settings
+
+Please note the following `.env` file configuration parameters for Grafana (not used when `COMPOSE_FILE=docker-compose-default.yaml` or `COMPOSE_FILE=docker-compose-cluster.yaml`):
+
+- `GRAFANA_VERSION`
+
+  The Grafana Docker image version to use in the workshop (default: `7.0.0`).
+
+- `GF_AUTH_BASIC_ENABLED`
+
+  Enables Grafana basic auth.
+  See the [Grafana User Authentication documentation](https://grafana.com/docs/grafana/latest/auth/overview/#basic-authentication) for more information.
+
+- `GF_SECURITY_ADMIN_USER`
+
+  The default admin username.
+  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
+
+- `GF_SECURITY_ADMIN_PASSWORD`
+
+  The default admin password.
+  See the [Grafana Configuration documentation](https://grafana.com/docs/grafana/latest/administration/configuration/) for more information.
+
+## InfluxDB Settings
+
+Please note the following `.env` file configuration parameters for InfluxDB (only used when `COMPOSE_FILE=docker-compose-influxdb.yaml`):
+
+- `INFLUXDB_VERSION`
+
+  ==TODO==
+
+- `INFLUXDB_VERSION`
+
+  ==TODO==
+
+- `INFLUXDB_DB`
+
+  ==TODO==
+
+- `INFLUXDB_ADMIN_USER`
+
+  ==TODO==
+
+- `INFLUXDB_ADMIN_PASSWORD`
+
+  ==TODO==
+
+## Prometheus Settings
+
+Please note the following `.env` file configuration parameters for Prometheus (only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`):
+
+- `PROM_PROMETHEUS_VERSION`
+
+  The Prometheus Docker image version to use in the workshop environment (default: `v2.20.0`).
+  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
+
+- `PROM_PUSHGATEWAY_VERSION`
+
+  The Prometheus Pushgateway Docker image version to use in the workshop environment (default: `v1.2.0`).
+  Only used when `COMPOSE_FILE=docker-compose-prometheus.yaml`.
+
+## TimescaleDB Settings
+
+Please note the following `.env` file configuration parameters for TimescaleDB (only used when `COMPOSE_FILE=docker-compose-timescaledb.yaml`):
+
+- `TIMESCALEDB_VERSION`
+
+  The TimescaleDB Docker image version to use in the workshop environment (default: `1.7.2-pg12`).
+
+- `POSTGRES_PASSWORD`
+
+  The TimescaleDB Postgres database password (for the default `postgres` user).
+
+- `POSTGRES_DB`
+
+  The TimescaleDB Postgres database to connect to.
+  If omitted, the default database will be `postgres`.
+  If a database name is provided for a database that does not exist, it will be created.
+

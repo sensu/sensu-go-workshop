@@ -681,7 +681,7 @@ For those who prefer a browser-based user experience, the Sensu Web App can perf
 
 [Lesson 4: Introduction to Handlers](../04/README.md#readme)
 
-[setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+[setup_workshop]: ../02/README.md#readme
 [fhs_usr_local_docs]: https://www.pathname.com/fhs/pub/fhs-2.3.html#USRLOCALLOCALHIERARCHY
 [sensuctl_global_flags_docs]: https://docs.sensu.io/sensu-go/latest/sensuctl/#global-flags
 [api_key_docs]: https://docs.sensu.io/sensu-go/latest/operations/control-access/use-apikeys/

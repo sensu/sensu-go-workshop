@@ -21,7 +21,7 @@ services:
     - SENSU_TIMESCALEDB_DSN
     - SENSU_ETCD_CLIENT_URLS
     - SENSU_NO_EMBED_ETCD=true
-    - SENSU_PAGERDUTY_TOKEN
+    - SUMOLOGIC_HTTP_SOURCE_URL
     volumes:
     - type: volume
       source: sensu_data
@@ -255,73 +255,6 @@ services:
       retries: 6
     command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
 
-  # InfluxDB
-  #
-  # Includes the InfluxDB time-series database for storage of telemetry data.
-  #
-  # See: https://docs.influxdata.com/influxdb/
-  influxdb:
-    image: influxdb:${INFLUXDB_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-    labels:
-    - io.sensu.role=data-platform
-    ports:
-    - 8086:8086
-    environment:
-    - INFLUXDB_DB
-    - INFLUXDB_ADMIN_USER
-    - INFLUXDB_ADMIN_PASSWORD
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:8086/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
-    volumes:
-    - type: volume
-      source: influxdb_data
-      target: /var/lib/influxdb
-    command: influxd
-
-  # Grafana
-  #
-  # Includes Grafana dashboard and datasource configuration files for
-  # Timescaledb.
-  #
-  # See: https://grafana.com/docs/grafana/latest/
-  grafana:
-    image: grafana/grafana:${GRAFANA_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-    labels:
-    - io.sensu.role=dashboards
-    ports:
-    - 3001:3000
-    environment:
-    - POSTGRES_PASSWORD
-    - GF_AUTH_BASIC_ENABLED
-    - GF_SECURITY_ADMIN_USER
-    - GF_SECURITY_ADMIN_PASSWORD
-    volumes:
-    - type: bind
-      source: ./config/grafana/provisioning
-      target: /etc/grafana/provisioning
-    - type: bind
-      source: ./config/grafana/dashboards/timescaledb
-      target: /etc/grafana/dashboards
-    - type: volume
-      source: grafana_data
-      target: /var/lib/grafana
-    healthcheck:
-      test: wget -q -O- http://127.0.0.1:3000/api/health
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
   # Vault
   #
   # Includes a Vault "devmode" server for secrets management.
@@ -412,7 +345,7 @@ services:
       retries: 6
     command: mongod --smallfiles --oplogSize 128 --replSet rs01
 
-  # Workstation
+  # Sensu CLI
   #
   # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
   # pre-installed in case the trainee workstation is missing a required
@@ -473,7 +406,7 @@ services:
 
   # Configurator
   #
-  # Configuration automation for user profile generation using 
+  # Configuration automation for user profile generation using
   # a super light-weight "configuration management" stack:
   #
   # - curl

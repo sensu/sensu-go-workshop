@@ -19,6 +19,10 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_WORKSHOP_ENV_SECRET
+    - SENSU_INFLUXDB_ADDR
+    - SENSU_INFLUXDB_DB
+    - SENSU_INFLUXDB_USER
+    - SENSU_INFLUXDB_PASSWORD
     volumes:
     - type: volume
       source: sensu_data
@@ -68,7 +72,7 @@ services:
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
-      --statsd-event-handlers elasticsearch
+      --statsd-event-handlers influxdb
       --password ${SENSU_AGENT_PASSWORD}
 
   # Sensu Asset Server
@@ -131,56 +135,36 @@ services:
       retries: 6
     command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
 
-  # Elasticsearch
+  # InfluxDB
   #
-  # Includes Elasticsearch data platform for storage of event and
-  # metric data.
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+  # Includes the InfluxDB time-series database for storage of telemetry data.
+  #
+  # See: https://docs.influxdata.com/influxdb/
+  influxdb:
+    image: influxdb:${INFLUXDB_VERSION}
     labels:
     - io.sensu.role=data-platform
     ports:
-    - 9200:9200
-    - 9300:9300
+    - 8086:8086
     environment:
-    - "discovery.type=single-node"
+    - INFLUXDB_DB
+    - INFLUXDB_ADMIN_USER
+    - INFLUXDB_ADMIN_PASSWORD
     volumes:
     - type: volume
-      source: elasticsearch_data
-      target: /data
+      source: influxdb_data
+      target: /var/lib/influxdb
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:9200/_cluster/health
+      test: wget -q -O- http://127.0.0.1:8086/health
       interval: 10s
       timeout: 5s
       retries: 6
-
-  # Kibana
-  #
-  # Includes the Kibana web app for operating Elasticsearch and visualizing
-  # Elasticsearch data.
-  kibana:
-    image: docker.elastic.co/kibana/kibana:${KIBANA_VERSION}
-    depends_on:
-    - elasticsearch
-    labels:
-    - io.sensu.role=dashboards
-    ports:
-    - 5601:5601
-    environment: []
-    volumes:
-    - type: bind
-      source: ./config/elasticsearch/kibana.yml
-      target: /usr/share/kibana/config/kibana.yml
-    healthcheck:
-      test: curl -i http://127.0.0.1:5601/api/status
-      interval: 10s
-      timeout: 5s
-      retries: 6
+    command: influxd
 
   # Grafana
   #
   # Includes Grafana dashboard and datasource configuration files for
-  # InfluxDB, TimescaleDB, and Elasticsarch.
+  # Timescaledb.
   #
   # See: https://grafana.com/docs/grafana/latest/
   grafana:
@@ -214,6 +198,8 @@ services:
   # Vault
   #
   # Includes a Vault "devmode" server for secrets management.
+  #
+  # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
     labels:
@@ -353,7 +339,7 @@ services:
 
   # Configurator
   #
-  # Configuration automation for user profile generation using
+  # Configuration automation for user profile generation, using
   # a super light-weight "configuration management" stack:
   #
   # - curl
@@ -454,4 +440,3 @@ volumes:
     driver: local
   rocketchat_data:
     driver: local
-

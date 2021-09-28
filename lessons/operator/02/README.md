@@ -70,8 +70,7 @@ Please review this list of prerequisites to make sure your system is ready to go
 To fully demonstrate Sensu's capabilities, it is necessary to have a multi-node environment.
 This workshop includes a set of containerized components that represent a simplified Sensu-enabled monitoring environment.
 
-<!-- TODO:  Diagram of Workshop Environment -->
-[![](https://via.placeholder.com/800x250.png?text=TODO:+Insert+Workshop+Diagram+Here+(Issue+62))](https://github.com/sensu/sensu-go-workshop/issues/62)
+![](img/architecture.png)
 
 ### The Docker Configuration
 

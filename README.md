@@ -1,7 +1,6 @@
 # Sensu Go Workshop
 
 - [Overview](#overview)
-- [Setup](#setup)
 - [Lessons](#lessons)
   - [Operator Workshop](#operator-workshop)
   - [Developer Workshop](#developer-workshop)
@@ -11,27 +10,30 @@
 
 ## Overview
 
-The workshop lessons included with this project are designed to help new Sensu users learn the basic concepts of an [Observability Pipeline](#) and help them get started with Sensu Go.
+The Sensu Go Workshop is a collection of learning resources designed to help new users learn Sensu.
+The project includes the following resources:
 
-This project has been designed for self-guided learning.
-It's easy to deploy the workshop environment on a laptop for personal use.
-See [SETUP.md](/SETUP.md#readme) for more information on setting up the workshop environment.
+1. Interactive lessons designed for self-guided learning
+2. Instructions for Mac, Windows, and Linux workstations
+3. A local sandbox environment for use with the workshop
 
-## Setup
-
-This workshop is designed to be simple enough for self-guided training.
-See [SETUP.md](/SETUP.md#readme) for more details on setting up the workshop environment.
-
-Once you have deployed a workshop environment, you may proceed with the following local workstation setup instructions which will help you install the Sensu Go CLI (`sensuctl`) and connect to your workshop environment.
+Additional workshop materials are also available for advanced use cases, including instructor-led workshops (with multi-tenant sandbox environment), and alternative sandbox environments based on popular Sensu reference architectures (e.g. Sensu w/ [InfluxDB][influxdb], [TimescaleDB][timescaledb], [Elasticsearch][elasticsearch], [Prometheus][prometheus], and more).
 
 ## Lessons
 
+The Sensu Go Workshop aims to provide learning resources for every Sensu user, including:
+
+- **Operators** and other end-users who rely on Sensu for infrastructure and application monitoring.
+- **Developers** and other engineers who want to build integrations using Sensu APIs.
+
+See below for the complete list of lesson plans.
+
 ### Operator Workshop
 
-- [Lesson 01: Introduction to Monitoring as Code](/lessons/operator/01/README.md#readme)
-- [Lesson 02: Introduction to the Observability Data Model](/lessons/operator/02/README.md#readme)
-- [Lesson 03: Introduction to Sensu Go](/lessons/operator/03/README.md#readme)
-- [Lesson 04: Introduction to Handlers & Handler Sets](/lessons/operator/04/README.md#readme)
+- [Lesson 01: Introduction to Sensu](/lessons/operator/01/README.md#readme)
+- [Lesson 02: Setup the Workshop Environment](/lessons/operator/02/README.md#readme)
+- [Lesson 03: Using the Sensu CLI](/lessons/operator/03/README.md#readme)
+- [Lesson 04: Introduction to Handlers](/lessons/operator/04/README.md#readme)
 - [Lesson 05: Introduction to Events](/lessons/operator/05/README.md#readme)
 - [Lesson 06: Introduction to Filters](/lessons/operator/06/README.md#readme)
 - [Lesson 07: Introduction to Agents & Entities](/lessons/operator/07/README.md#readme)
@@ -83,8 +85,8 @@ When it arrives it will cover the following topics:
 
 ## Next Steps
 
-We hope you enjoyed this workshop and found it helpful for learning more about Sensu Go!
-At this point we have covered Sensu's most common concepts, which should give you a much better sense for how Sensu works – but we've only really just scratched the surface.
+We hope you enjoy this workshop and find it helpful for learning more about Sensu!
+At this point we have covered Sensu's most common concepts, which should give you a much better sense for how Sensu works – but we've barely scratched the surface.
 If you're interest in learning more, pleaes consider the following resources:
 
 ### Join the Sensu Community
@@ -104,19 +106,8 @@ The [Sensu GitHub org](https://github.com/sensu) is home to a number of open sou
 - [sensu/check-plugin-template](https://github.com/sensu/check-plugin-template)
 - Last but not least: [sensu/sensu-go](https://github.com/sensu/sensu-go) (_the_ Sensu Go OSS project)
 
-[0-2]: https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensuctl
-[0-3]: https://docs.sensu.io/sensu-go/latest/
-[0-4]: https://docs.sensu.io/sensu-go/latest/reference/apikeys/
-
-[1-1]: https://docs.sensu.io/sensu-go/latest/reference/handlers/
-[1-2]: https://docs.sensu.io/sensu-go/latest/api/events/
-[1-3]: https://docs.sensu.io/sensu-go/latest/reference/entities/
-[1-4]: https://https://docs.sensu.io/sensu-go/latest/api/entities/
-[1-5]: https://docs.sensu.io/sensu-go/latest/reference/filters/
-
-[2-1]: https://docs.sensu.io/sensu-go/latest/reference/agent/
-[2-2]: https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api
-[2-3]: https://docs.sensu.io/sensu-go/latest/reference/checks/
-[2-4]: https://docs.sensu.io/sensu-go/latest/reference/events/
-[2-5]: https://en.wikipedia.org/wiki/Standard_streams
-
+<!-- Links -->
+[influxdb]: docker-compose-influx.yaml
+[timescaledb]: docker-compose-timescaledb.yaml
+[elasticsearch]: docker-compose-elasticsearch.yaml
+[prometheus]: docker-compose-prometheus.yaml

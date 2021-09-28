@@ -1,4 +1,5 @@
 # Lesson 3: Using the Sensu CLI
+
 - [Goals](#goals)
 - [The `sensuctl` Command Line Interface (CLI)](#the-sensuctl-command-line-interface-cli)
    - [EXERCISE 1: Install the `sensuctl` CLI](#exercise-1-install-the-sensuctl-cli)
@@ -24,7 +25,7 @@ This lesson is intended for operators of Sensu and assumes you have [set up a lo
 
 ## The `sensuctl` Command Line Interface (CLI)
 
-The `sensuctl` CLI, short for _Sensu Control_, gives you full control of your Sensu pipeline from a command-line environment. 
+The `sensuctl` CLI, short for _Sensu Control_, gives you full control of your Sensu pipeline from a command-line environment.
 You can use `sensuctl` interactively in a shell, or script it as part of an automated solution.
 
 The `sensuctl` tool is available for Linux, macOS, and Windows.
@@ -46,7 +47,7 @@ First, we will configure some helpful environment variables, download the `sensu
 
    The [workshop repository](https://github.com/sensu/sensu-go-workshop) includes platform-specific files that export some environment variables which we will use throughout the workshop.
    The exercises assume you are in a shell that has these variables configured.
-   
+
    When you open a new shell environment, export the variables using one of the following commands:
 
    **Mac and Linux:**
@@ -61,8 +62,8 @@ First, we will configure some helpful environment variables, download the `sensu
    . .\.envrc.ps1
    ```
 
-1. **Verify Your Environment.** 
-   
+1. **Verify Your Environment.**
+
    The Sensu-specific environment variables are prefixed with `SENSU`. You can verify that you have the Sensu environment variables set up correctly by running one of these commands:
 
    **Mac and Linux:**
@@ -106,10 +107,10 @@ First, we will configure some helpful environment variables, download the `sensu
    **Linux:**
 
    ```shell
-   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" 
-   tar -xzf "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" -C /usr/local/bin/ 
+   curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz"
+   tar -xzf "sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz" -C /usr/local/bin/
    ```
- 
+
    **Windows (Powershell):**
 
    ```powershell
@@ -122,8 +123,8 @@ First, we will configure some helpful environment variables, download the `sensu
    ${Env:Path} += ";${Env:UserProfile}\Sensu\bin"
    ```
 
-   > **NOTE:** On Unix-like systems `/usr/local/bin` is the [standard location for binaries shared between multiple users][fhs_usr_local_docs]. 
-   > On macOS, the default permissions for `/usr/local/bin` require the used of `sudo`. 
+   > **NOTE:** On Unix-like systems `/usr/local/bin` is the [standard location for binaries shared between multiple users][fhs_usr_local_docs].
+   > On macOS, the default permissions for `/usr/local/bin` require the used of `sudo`.
    > However, any location that is on your `$PATH` will work (i.e. `~/bin`).
    > On Windows systems we create a new location specifically for Sensu, then add it to the path.
 
@@ -131,7 +132,7 @@ First, we will configure some helpful environment variables, download the `sensu
 
 ### Sensu is an API
 
-Sensu has an [API-based][sensu_api_docs] architecture. 
+Sensu has an [API-based][sensu_api_docs] architecture.
 Everything that happens on the platform is done by interacting with one or more APIs.
 The primary function of `sensuctl` is to manage Sensu resources.
 It does this by calling Sensu's API to create, read, update, and delete (CRUD) resources like _events_, _checks_, and _handlers_.
@@ -139,7 +140,7 @@ It does this by calling Sensu's API to create, read, update, and delete (CRUD) r
 Since `sensuctl` is an API client, it requires some configuration settings to get started.
 
 #### Sensu Backend Url
-Sensu's API is provided by a _backend_. 
+Sensu's API is provided by a _backend_.
 The backend URL is the adress and port of the backend you want to manage.
 
 For this workshop, we will be using the URL `http://127.0.0.1:8080`.
@@ -194,12 +195,12 @@ This interactive command will prompt you for all the necessary configuration var
    - **Preferred output format:** `tabular`
    - **Username:** `sensu`
    - **Password:** `sensu`
-   
- 
+
+
 1. **Verify the `sensuctl` Configuration.**
 
    You should now have successfully configured `sensuctl`.
- 
+
    To confirm, run a `sensuctl` command to verify the configuration:
 
    ```shell
@@ -219,10 +220,10 @@ This interactive command will prompt you for all the necessary configuration var
    ```
 > **PROTIP:** Certain `sensuctl` commands support a _non-interactive_ mode.
 > This is helpful when using `sensuctl` in an automated context like a CI/CD pipeline.
-> 
+>
 > For example, the `sensuctl configure` command can be run non-interactively using the `-n` option.
-> 
-> 
+>
+>
 > **Example:** Non-interactive use of `sensuctl configure`
 >
 > ```shell
@@ -236,7 +237,7 @@ This interactive command will prompt you for all the necessary configuration var
 
 ## API Keys
 
-Another way to authenticate requests is to use an [api key][api_key_docs]. 
+Another way to authenticate requests is to use an [api key][api_key_docs].
 API keys allow automated components access to the API without the need for usernames and passwords.
 
 Many of the exercises in this workshop will require an API key, so let's create one now.
@@ -245,7 +246,7 @@ Many of the exercises in this workshop will require an API key, so let's create 
 
 #### Scenario
 
-You want to use tools like `curl` and `sensuctl` to create and manage resources, but you prefer to use [revocable API keys](https://medium.com/swlh/api-keys-whats-the-point-8f58d7966f9) instead of usernames and passwords. 
+You want to use tools like `curl` and `sensuctl` to create and manage resources, but you prefer to use [revocable API keys](https://medium.com/swlh/api-keys-whats-the-point-8f58d7966f9) instead of usernames and passwords.
 
 #### Solution
 
@@ -257,7 +258,7 @@ This key can also be used with any `sensuctl` command by adding the [`--api-key`
 
 1. **Create an API Key Using the `sensuctl api-key grant` Command.**
 
-   API keys are user-specfic, so we need to specify the user. 
+   API keys are user-specfic, so we need to specify the user.
    This key will be created for the `sensu` user.
 
    ```shell
@@ -273,11 +274,11 @@ This key can also be used with any `sensuctl` command by adding the [`--api-key`
 1. **Save the API Key in the `SENSU_API_KEY` Environment Variable.**
 
    For this workshop, we want to save the API key in an environment variable for use in future exercises.
-   
+
    1. Copy the `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` part of the output onto the clipboard (without the `/api/core/v2/apikeys/` portion).
-   
+
    1. Modify the `.envrc` or `.envrc.ps1`, replacing the value for `SENSU_API_KEY` with the key we just copied, then uncomment the line.
-   
+
       When complete, your file should have a line like this:
 
       **Mac and Linux users (`.envrc`):**
@@ -291,7 +292,7 @@ This key can also be used with any `sensuctl` command by adding the [`--api-key`
       ```powershell
       ${Env:SENSU_API_KEY}="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       ```
-   
+
 1. **Reload the Environment Variables.**
 
    **Mac and Linux:**
@@ -309,7 +310,7 @@ This key can also be used with any `sensuctl` command by adding the [`--api-key`
 1. Verify that the `SENSU_API_KEY` environment variable is set:
 
    **Mac and Linux:**
- 
+
    ```shell
    echo $SENSU_API_KEY
    ```
@@ -331,16 +332,16 @@ This key can also be used with any `sensuctl` command by adding the [`--api-key`
 
 ## Listing and Viewing Resources
 
-One of the common uses of `sensuctl` is to list and view resources like namespaces, users, and entities. 
+One of the common uses of `sensuctl` is to list and view resources like namespaces, users, and entities.
 
 ### EXERCISE 4: List Sensu Resources
 #### Scenario
 
-You want to explore the resources under management by Sensu. 
+You want to explore the resources under management by Sensu.
 
 #### Solution
 
-To see a list, use the `sensuctl <resource_type> list` command pattern. 
+To see a list, use the `sensuctl <resource_type> list` command pattern.
 The `list` subcommand is available for nearly all resources, including common resources like namespaces, users, and entities.
 
 #### Steps
@@ -350,7 +351,7 @@ The `list` subcommand is available for nearly all resources, including common re
    ```shell
    sensuctl namespace list
    ```
-   
+
    **Example Output:**
    ```shell
       Name
@@ -363,7 +364,7 @@ The `list` subcommand is available for nearly all resources, including common re
    ```shell
    sensuctl user list
    ```
-   
+
    **Example Output:**
    ```shell
      Username           Groups            Enabled
@@ -391,8 +392,8 @@ You also want to automate some tasks based on that list, but need some detailed 
 
 #### Solution
 
-To view a list of nodes, use the `sensuctl entity list` command. 
-Individual node information can be viewed using the `sensuctl entity info <entity_id>` command. 
+To view a list of nodes, use the `sensuctl entity list` command.
+Individual node information can be viewed using the `sensuctl entity info <entity_id>` command.
 In automated scenarios, adding the `--format json` option will output the information in JSON format.
 
 #### Steps
@@ -403,7 +404,7 @@ In automated scenarios, adding the `--format json` option will output the inform
    ```shell
    sensuctl entity list
    ```
- 
+
    **Example Output:**
    ```shell
               ID         Class      OS                       Subscriptions                              Last Seen
@@ -412,7 +413,7 @@ In automated scenarios, adding the `--format json` option will output the inform
      learn.sensu.io   proxy   Workshop   entity:learn.sensu.io                             N/A
 
    ```
-  
+
 1. **Show Detailed Entity Information.**
 
    To get detailed information about an entity, run `sensuctl entity info <entity_id>`.
@@ -434,13 +435,13 @@ In automated scenarios, adding the `--format json` option will output the inform
    Platform Family:        Training
    Platform Version:       6.2.7
    Auto-Deregistration:    true
-   Deregistration Handler: 
+   Deregistration Handler:
    ```
 
 1. **Output Entity Information in JSON Format.**
 
    Entity information is commonly used in automation scenarios, such as scripts or CI/CD workflows.
-   In those situations it you may wish to output this information in a structured format like JSON. 
+   In those situations it you may wish to output this information in a structured format like JSON.
 
    ```shell
    sensuctl entity info learn.sensu.io --format json
@@ -516,10 +517,10 @@ The `sensuctl` monitoring-as-code workflow manages resource configurations using
 Managing resources follows these basic steps:
 1. Resource configurations are defined in a YAML or JSON file.
 2. The `sensuctl create` command reads the resource configuration from the file, then pushes that configuration to the backend API where the resource is created.
-3. The file can then be saved to a file within a source code repository. 
+3. The file can then be saved to a file within a source code repository.
 4. Later, the file can be modified and `sensuctl create` is used to update the resource.
 
-You can also use the `sensuctl dump` command to export a resource to a file, or add the `--format` option to a `sensuctl entity info` command to output the resource in a structured format. 
+You can also use the `sensuctl dump` command to export a resource to a file, or add the `--format` option to a `sensuctl entity info` command to output the resource in a structured format.
 
 These features together enable Sensu's _monitoring-as-code_ workflow.
 
@@ -530,13 +531,13 @@ You have an entity in a running Sensu environment but don't have a YAML file tha
 
 #### Solution
 
-To accomplish this, we will use the `sensuctl entity info` command with the `--format yaml` option to output an existing resource to YAML. 
+To accomplish this, we will use the `sensuctl entity info` command with the `--format yaml` option to output an existing resource to YAML.
 Once we have that YAML file, we can modify the configuration, then update the resource configuration using `sensuctl create`.
 
 #### Steps
 1. **Export an Entity Configuration in YAML Format.**
 
-   Use the `sensuctl entity info` command with the `--format yaml` option. 
+   Use the `sensuctl entity info` command with the `--format yaml` option.
    Pipe the output to a file named `entity.yaml`.
 
    ```shell
@@ -589,7 +590,7 @@ Once we have that YAML file, we can modify the configuration, then update the re
 1. **Modify the Resource Configuration.**
 
    Using a text editor, change the `subscriptions` list, adding a new item `workshop-test`.
-   
+
    **Example:** `entity.yaml`
    ```yaml
    type: Entity
@@ -609,14 +610,14 @@ Once we have that YAML file, we can modify the configuration, then update the re
        subscriptions:
        - entity:learn.sensu.ioi
        - workshop-test
-       system:     
+       system:
    [..clipped..]
    ```
-   
+
 1. **Update the Running Resource Configuration.**
 
-   Update the running entity configuration using `sensuctl create`. 
-   The `-f` option specifies the YAML file to read from. 
+   Update the running entity configuration using `sensuctl create`.
+   The `-f` option specifies the YAML file to read from.
 
    If the specified resource doesn't exist, the `sensuctl create` command will _create_ it.
    However, if it already exists, the command will _update_ it.
@@ -661,7 +662,7 @@ At the core of these operations is the [Sensu API][sensu_api_docs]. In fact, `se
 
 Sensu's API-based design is key to enabling monitoring-as-code workflows, and allows for extensive customization via scripting and automation.
 
-### Sensu Web App 
+### Sensu Web App
 
 For those who prefer a browser-based user experience, the Sensu Web App can perform many of the same tasks. It interacts with the same APIs and gives you some powerful visualization and exploration tools. Learn more about the Sensu Web App in Lesson X.
 

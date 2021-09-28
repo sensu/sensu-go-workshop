@@ -17,7 +17,9 @@ The project includes the following resources:
 2. Detailed instructions for Mac, Windows, and Linux workstations
 3. A local sandbox environment for use with the workshop (via Docker Compose or Vagrant)
 
-Additional workshop materials are also available for advanced use cases, including instructor-led workshops (with multi-tenant sandbox environment), and alternative sandbox environments based on popular Sensu reference architectures (e.g. Sensu w/ [InfluxDB][influxdb], [TimescaleDB][timescaledb], [Elasticsearch][elasticsearch], [Prometheus][prometheus], and more).
+Additional workshop materials are also available for advanced use cases, including instructor-led workshops with multi-tenant sandbox environment, and alternative sandbox environments based on popular Sensu reference architectures (e.g. Sensu w/ [InfluxDB][influxdb], [TimescaleDB][timescaledb], [Elasticsearch][elasticsearch], and [Prometheus][prometheus]).
+
+> _NOTE: the Sensu Go Workshop is under active development, so check back often for new content and other improvements, including videos (coming Q4'21)!_
 
 ## Lessons
 

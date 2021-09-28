@@ -297,7 +297,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [Lesson 5: Introduction to Events][next lesson]
 
 <!-- Other lessons -->
-[setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+[setup_workshop]: ../04/README.md#readme
 [next lesson]: ../05/README.md#readme
 <!-- Product Links -->
 [sumologic]: https://sumologic.com

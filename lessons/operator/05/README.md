@@ -419,6 +419,6 @@ Entities and proxy entities are covered in more detail in [Lesson 7: introductio
 [Lesson 6: Introduction to Filters](../06/README.md#readme)
 
 
-[setup_workshop]: https://github.com/sensu/sensu-go-workshop/blob/latest/SETUP.md
+[setup_workshop]: ../02/README.md#readme
 [events_api_docs]: https://docs.sensu.io/sensu-go/latest/api/events/
 

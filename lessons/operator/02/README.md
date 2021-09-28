@@ -1,4 +1,4 @@
-# Lesson 2: Setup the Workshop Sandbox
+# Lesson 2: Setup the Workshop Environment
 
 - [Goals](#goals)
 - [Prerequisites](#prerequisites)
@@ -16,7 +16,7 @@ This lesson is intended for operators of Sensu or anyone who would like to explo
 
 ## Prerequisites
 
-This workshop was designed with common IT/DevOps/SRE tooling in mind, so we expect most users will already have everything they need installed. 
+This workshop was designed with common IT/DevOps/SRE tooling in mind, so we expect most users will already have everything they need installed.
 All you need to get started is a laptop or workstation with a `git` client, [Docker](https://www.docker.com/), text editor, and a modern web browser.
 
 Please review this list of prerequisites to make sure your system is ready to go:
@@ -24,7 +24,7 @@ Please review this list of prerequisites to make sure your system is ready to go
 1. **Workstation**
 
    Workshop users will need a 64-bit workstation running a recent version of **macOS, Windows, or Linux**.
- 
+
 1. **Docker**
    - Mac users should install [Docker CE Desktop for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac).
    - Windows users should install [Docker CE Desktop for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows).
@@ -37,16 +37,16 @@ Please review this list of prerequisites to make sure your system is ready to go
 1. **Git Client (`git`)**
 
    To install `git`, please read the [`git` downloads](https://git-scm.com/downloads) page.
-   
+
 1. **Supported Web Browser**
 
-   The workshop expects that you have a modern web browser installed. 
+   The workshop expects that you have a modern web browser installed.
    Please verify that you have a recent version of one of these common browsers:
    - [Chrome](https://www.google.com/chrome/fast-and-secure/)
    - [Safari](https://support.apple.com/en-us/HT204416)
    - [Firefox](https://www.mozilla.org/en-US/firefox/new/)
    - [Microsoft Edge](https://www.microsoft.com/en-us/edge)
-   
+
 1. **Compatible Text Editor**
 
    This workshop involves creating and editing plain-text configuration files and monitoring code templates.
@@ -56,9 +56,9 @@ Please review this list of prerequisites to make sure your system is ready to go
    - [Sublime Text](https://www.sublimetext.com)
    - [`vim`](https://www.vim.org/download.php)
    - [`emacs`](https://www.gnu.org/software/emacs/download.html)
-   
+
    _NOTE: Windows users should avoid using `Notepad.exe` which can save edited files in incompatible encodings._
-   
+
 1. **Optional CLI Tools**
 
    The workshop includes examples using some optional CLI utilties:
@@ -76,7 +76,7 @@ This workshop includes a set of containerized components that represent a simpli
 ### The Docker Configuration
 
 We are using `docker-compose` to automate setting up the local workshop environment.
-The containers are configured by a variety of environment variables, defined in the `.env` file included in the [workshop repo](https://github.com/sensu/sensu-go-workshop). 
+The containers are configured by a variety of environment variables, defined in the `.env` file included in the [workshop repo](https://github.com/sensu/sensu-go-workshop).
 
 
 The `docker-compose-default.yaml` defines the configuration of the following containers:
@@ -103,7 +103,7 @@ The basic flow of information in this environment looks something like this:
 
 Depending on the configuration, and the details of the event, the backend may raise _alerts_ which are sent to _Rocket.Chat_, or send _events_ containing _metrics_ to _InfluxDb_ to be recorded. The _Grafana_ dashboard visualizes the metrics stored in InfluxDB.
 
-Access to these third-party services requires authentication. 
+Access to these third-party services requires authentication.
 Secrets are securely delivered through _HashiCorp Vault_ directly to the backend.
 
 The _configurator_ runs only during the initial setup of the workshop, to wire everything together and apply the configuration.
@@ -118,7 +118,7 @@ You want to mimic a production Sensu environment, so that you can experiment wit
 
 To accomplish this, we will setup a local sandbox environment using `docker-compose`.
 Each component will be created within a container running on your local machine.
-The installation and configuration is automated for you, so you can start using Sensu right away. 
+The installation and configuration is automated for you, so you can start using Sensu right away.
 
 ### Steps
 > **BEFORE YOU START:** Make sure that you've looked over all the [prerequisites](#prerequisites), and that Docker is running.
@@ -135,7 +135,7 @@ The installation and configuration is automated for you, so you can start using 
    Create the workshop environment with the `docker-compose up` command.
 
    **Mac and Linux**:
-   
+
    ```shell
    sudo docker-compose up -d
    ```
@@ -145,7 +145,7 @@ The installation and configuration is automated for you, so you can start using 
    docker-compose up -d
    ```
 
-   > **NOTE:** On Linux/macOS `sudo` is required because Docker runs as root. 
+   > **NOTE:** On Linux/macOS `sudo` is required because Docker runs as root.
    > If you'd like to configure Docker to not need `sudo`, read the [Manage Docker as a non-root user](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) documentation.
 
    **Example Output:**
@@ -167,12 +167,12 @@ The installation and configuration is automated for you, so you can start using 
    Creating workshop_configurator_1  ... done
    ```
 
-   > **NOTE:** The first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images. 
+   > **NOTE:** The first time you run the `docker-compose up` command you will likely see output related to the pulling and building of the workshop container images.
    > This process shouldn't take more than 2-3 minutes, depending on your system.
 
 1. **Verify Your Workshop Installation.**
 
-   1. **Verify the Docker Containers are Running.** 
+   1. **Verify the Docker Containers are Running.**
 
       ```shell
       sudo docker-compose ps
@@ -195,18 +195,18 @@ The installation and configuration is automated for you, so you can start using 
       ```
 
       Every container should show a status of `Up (healthy)` or `Exit 0`.
-      
+
       If any containers have the status `Up` or `Up (health: starting)`, wait a few seconds then retry the `sudo docker-compose ps` command.
 
       > **TROUBLESHOOTING:**
-      > 
+      >
       > If any containers have completed with the `Exit 1` or `Exit 2` state, it's possible that these were the result of an intermittent failure (e.g. if the `sensu-backend` container was slow to start). Re-running the `sudo docker-compose up -d` command will likely resolve the issue.
 
    1. **Check that the Sensu Web UI is Running**
 
       The Sensu Web UI should be available at [http://127.0.0.1:3000](http://127.0.0.1:3000).
       Login with the user `sensu` and password `sensu`.
-   
+
    1. **Check that Rocket.Chat is Running**
 
       The Rocket.Chat app should be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
@@ -216,7 +216,7 @@ The installation and configuration is automated for you, so you can start using 
 
    The [workshop repository](https://github.com/sensu/sensu-go-workshop) includes platform-specific files that export some environment variables which we will use throughout the workshop.
    The exercises assume you are in a shell that has these variables configured.
-   
+
    When you open a new shell environment, export the variables using one of the following commands:
 
    **Mac and Linux:**
@@ -231,8 +231,8 @@ The installation and configuration is automated for you, so you can start using 
    . .\.envrc.ps1
    ```
 
-1. **Verify Your Environment.** 
-   
+1. **Verify Your Environment.**
+
    The Sensu-specific environment variables are prefixed with `SENSU`. You can verify that you have the Sensu environment variables set up correctly by running one of these commands:
 
    **Mac and Linux:**
@@ -267,14 +267,14 @@ The installation and configuration is automated for you, so you can start using 
 
 ## Discussion
 
-In this lesson you installed a local sandbox environment, and verified that it was up and running. 
+In this lesson you installed a local sandbox environment, and verified that it was up and running.
 You learned about the various components of a Sensu-enabled monitoring environment and how they work together.
 
-In the following lessons, we will install the `sensuctl` command-line tool, and learn how to do some essential tasks via hands-on exercises using this environment. 
+In the following lessons, we will install the `sensuctl` command-line tool, and learn how to do some essential tasks via hands-on exercises using this environment.
 
 ### Troubleshooting Guide
 
-Most users have no problems setting up and running the workshop, but sometimes issues do come up. 
+Most users have no problems setting up and running the workshop, but sometimes issues do come up.
 We've collected a short [Troubleshooting Guide](https://github.com/sensu/sensu-go-workshop/blob/latest/TROUBLESHOOTING.md) with answers to the most common issues.
 
 If you can't find your answer there, please reach out by [filing a GitHub Issue](https://github.com/sensu/sensu-go-workshop/issues) or asking a question in the [Sensu Discourse Forum](https://discourse.sensu.io/).
@@ -301,14 +301,14 @@ When you're ready to start again, just run `docker-compose up -d` again.
 
 #### Viewing Docker Processes and Logs
 
-If you're running into problems, or just curious, you can view the running containers with `docker-compose ps`. 
+If you're running into problems, or just curious, you can view the running containers with `docker-compose ps`.
 You can view the log output for any container with `docker-compose logs <container_name>`.
 
 1. Check that Docker containers are running:
 
    **All Platforms:**
    ```shell
-   docker-compose ps 
+   docker-compose ps
    ```
 
 1. View logs for `sensu-backend` container.
@@ -340,9 +340,9 @@ If something's not working right, the first thing to check is that Docker and th
 ### The Workshop Repository
 
 Feel free to have a look around the [`sensu-go-workshop` GitHub repository](https://github.com/sensu/sensu-go-workshop).
-You can find the [Docker configuration files](https://github.com/sensu/sensu-go-workshop/blob/latest/docker-compose-default.yaml) used to setup this sandbox, all the [lessons in Markdown format](https://github.com/sensu/sensu-go-workshop/tree/latest/lessons/operator), and much more. 
+You can find the [Docker configuration files](https://github.com/sensu/sensu-go-workshop/blob/latest/docker-compose-default.yaml) used to setup this sandbox, all the [lessons in Markdown format](https://github.com/sensu/sensu-go-workshop/tree/latest/lessons/operator), and much more.
 
-We are constantly evolving the workshop, so you may run across some interesting work-in-progress modules. 
+We are constantly evolving the workshop, so you may run across some interesting work-in-progress modules.
 As usual, we welcome contributions of all kinds!
 
 ## Learn More

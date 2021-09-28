@@ -233,7 +233,7 @@ services:
     - 5000:5000
     environment:
     - PORT=5000
-    - ROOT_URL=http://localhost:5000
+    - ROOT_URL=http://0.0.0.0:5000
     - MONGO_URL=mongodb://mongo:27017/rocketchat
     - MONGO_OPLOG_URL=mongodb://mongo:27017/local
     - ADMIN_USERNAME=$ROCKETCHAT_ADMIN_USER

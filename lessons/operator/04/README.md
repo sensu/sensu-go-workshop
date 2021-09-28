@@ -150,12 +150,12 @@ In the exercise below, we will use the built-in filter [`has_metrics`][has_metri
 
 #### Scenario
 
-You want to store metrics and other observability data in a data platform like [Sumo Logic][sumologic], [Prometheus][prometheus], or [InfluxDB].
+You want to store metrics in a data platform like [Sumo Logic][sumologic], [Prometheus][prometheus], or [InfluxDB].
 
 #### Solution
 
 To accomplish this we will use the [sensu-sumologic-handler][sensu_sumologic_handler].
-The Sumo Logic handlers send metrics and other observability data to your [Sumo Logic][sumologic] account.
+The Sumo Logic handlers send metrics to your [Sumo Logic][sumologic] account.
 
 #### Steps
 
@@ -184,26 +184,6 @@ The Sumo Logic handlers send metrics and other observability data to your [Sumo 
      timeout: 10
      filters:
      - has_metrics
-   ---
-   type: Handler
-   api_version: core/v2
-   metadata:
-     name: sumologic-events
-   spec:
-     type: pipe
-     command: >-
-       sensu-sumologic-handler
-       --send-log
-       --log-fields "entity={{ .Entity.Name }},namespace={{ .Namespace }}"
-       --source-host "{{ .Entity.Name }}"
-       --source-name "{{ .Check.Name }}"
-       --source-category "sensu-event"
-     runtime_assets:
-     - sensu/sensu-sumologic-handler:0.2.0
-     secrets:
-     - name: SUMOLOGIC_URL
-       secret: sumologic_url
-     timeout: 10
    ```
 
    > **Understanding the YAML:**

@@ -167,10 +167,15 @@ services:
     ports:
     - 5432
     environment:
-    - POSTGRES_PASSWORD
     - POSTGRES_USER
+    - POSTGRES_PASSWORD
     - POSTGRES_DB
     - PGDATA=/var/lib/postgresql/data
+    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - APP_DB_USERNAME
+    - APP_DB_PASSWORD
+    - APP_DB_NAME
     volumes:
     - type: bind
       source: ./config/postgres/postgresql.conf
@@ -182,10 +187,38 @@ services:
       source: postgres_data
       target: /var/lib/postgresql/data
     healthcheck:
-      test: pg_isready -U postgres
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
       interval: 10s
       timeout: 5s
       retries: 6
+
+  # Demo App
+  #
+  # See: https://github.com/portertech/demo-app
+  app:
+    image: portertech/demo-app:latest
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    labels:
+    - io.sensu.role=sensu-agent
+    ports:
+    - 8080/tcp
+    environment:
+    - DB_HOST=${APP_DB_HOST}
+    - DB_PORT=${APP_DB_PORT}
+    - DB_USER=${APP_DB_USERNAME}
+    - DB_PASS=${APP_DB_PASSWORD}
+    - DB_NAME=${APP_DB_NAME}
+    volumes: []
+    healthcheck:
+      test: curl -XGET -I http://127.0.0.1:8080/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: >-
+      /usr/bin/demo-app
 
   # Sensu Asset Server
   #

@@ -1,526 +1,155 @@
-# Lesson 7: Introduction to Agents & Entities
-
-- [Overview](#overview)
-- [Agent configuration](#agent-configuration)
-- [Keepalives](#keepalives)
-- [Subscriptions](#subscriptions)
-- [Agent entities](#agent-entities)
-- [Entity management](#entity-management)
-- [Advanced topics](#advanced-topics)
-  - [Proxy Entities](#proxy-entities)
-  - [Entity Lifecycle Hooks](#entity-lifecycle-hooks)
-  - [Agent Events API & event socket](#agent-events-api--event-socket)
-  - [StatsD API](#statsd-api)
-  - [Platform detection](#platform-detection)
-  - [Command allow list](#command-allow-list)
-- [EXERCISE 1: register a proxy entity](#exercise-1-register-a-proxy-entity)
-- [EXERCISE 2: install and start your first agent](#exercise-2-install-and-start-your-first-agent)
-- [EXERCISE 3: customize agent and entity configuration](#exercise-3-customize-agent-and-entity-configuration)
-- [Learn more](#learn-more)
-- [Next steps](#next-steps)
-
-## Overview
-
-The Sensu Agent is a lightweight observability client that runs on your infrastructure.
-Sensu Agents are represented in the Sensu API as [Sensu Entities](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/).
-The primary function of the Sensu Agent is to generate events (observability data) for processing in the Sensu observability pipeline.
-
-Sensu Entities are API resources that represent anything from a server, compute instance, container/pod, connected device (IoT gateways and devices), network device, application, or even a function.
-Valid Sensu Entities must have an `entity_class`, the most common of which are "agent" and "proxy" – a generic entity class designation for any resource that is not actively under management by a Sensu Agent.
-
-## Agent Configuration
-
-The Sensu Agent is distributed as a single statically compiled binary (`sensu-agent`), typically installed via installer packages or Docker containers.
-All Sensu configuration is loaded at `sensu-agent` start time, so the agent must be restarted to update the configuration.
-The Sensu Agent can be configured via command flags (e.g. `sensu-agent start --backend-url`), a config file (see below for example), or environment variables (e.g. `SENSU_BACKEND_URL`).
-If configuration values are set in multiple places, the `sensu-agent` will apply configuration in the following order:
-
-1. Configuration flags (highest)
-2. Environment variables
-3. Configuration files
-4. Default values, if any (lowest)
-
-<details>
-<summary><strong>Example <code>sensu-agent start --help</code> configuration flags:</strong></summary>
-
-```
-start the sensu agent
-
-Usage:
-  sensu-agent start [flags]
-
-Flags:
-      --agent-managed-entity                  manage this entity via the agent
-      --allow-list string                     path to agent execution allow list configuration file
-      --annotations stringToString            entity annotations map (default [])
-      --api-host string                       address to bind the Sensu client HTTP API to (default "127.0.0.1")
-      --api-port int                          port the Sensu client HTTP API listens on (default 3031)
-      --assets-burst-limit int                asset fetch burst limit (default 100)
-      --assets-rate-limit float               maximum number of assets fetched per second
-      --backend-handshake-timeout int         number of seconds the agent should wait when negotiating a new WebSocket connection (default 15)
-      --backend-heartbeat-interval int        interval at which the agent should send heartbeats to the backend (default 30)
-      --backend-heartbeat-timeout int         number of seconds the agent should wait for a response to a hearbeat (default 45)
-      --backend-url strings                   ws/wss URL of Sensu backend server (to specify multiple backends use this flag multiple times) (default [ws://127.0.0.1:8081])
-      --cache-dir string                      path to store cached data (default "/var/cache/sensu/sensu-agent")
-      --cert-file string                      TLS certificate in PEM format
-  -c, --config-file string                    path to sensu-agent config file
-      --deregister                            ephemeral agent
-      --deregistration-handler string         deregistration handler that should process the entity deregistration event.
-      --detect-cloud-provider                 enable cloud provider detection mechanisms
-      --disable-assets                        disable check assets on this agent
-      --disable-api                           disable the Agent HTTP API
-      --disable-sockets                       disable the Agent TCP and UDP event sockets
-      --discover-processes                    indicates whether process discovery should be enabled
-      --events-burst-limit                    /events api burst limit
-      --events-rate-limit                     maximum number of events transmitted to the backend through the /events api
-  -h, --help                                  help for start
-      --insecure-skip-tls-verify              skip ssl verification
-      --keepalive-critical-timeout uint32     number of seconds until agent is considered dead by backend to create a critical event (default 0)
-      --keepalive-handlers string             comma-delimited list of keepalive handlers for this entity. This flag can also be invoked multiple times
-      --keepalive-interval uint32             number of seconds to send between keepalive events (default 20)
-      --keepalive-warning-timeout uint32      number of seconds until agent is considered dead by backend to create a warning event (default 120)
-      --key-file string                       TLS certificate key in PEM format
-      --labels stringToString                 entity labels map (default [])
-      --log-level string                      logging level [panic, fatal, error, warn, info, debug] (default "info")
-      --name string                           agent name (defaults to hostname) (default "my-hostname")
-      --namespace string                      agent namespace (default "default")
-      --password string                       agent password (default "P@ssw0rd!")
-      --redact string                         comma-delimited customized list of fields to redact
-      --require-fips                          indicates whether fips support should be required in openssl
-      --require-openssl                       indicates whether openssl should be required instead of go's built-in crypto
-      --socket-host string                    address to bind the Sensu client socket to (default "127.0.0.1")
-      --socket-port int                       port the Sensu client socket listens on (default 3030)
-      --statsd-disable                        disables the statsd listener and metrics server
-      --statsd-event-handlers strings         comma-delimited list of event handlers for statsd metrics
-      --statsd-flush-interval int             number of seconds between statsd flush (default 10)
-      --statsd-metrics-host string            address used for the statsd metrics server (default "127.0.0.1")
-      --statsd-metrics-port int               port used for the statsd metrics server (default 8125)
-      --subscriptions string                  comma-delimited list of agent subscriptions
-      --trusted-ca-file string                tls certificate authority
-      --user string                           agent user (default "agent")
-```
-
-</details>
-
-All of the `sensu-agent` command flags (except `--config-file`) can be set via the Sensu Agent configuration file using the same flag name (sans the `--`).
-
-<details>
-<summary><strong>Example <code>agent.yml</code> file:</strong></summary>
-
-```yaml
----
-# Sensu agent configuration
-
-##
-# agent overview
-##
-#name: "hostname"
-#namespace: "default"
-#subscriptions:
-#  - example
-#labels:
-#  example_key: "example value"
-#annotations:
-#  example/key: "example value"
-
-##
-# agent configuration
-##
-#backend-url:
-#  - "ws://127.0.0.1:8081"
-#cache-dir: "/var/cache/sensu/sensu-agent"
-#config-file: "/etc/sensu/agent.yml"
-#log-level: "warn" # available log levels: panic, fatal, error, warn, info, debug
-
-##
-# api configuration
-##
-#api-host: "127.0.0.1"
-#api-port: 3031
-#disable-api: false
-#events-burst-limit: 10
-#events-rate-limit: 10.0
-
-##
-# authentication configuration
-##
-#user: "agent"
-#password: "P@ssw0rd!"
-
-##
-# monitoring configuration
-##
-#deregister: false
-#deregistration-handler: "example_handler"
-#keepalive-timeout: 120
-#keepalive-interval: 20
-
-##
-# security configuration
-##
-#insecure-skip-tls-verify: false
-#redact:
-#  - password
-#  - passwd
-#  - pass
-#  - api_key
-#  - api_token
-#  - access_key
-#  - secret_key
-#  - private_key
-#  - secret
-#trusted-ca-file: "/path/to/trusted-certificate-authorities.pem"
-
-##
-# socket configuration
-##
-#disable-sockets: false
-#socket-host: "127.0.0.1"
-#socket-port: 3030
-
-##
-# statsd configuration
-##
-#statsd-disable: false
-#statsd-event-handlers:
-#  - example_handler
-#statsd-flush-interval: 10
-#statsd-metrics-host: "127.0.0.1"
-#statsd-metrics-port: 8125
-```
-
-</details>
-
-Every `sensu-agent` configuration flag (e.g. `--backend-url=ws://127.0.0.1:8081`) also has a corresponding environment variable (e.g. `SENSU_BACKEND_URL="ws://127.0.0.1:8081"`).
-All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding flag in capitalized letters and underscores (`_`) instead of dashes (`-`).
-For example, the environment variable for the flag `--api-host` is `SENSU_API_HOST`.
-
-<details>
-<summary><strong>Example configuration environment variables:</strong></summary>
-
-```
-export SENSU_BACKEND_URL="ws://sensu-backend-1:8081 ws://sensu-backend-2:8081 ws://sensu-backend-3:8081"
-export SENSU_NAMESPACE="default"
-export SENSU_SUBSCRIPTIONS="linux nginx postgres"
-export SENSU_USER="agent"
-export SENSU_PASSWORD="topsecret"
-export SENSU_TRUSTED_CA_FILE="/path/to/ca.pem"
-```
-
-</details>
-
-### Communication
-
-Sensu Agents connect to Sensu Backends over a persistent [WebSocket](https://en.m.wikipedia.org/wiki/WebSocket) (`ws`) or encrypted WebSocket Secure (`wss`) connection.
-For optimal network throughput, agents will attempt to negotiate the use of [Protobuf serialization](https://en.m.wikipedia.org/wiki/Protocol_Buffers) when communicating with a Sensu backend that supports it. This communication is via clear text by default.
-
-### Authentication
-
-Agent authentication is required connect to Sensu Backends.
-The Sensu Agent supports [basic authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#username-and-password-authentication) (username/password) or [mutual transport layer security (mTLS) certificate authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#mtls-authentication).
-
-## Keepalives
-
-Sensu uses a heartbeat mechanism called "keepalives" to monitor Sensu Agent connectivity.
-Under the covers, a `keepalive` is effectively just another Sensu Event that the Sensu Agent publishes once every `--keepalive-interval` configured seconds.
-The `keepalive` event contains the current Sensu Agent configuration and entity properties.
-If a Sensu Agent fails to report a `keepalive` event within the `--keepalive-warning-timeout` or `--keepalive-critical-timeout` configured thresholds, a warning or critical event is produced on behalf of the Agent.
-
-Keepalive monitoring can be disabled using the `--deregister true` flag, which prompts the Sensu backend to remove Sensu Agent entities that have stopped generating `keepalive` events.
-
-## Subscriptions
-
-Sensu uses the [publish/subscribe model of communication](https://en.wikipedia.org/wiki/Publish–subscribe_pattern).
-Sensu "subscriptions" are equivalent to topics in a traditional publish/subscribe message bus.
-Sensu backends "publish" requests for observability data and agents who are subscribed to the corresponding topics receive the published request, perform the corresponding monitoring job, and sending the corresponding event data to the observability pipeline.
-
-The publish/subscribe model is powerful in ephemeral or elastic infrastructures, where endpoint identifiers are unpredictable and break traditional host-based monitoring configuration.
-Instead of configuring monitoring on a per-host basis, Sensu follows a service-based monitoring configuration model where monitors are configured per service topic (e.g. "postgres"), and agents deployed on hosts running the corresponding services simply subscribe to those same topics.
-
-## Entity specification
-
-Sensu Entities are structured like other Sensu API resources, with the same common top-level fields/objects (i.e. `type`, `api_version`, `metadata`, `spec`).
-The Sensu Entity `spec` object contains the following fields:
-
-<details>
-<summary><strong>Sensu Entity <code>spec</code> properties:</strong></summary>
-
-```json
-{
-  "entity_class": "agent",
-  "system": {
-    "hostname": "server-01",
-    "os": "linux",
-    "platform": "alpine",
-    "platform_family": "alpine",
-    "platform_version": "3.12.6",
-    "network": {
-      "interfaces": [
-        {
-          "name": "lo",
-          "addresses": [
-            "127.0.0.1/8"
-          ]
-        },
-        {
-          "name": "eth0",
-          "mac": "02:42:ac:13:00:07",
-          "addresses": [
-            "172.19.0.7/16"
-          ]
-        }
-      ]
-    },
-    "arch": "amd64",
-    "libc_type": "musl",
-    "vm_system": "docker",
-    "vm_role": "guest",
-    "cloud_provider": "EC2"
-  },
-  "subscriptions": [
-    "system/linux",
-    "workshop",
-    "devel",
-    "entity:server-01"
-  ],
-  "last_seen": 1617835646,
-  "deregister": true,
-  "deregistration": {},
-  "user": "agent",
-  "redact": [
-    "password",
-    "passwd",
-    "pass",
-    "api_key",
-    "api_token",
-    "access_key",
-    "secret_key",
-    "private_key",
-    "secret"
-  ],
-  "sensu_agent_version": "6.2.7"
-}
-```
-
-</details>
-
-The only required entity `spec` property is `entity_class` – all other properties are optional.
-
-> _NOTE: Sensu Entities that are not associated with a running Sensu Agent are generally referred to as "proxy entities" and will have an `entity_class` of "proxy".
-> For more information about proxy entities and how they are managed by Sensu, please see [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
-
-## Agent Entities
-
-If you look at your Sensu entity list you'll note that you already have at least one entity (including one named "i-424242").
-Sensu automatically created this entity when we published our first event data to the pipeline, but it isn't associated with a running agent, so its agent class is set to "proxy".
-
-```shell
-$ sensuctl entity list
-     ID      Class   OS   Subscriptions   Last Seen
- ────────── ─────── ──── ─────────────── ───────────
-  i-424242   proxy                        N/A
-```
-
-## Entity management
-
-There are two types of entity management in Sensu Go 6.x:
-
-- **API-managed entities (cloud-native).**
-
-  Certain entity properties can be modified in real-time via the API, CLI, or web app.
-  Agent entities are API-managed by default in Sensu Go 6.x (API management was not available for agent entities in Sensu Go 5.x).
-
-  [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-backend)
-
-- **Agent-managed entities (traditional).**
-
-  All entity properties are managed via `sensu-agent` configuration (command flags, config file, or environment variables).
-  Agent-managed entity updates are applied by modifying one or more configuration attributes and restarting the `sensu-agent` process.
-  To enable agent management for an agent entity in Sensu Go 6.x, set the `--agent-managed-entity` flag.
-
-  [Learn more (reference docs)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/#manage-agent-entities-via-the-agent)
-
-**NOTE:** All agent entities are _created_ using the `sensu-agent` configuration; i.e. the _initial_ configuration for API-managed entities is provided by the `sensu-agent`, but subsequent edits made to the `sensu-agent` (via config flags, config file, or environment variables) will be ignored unless the `--agent-managed-entity` flag is set.
-
-## Advanced topics
-
-### Proxy Entities
-
-A "proxy entity" is any Sensu entity resource that is not actively under management by a Sensu Agent.
-Proxy entities have an `entity_class` of "proxy" and can be used to represent any resource under management by Sensu, though proxy entities are generally used to represent resources where we can't run an agent (e.g.  certain IoT/connected devices, or network devices), or resources that may emit observability data directly to Sensu without the need for an agent (e.g. applications or serverless functions).
-
-> _NOTE: For more information about proxy entities and how they are managed by Sensu, please see [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme)._
-
-### Entity Lifecycle Hooks
-
-==TODO: entity registration and deregistration handlers...==
-
-### Events API & event socket
-
-The Sensu Agent Events API provides an HTTP POST endpoint for publishing observabilty data to the Sensu Observability Pipeline.
-While similar to the Sensu backend Events API, the Sensu Agent Events API differs in a few ways:
-
-- Only accepts HTTP POST requests (i.e. it is a write-only API endpoint)
-- Authentication is not supported (authentication is managed via the Sensu Agent)
-- Accepts event payloads without an `entity` object (all events are automatically associated with the agent entity)
-
-The agent places events created via the `/events POST` endpoint into a durable queue stored on disk.
-In case of a loss of connection with the backend or agent shutdown, the agent preserves queued event data.
-When the connection is reestablished, the agent sends the queued events to the backend.
-
-To learn more about the Agent Events API, please visit the [Sensu Agent reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#create-observability-events-using-the-agent-api).
-
-### Dead mans switches
-
-The Sensu Agent Events API makes it easy to implement dead mans switches with as little as one line of `bash` or Powershell (see below for examples).
-The Sensu Event specification supports an `event.check.ttl` attribute which can be set to instruct the Sensu platform to expect subsequent event updates; if another event is not received within the configured TTL interval, Sensu generates a TTL event with a status like "Last check execution was 120 seconds ago" and processes the event using the configured handlers.
-
-Dead mans switches are useful for monitoring jobs like nighly backup jobs (e.g. a bash script scheduled via a cron job).
-A simple one-liner at the end of the backup script can be used to report on the backup status (e.g. `"Backup completed successfully. Backup data is available at <backup location URI>.`) with a ~25 hour TTL to account for long running backup jobs.
-A failed backup job will result in a TTL event without the need for any if/then/else conditional logic in the script (i.e. no need to also send an event if the script fails) – the mere absence of an "OK" event is all that is needed.
-
-#### Examples
-
-**Bash**
-
-```shell
-curl -XPOST -H 'Content-Type: application/json' -d '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' 127.0.0.1:3031/events
-```
-
-**Powershell**
-
-```powershell
-Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{"metadata":{"name":"dead-mans-switch"},"output":"Alert if another event is not received in 30s","status":0,"ttl":30}}' -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
-```
-
-### StatsD API
-
-==TODO==
-
-### Platform detection
-
-==TODO==
-
-### Command allow list
-
-==TODO==
-
-## EXERCISE 1: register a proxy entity
-
-1. **Create a proxy Entity using the Sensu Entities API.**
-
-   In Sensu, any entity that does not under active management by a Sensu Agent is considered a "proxy" entity.
-   Let's create a proxy entity as a precursor to installing our first agent so we can better understand the association between the agent (a software component) and its entity (a Sensu API resource).
-
-   **Mac and Linux users:**
-
-   ```shell
-   curl -i -X PUT -H "Authorization: Key ${SENSU_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d "{\"entity_class\": \"proxy\", \"metadata\":{\"name\":\"i-424242\",\"namespace\":\"${SENSU_NAMESPACE:-default}\"}}" \
-        "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/entities/i-424242"
-   ```
-
-   **Windows users (Powershell):**
-
-   ```powershell
-   Invoke-RestMethod `
-     -Method PUT `
-     -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
-     -ContentType "application/json" `
-     -Body "{`"entity_class`": `"proxy`", `"metadata`":{`"name`":`"i-424242`",`"namespace`":`"${Env:SENSU_NAMESPACE}`"}}" `
-     -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/entities/i-424242"
-   ```
-
-   Do you see a new entity in Sensu?
-   The Sensu Entities API enables us to register endpoints for management by Sensu using external mechanisms (e.g. third-party integrations, discovery scripts, etc).
-   Try deleting the entity (e.g. via `sensuctl entity delete i-424242` or using the Sensu web app), and recreating it with different properties.
-
-**NEXT:** If you see the example proxy entity in Sensu, you're ready to move on to the next exercise.
-
-## EXERCISE 2: install and start your first agent
-
-The Sensu Agent is available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, MacOS, and FreeBSD.
-This exercise will focus on a simplified install for running a Sensu agent on your local workstation, but it will not go into as much detail as the official documentation.
-The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides detailed instructions for installing & operating Sensu Agents.
-
-1. **Configure environment variables.**
-
-   Setup the necessary environment variables by running one of the following commands:
-
-   **Mac and Linux users (`.envrc`):**
-
-   ```shell
-   source .envrc
-   env | grep SENSU
-   ```
-
-   **Windows users (`.envrc.ps1`):**
-
-   ```powershell
-   . .\.envrc.ps1
-   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
-   ```
-
-   The output should include the expected values for `SENSU_VERSION` (i.e. a supported Sensu version such as "6.2.7"), `SENSU_BUILD`  (i.e. a supported Sensu build such as "4449"), `SENSU_BACKEND_URL`, `SENSU_NAMESPACE`, `SENSU_USER`, and `SENSU_PASSWORD`.
-
-1. **Download & install the latest Sensu Agent for MacOS, Windows, or Linux.**
-
-   **Mac users:**
-
-   ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
-   tar -xzf sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz sensu-agent
-   rm sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
-   sudo mkdir -p /usr/local/bin/
-   sudo mv sensu-agent /usr/local/bin/sensu-agent
-   ```
-
-   **Windows users (Powershell):**
-
-   First download the Sensu agent package:
-
-   ```powershell
-   Invoke-WebRequest `
-     -Uri "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${Env:SENSU_VERSION}/sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" `
-     -OutFile "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
-   ```
-   
-   Once the download is complete, install the package and add the executable into your command path:
-
-   ```powershell
-   msiexec.exe /i "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" /qr
-   rm "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
-   ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"
-   ```
-
-   **Linux users (amd64):**
-
-   ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
-   sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/
-   rm sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
-   ```
-
-   **Linux users (arm64):**
-
-   ```shell
-   curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
-   sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/
-   rm sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
-   ```
-   
-1. **Start the Sensu Agent.**
-
-   _NOTE: Mac and Linux users are encouraged to run the `sensu-agent` with a service account (e.g. a `sensu` or `_sensu` user).
-   To create this service account, please refer to the ["Create a Sensu user account (service account)"](/TROUBLESHOOTING.md#create-a-sensu-user-account-service-account) instructions in [TROUBLESHOOTING.md](/TROUBLESHOOTING.md#readme).
-   Alternatively, Mac and Linux users may modify the `sensu-agent start` commands by removing the `-u sensu` or `-u _sensu` flag._
-
-   **Mac users:**
+# Lesson 7: Introduction to Agents
+
+- [Lesson 7: Introduction to Agents](#lesson-7-introduction-to-agents)
+  - [Goals](#goals)
+  - [The Sensu Agent](#the-sensu-agent)
+    - [Authentication and Communication](#authentication-and-communication)
+    - [EXERCISE 1: Install the Sensu Agent](#exercise-1-install-the-sensu-agent)
+      - [Scenario](#scenario)
+      - [Solution](#solution)
+      - [Steps](#steps)
+  - [Configuring the Agent](#configuring-the-agent)
+    - [Configuration Priority](#configuration-priority)
+    - [Configuration Names and Formats](#configuration-names-and-formats)
+    - [EXERCISE 2: Customize Agent Configuration](#exercise-2-customize-agent-configuration)
+      - [Scenario](#scenario-1)
+      - [Solution](#solution-1)
+      - [Steps](#steps-1)
+  - [Discussion](#discussion)
+    - [Multiple Configuration Methods](#multiple-configuration-methods)
+    - [Keepalives](#keepalives)
+  - [Learn More](#learn-more)
+  - [Next Steps](#next-steps)
+
+## Goals
+
+In this lesson we will install and configure the Sensu agent, and discuss how events and other status are communicated to the backend.
+This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
+
+## The Sensu Agent
+
+An agent is a lightweight observability client that runs on your infrastructure.
+The agent generates the events which are processed by the observability pipeline.
+
+The agent is a statically-compiled binary (`sensu-agent`), typically installed via package management or Docker containers.
+Packages are available for Docker, Ubuntu/Debian, RHEL/CentOS, Windows, MacOS, and FreeBSD.
+
+### Authentication and Communication
+
+Authentication is required for an agent to connect to the backend.
+The agent supports [basic authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#username-and-password-authentication) (username/password) or [mTLS authentication](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#mtls-authentication).
+
+Agents connect to the backend over a persistent [WebSocket](https://en.m.wikipedia.org/wiki/WebSocket) (`ws`) or encrypted WebSocket Secure (`wss`) connection.
+For optimal network throughput, agents will attempt to negotiate the use of [Protobuf serialization](https://en.m.wikipedia.org/wiki/Protocol_Buffers) when communicating with a backend that supports it. Communication is via clear text by default.
+
+### EXERCISE 1: Install the Sensu Agent
+
+#### Scenario
+
+You have a server, container, or other device or piece of software that you want to manage with Sensu.
+
+#### Solution
+
+Install the the Sensu Agent on the system. 
+The agent runs as a separate process that observes your system.
+Once it is installed, you can update its configuration and behavior dynamically without the need to redeploy.
+
+#### Steps
+
+> **BEFORE YOU START:**
+> 
+> Make sure you have the following environment variables set:
+>
+> - `SENSU_VERSION`
+> - `SENSU_BUILD`
+> - `SENSU_BACKEND_URL`
+> - `SENSU_NAMESPACE`
+> - `SENSU_USER`
+> - `SENSU_PASSWORD`
+> 
+> If any are missing, review the environment setup from [Lesson 3: Using the Sesnu CLI](../03/README.md#readme).
+
+1. **Download & Install the Agent**
+
+   This exercise will focus on a simplified install for running the agent on your local workstation.
+   For more details, the [Sensu Go installation documentation](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/install-sensu/#install-sensu-agents) provides comprehensive instructions for installing & operating the agent.
+
+   1. **Download the Installation Package**
+
+      The agent binary is available for download from Sensu's repository on Amazon S3.
+
+      **MacOS**
+
+      ```shell
+      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
+      ```
+
+      **Windows (PowerShell):**
+
+      ```powershell
+      Invoke-WebRequest `
+       -Uri "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${Env:SENSU_VERSION}/sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" `
+       -OutFile "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
+      ```
+
+      **Linux (amd64):**
+
+      ```shell
+      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
+      ```
+
+      **Linux (arm64):**
+
+      ```shell
+      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
+      ```
+
+   2. **Install the Package and Cleanup**
+  
+      Installation involves extracting and copying the `sensu-agent` executable to an approriate location on the system.
+      Afterwards, we will delete the installation package.
+
+      **MacOS**
+
+      ```shell
+      tar -xzf sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz sensu-agent
+      rm sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
+      sudo mkdir -p /usr/local/bin/
+      sudo mv sensu-agent /usr/local/bin/sensu-agent
+      ```
+
+      **Windows (PowerShell):**
+
+      ```powershell
+      msiexec.exe /i "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" /qr
+      rm "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
+      ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"
+      ```
+
+      **Linux (amd64):**
+
+      ```shell
+      sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/
+      rm sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
+      ```
+
+      **Linux (arm64):**
+
+      ```shell
+      sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/
+      rm sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
+      ```
+
+2. **Start the Agent.**
+
+    > _**NOTE:**_ Mac and Linux users are encouraged to run the `sensu-agent` with a service account (e.g. a user named `sensu` or `_sensu`).
+    > To create this service account, please read ["Create a Sensu Service Account"](/TROUBLESHOOTING.md#create-a-sensu-user-account-service-account).
+
+   **MacOS**
 
    ```shell
    TMPDIR=/opt/sensu/tmp \
-   sudo -E -u _sensu sensu-agent start \
+   sudo -E sensu-agent start \
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
@@ -531,7 +160,7 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --password ${SENSU_PASSWORD}
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    sensu-agent start `
@@ -544,10 +173,10 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --password ${Env:SENSU_PASSWORD}
    ```
 
-   **Linux users:**
+   **Linux:**
 
    ```shell
-   sudo -E -u sensu sensu-agent start \
+   sudo -E sensu-agent start \
    --name workshop \
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
@@ -557,36 +186,119 @@ The [official Sensu Go installation documentation](https://docs.sensu.io/sensu-g
    --password ${SENSU_PASSWORD}
    ```
 
-   Verify that your agent is running and connected to the Sensu Backend by consulting `sensuctl` (e.g. `sensuctl entity list`) or the Sensu web app.
+   Verify that your agent is running and connected to the backend by running `sensuctl entity list`.
 
-**NEXT:** If your Sensu Agent has successfully connected to your backend, you're ready to move on to the next exercise.
+**NEXT:** If `sensu-agent` has successfully connected to your backend, you're ready to move on to the next exercise.
 
-## EXERCISE 3: customize agent and entity configuration
+## Configuring the Agent
 
-Sensu Agents are represented in the Sensu API as Sensu Entities.
-As a result, some Sensu Agent configuration parameters are used to manage the behavior of the agent (e.g. TLS certificates, authentication, subscriptions, etc), while others are used to configure the corresponding Sensu Entity (e.g. metadata properties like labels and annotations).
+Some agent configuration parameters are used to manage the behavior of the agent, such as TLS certificates, authentication, and subscriptions.
+Others are used to configure aspects of the *entity* representation, such as labels and annotations.
 
-Let's stop our agent and modify its configuration:
+For a full list of available configuration values, use the `--help` option:
 
-1. **Stop the Sensu Agent.**
+```shell
+sensu-agent start --help
+```
+
+### Configuration Priority
+
+The agent can be configured via command-line options, YAML config file, or environment variables.
+If a configuration value is set in multiple places, it will be overrided with the following priority:
+
+1. **Command-line Option** (highest)
+2. **Environment Variable**
+3. **Configuration File**
+4. **Default Value** (lowest)
+
+### Configuration Names and Formats
+
+All of the agent configuration options have the same name regardless of the way they are set, differing only in format.
+
+For example, setting the namespace, backend url, and log level in all three formats is as follows:
+
+- **Command-Line Option:**
+
+  Pass the configuration option and the value using the format `--<option_name>=<value>`.
+  
+  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
+  - For options that can have a list of values, separate the values with commas and no spaces. 
+  
+  **Example:** Using Command-line Options for Configuration
+
+  ```shell
+  sensu-agent start --namespace=default --backend-url=ws://backend-1:8081,ws://backend-2:8081 --log-level=warn
+  ```
+  
+- **YAML Config File:**
+
+  Every configuration option has a corresponding YAML property. 
+  
+  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
+  - For options that can have a list of values, use the YAML list format.
+
+  **Example (`agent.yaml`):** Using a YAML Config File for Configuration
+
+  ```yaml
+  namespace: "default"
+  backend-url:
+    - "ws://backend-1:8081"
+    - "ws://backend-2:8081"
+  log-level: "warn"
+  ```
+  
+  To use the config file, pass the name of the config file via the `--config-file` option.  
+  
+  ```shell
+  sensu-agent start --config-file=agent.yaml
+  ```
+
+- **Environment Variable:**
+
+  Every configuration option also has a corresponding environment variable.
+  - All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding option name in capitalized letters.
+  - Option values should be enclosed in quotes.
+  - If the name of the configuration option has multiple words, separated the words with an underscore (`_`).
+  - For options that can have a list of values, separate the values with a space (` `).
+
+  **Example:** Using Environment Variables for Configuration
+
+  ```shell
+  SENSU_NAMESPACE="default" SENSU_BACKEND_URL="ws://backend-1:8081 ws://backend-2:8081" SENSU_LOG_LEVEL="warn" sensu-agent start
+  ```
+
+In the next exercise, we will stop our agent and modify its configuration.
+
+### EXERCISE 2: Customize Agent Configuration
+
+#### Scenario
+
+You want to change the behavior or metadata for an agent.
+
+#### Solution
+
+Stop the agent, modify the configuration, then restart the agent.
+
+#### Steps
+
+1. **Stop the Agent.**
 
    If you started your agent in the previous exercise using the `sensu-agent start` command, you can stop the agent by pressing `Control-C` in your terminal.
 
-1. **Configure Sensu Agent.**
+   > _**NOTE:**_ Agent configuration is loaded at start time, so the agent must be restarted to update the configuration.
 
-   The Sensu Agent supports configuration via **command flags** (e.g. `--backend-url`), a **configuration file** (e.g. `/etc/sensu/agent.yml`), or **environment variables** (e.g. `SENSU_SUBSCRIPTIONS`).
-   For training purposes we will use a mix of all three, however in practice you may find that just one method is best suited for your environment (e.g. on Kubernetes or other container-based environments it may be easiest to manage all configuration via environment variables).
+1. **Configure Agent Using YAML.**
 
-   At minimum, the Sensu Agent requires a Sensu backend URL (a websocket API to connect to), and one or more subscriptions (observability topics the agent will subscribe to).
+   At minimum, the agent requires a backend Websocket URL, and one or more subscriptions.
    We'll also add some agent metadata in the form of labels & annotations.
 
-   Let's start by creating an `agent.yaml` configuration file in one of the following recommended locations:
+   Let's start by creating an `agent.yaml` file in one of the following recommended locations:
 
-   - **Mac users:** `/opt/sensu/agent.yaml`
-   - **Windows users:** `${Env:UserProfile}\Sensu\agent.yaml`
-   - **Linux users:** `/etc/sensu/agent.yaml`
+   - **MacOS:** `/opt/sensu/agent.yaml`
+   - **Windows:** `${Env:UserProfile}\Sensu\agent.yaml`
+   - **Linux:** `/etc/sensu/agent.yaml`
 
-   Now let's copy the following contents into the `agent.yaml` file:
+   Next, copy the following contents into the `agent.yaml` file:
 
    ```yaml
    ---
@@ -603,31 +315,11 @@ Let's stop our agent and modify its configuration:
 
    Make sure to save the contents of the file before moving on to the next step.
 
-1. **Configure environment variables.**
+2. **Restart the Agent.**
 
-   Setup the necessary environment variables by running one of the following commands:
+   Let's start the agent from the command line, this time using a mix of environment variables and our configuration file.
 
-   **Mac and Linux users (`.envrc`):**
-
-   ```shell
-   source .envrc
-   env | grep SENSU
-   ```
-
-   **Windows users (`.envrc.ps1`):**
-
-   ```powershell
-   . .\.envrc.ps1
-   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
-   ```
-
-   The output should include the expected values for `SENSU_USER` and `SENSU_PASSWORD`.
-
-1. **Start/Restart the Sensu Agent.**
-
-   Let's start/restart the agent from the command line again, this time using a mix of environment variables and our configuration file to configure the agent.
-
-   **Mac users:**
+   **MacOS:**
 
    ```shell
    TMPDIR=/opt/sensu/tmp \
@@ -639,7 +331,7 @@ Let's stop our agent and modify its configuration:
    --password ${SENSU_PASSWORD}
    ```
 
-   **Windows users (Powershell):**
+   **Windows (PowerShell):**
 
    ```powershell
    ${Env:SENSU_SUBSCRIPTIONS}="system/windows workshop" `
@@ -649,7 +341,7 @@ Let's stop our agent and modify its configuration:
    --password ${Env:SENSU_PASSWORD}
    ```
 
-   **Linux users:**
+   **Linux:**
 
    ```shell
    SENSU_SUBSCRIPTIONS="system/linux workshop" \
@@ -659,14 +351,33 @@ Let's stop our agent and modify its configuration:
    --password ${SENSU_PASSWORD}
    ```
 
-   Notice that we have moved the `--name`, `--backend-url`, and `--deregister` configuration settings into the `agent.yaml` config file, and we are now explicitly setting the `SENSU_SUBSCRIPTIONS` environment variable in place of `--subscriptions`... but how/where is `--namespace` being set?
-   The Sensu Agent is reading the value of `SENSU_NAMESPACE` from the environment variable, without the need for explicitly setting the variable with the `sensu-agent start` command.
+   Notice that we moved the `--name`, `--backend-url`, and `--deregister` configuration options into `agent.yaml`, and we set the `SENSU_SUBSCRIPTIONS` environment variable in place of `--subscriptions`... but how/where is `--namespace` being set?
+   The agent is automatically reading the value of `SENSU_NAMESPACE` from the environment variable.
 
-   In the previous exercise we provided all of the configuration via `sensu-agent start` command flags.
-   In this exercise we've moved some configuration to a config file, and other configuration to environment variables.
-   Understanding how to configure Sensu using all three methods – config flags, config file, and environment variables – is very useful in heterogeneus environments (e.g. mix of servers, compute instances, and containers) where a configuration method that is easier to manage in one context might not be as easy in another context.
+## Discussion
 
-## Learn more
+In this lesson we explored installing and configuring the agent, and you learned how it communicates and authenticates to the backend.
+
+### Multiple Configuration Methods
+
+In the first exercise we passed all of the configuration via `sensu-agent start` command-line options. In the second exercise we moved some configuration to a config file, and other configuration to environment variables.
+
+The ability to configure the agent using multiple methods is very useful in complex environments that may have a mix of servers, compute instances, and containers. However, in practice you may find that just one method is best suited for your environment.
+
+For example, on Kubernetes or other container-based environments it may be easiest to manage all configuration via environment variables.
+
+### Keepalives
+
+Sensu uses a heartbeat mechanism called "keepalives" to monitor agent connectivity.
+Under the hood, a `keepalive` is just another event that the agent publishes once every `--keepalive-interval` configured seconds.
+The `keepalive` event contains the agent configuration and entity properties.
+If an agent fails to report a `keepalive` event within the `--keepalive-warning-timeout` or `--keepalive-critical-timeout` configured thresholds, a warning or critical event is produced on behalf of the agent.
+
+Keepalive monitoring can be disabled using the `--deregister true` flag, which prompts the backend to remove agent entities that have stopped generating `keepalive` events.
+
+[setup_workshop]: ../02/README.md#readme
+
+## Learn More
 
 - [[Documentation] "Sensu Agent Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/)
 - [[Documentation] "Sensu Entity Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-entities/entities/)
@@ -675,9 +386,8 @@ Let's stop our agent and modify its configuration:
 - [[Documentation] "Configure Sensu Agent mTLS Authentication" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/operations/deploy-sensu/secure-sensu/#configure-sensu-agent-mtls-authentication)
 - [[Documentation] "Sensu Subscriptions Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/subscriptions/)
 
-## Next steps
+## Next Steps
 
 [Share your feedback on Lesson 07](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-07&title=Lesson%2007%20Feedback)
 
 [Lesson 8: Introduction to Checks](../08/README.md#readme)
-

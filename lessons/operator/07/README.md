@@ -1,25 +1,24 @@
 # Lesson 7: Introduction to Agents
 
-- [Lesson 7: Introduction to Agents](#lesson-7-introduction-to-agents)
-  - [Goals](#goals)
-  - [The Sensu Agent](#the-sensu-agent)
-    - [Authentication and Communication](#authentication-and-communication)
-    - [EXERCISE 1: Install the Sensu Agent](#exercise-1-install-the-sensu-agent)
-      - [Scenario](#scenario)
-      - [Solution](#solution)
-      - [Steps](#steps)
-  - [Configuring the Agent](#configuring-the-agent)
-    - [Configuration Priority](#configuration-priority)
-    - [Configuration Names and Formats](#configuration-names-and-formats)
-    - [EXERCISE 2: Customize Agent Configuration](#exercise-2-customize-agent-configuration)
-      - [Scenario](#scenario-1)
-      - [Solution](#solution-1)
-      - [Steps](#steps-1)
-  - [Discussion](#discussion)
-    - [Multiple Configuration Methods](#multiple-configuration-methods)
-    - [Keepalives](#keepalives)
-  - [Learn More](#learn-more)
-  - [Next Steps](#next-steps)
+- [Goals](#goals)
+- [The Sensu Agent](#the-sensu-agent)
+  - [Authentication and Communication](#authentication-and-communication)
+  - [EXERCISE 1: Install the Sensu Agent](#exercise-1-install-the-sensu-agent)
+    - [Scenario](#scenario)
+    - [Solution](#solution)
+    - [Steps](#steps)
+- [Configuring the Agent](#configuring-the-agent)
+  - [Configuration Priority](#configuration-priority)
+  - [Configuration Names and Formats](#configuration-names-and-formats)
+  - [EXERCISE 2: Customize Agent Configuration](#exercise-2-customize-agent-configuration)
+    - [Scenario](#scenario-1)
+    - [Solution](#solution-1)
+    - [Steps](#steps-1)
+- [Discussion](#discussion)
+  - [Multiple Configuration Methods](#multiple-configuration-methods)
+  - [Keepalives](#keepalives)
+- [Learn More](#learn-more)
+- [Next Steps](#next-steps)
 
 ## Goals
 
@@ -46,12 +45,13 @@ For optimal network throughput, agents will attempt to negotiate the use of [Pro
 
 #### Scenario
 
-You have a server, container, or other device or piece of software that you want to manage with Sensu.
+You have a server, container, connected device, or service that you want to manage with Sensu.
 
 #### Solution
 
-Install the the Sensu Agent on the system. 
+Install a Sensu Agent. 
 The agent runs as a separate process that observes your system.
+It can run directly on the system you are observing, or anywhere on the network.
 Once it is installed, you can update its configuration and behavior dynamically without the need to redeploy.
 
 #### Steps
@@ -67,7 +67,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
 > - `SENSU_USER`
 > - `SENSU_PASSWORD`
 > 
-> If any are missing, review the environment setup from [Lesson 3: Using the Sesnu CLI](../03/README.md#readme).
+> If any are missing, review the environment setup from [Lesson 3: Using the Sensu CLI](../03/README.md#readme).
 
 1. **Download & Install the Agent**
 
@@ -84,7 +84,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
       curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
       ```
 
-      **Windows (PowerShell):**
+      **Windows (PowerShell)**
 
       ```powershell
       Invoke-WebRequest `
@@ -92,16 +92,10 @@ Once it is installed, you can update its configuration and behavior dynamically 
        -OutFile "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi"
       ```
 
-      **Linux (amd64):**
+      **Linux**
 
       ```shell
       curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
-      ```
-
-      **Linux (arm64):**
-
-      ```shell
-      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
       ```
 
    2. **Install the Package and Cleanup**
@@ -118,7 +112,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
       sudo mv sensu-agent /usr/local/bin/sensu-agent
       ```
 
-      **Windows (PowerShell):**
+      **Windows (PowerShell)**
 
       ```powershell
       msiexec.exe /i "${Env:UserProfile}\sensu-go-agent_${Env:SENSU_VERSION}.${Env:SENSU_BUILD}_en-US.x64.msi" /qr
@@ -126,18 +120,11 @@ Once it is installed, you can update its configuration and behavior dynamically 
       ${Env:Path} += ";C:\Program Files\Sensu\sensu-agent\bin"
       ```
 
-      **Linux (amd64):**
+      **Linux**
 
       ```shell
       sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz -C /usr/bin/
       rm sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
-      ```
-
-      **Linux (arm64):**
-
-      ```shell
-      sudo -E tar -xzf sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz -C /usr/bin/
-      rm sensu-go_${SENSU_VERSION}_linux_arm64.tar.gz
       ```
 
 2. **Start the Agent.**
@@ -160,7 +147,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --password ${SENSU_PASSWORD}
    ```
 
-   **Windows (PowerShell):**
+   **Windows (PowerShell)**
 
    ```powershell
    sensu-agent start `
@@ -173,7 +160,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --password ${Env:SENSU_PASSWORD}
    ```
 
-   **Linux:**
+   **Linux**
 
    ```shell
    sudo -E sensu-agent start \
@@ -185,8 +172,16 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
    ```
+   
+1. ** Verify that your agent is running.** 
 
-   Verify that your agent is running and connected to the backend by running `sensuctl entity list`.
+   Verify that your agent is running and connected to the backend:
+
+   ```shell
+   sensuctl entity list
+   ```
+
+   You should see your machine in the entity list.
 
 **NEXT:** If `sensu-agent` has successfully connected to your backend, you're ready to move on to the next exercise.
 
@@ -210,62 +205,6 @@ If a configuration value is set in multiple places, it will be overrided with th
 2. **Environment Variable**
 3. **Configuration File**
 4. **Default Value** (lowest)
-
-### Configuration Names and Formats
-
-All of the agent configuration options have the same name regardless of the way they are set, differing only in format.
-
-For example, setting the namespace, backend url, and log level in all three formats is as follows:
-
-- **Command-Line Option:**
-
-  Pass the configuration option and the value using the format `--<option_name>=<value>`.
-  
-  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
-  - For options that can have a list of values, separate the values with commas and no spaces. 
-  
-  **Example:** Using Command-line Options for Configuration
-
-  ```shell
-  sensu-agent start --namespace=default --backend-url=ws://backend-1:8081,ws://backend-2:8081 --log-level=warn
-  ```
-  
-- **YAML Config File:**
-
-  Every configuration option has a corresponding YAML property. 
-  
-  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
-  - For options that can have a list of values, use the YAML list format.
-
-  **Example (`agent.yaml`):** Using a YAML Config File for Configuration
-
-  ```yaml
-  namespace: "default"
-  backend-url:
-    - "ws://backend-1:8081"
-    - "ws://backend-2:8081"
-  log-level: "warn"
-  ```
-  
-  To use the config file, pass the name of the config file via the `--config-file` option.  
-  
-  ```shell
-  sensu-agent start --config-file=agent.yaml
-  ```
-
-- **Environment Variable:**
-
-  Every configuration option also has a corresponding environment variable.
-  - All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding option name in capitalized letters.
-  - Option values should be enclosed in quotes.
-  - If the name of the configuration option has multiple words, separated the words with an underscore (`_`).
-  - For options that can have a list of values, separate the values with a space (` `).
-
-  **Example:** Using Environment Variables for Configuration
-
-  ```shell
-  SENSU_NAMESPACE="default" SENSU_BACKEND_URL="ws://backend-1:8081 ws://backend-2:8081" SENSU_LOG_LEVEL="warn" sensu-agent start
-  ```
 
 In the next exercise, we will stop our agent and modify its configuration.
 
@@ -365,6 +304,62 @@ In the first exercise we passed all of the configuration via `sensu-agent start`
 The ability to configure the agent using multiple methods is very useful in complex environments that may have a mix of servers, compute instances, and containers. However, in practice you may find that just one method is best suited for your environment.
 
 For example, on Kubernetes or other container-based environments it may be easiest to manage all configuration via environment variables.
+
+### Configuration Names and Formats
+
+All of the agent configuration options use consistent naming regardless of the way they are set, differing only in format.
+
+For example, setting the namespace, backend url, and log level in all three formats is as follows:
+
+- **Command-Line Option:**
+
+  Pass the configuration option and the value using the format `--<option_name>=<value>`.
+  
+  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
+  - For options that can have a list of values, separate the values with commas and no spaces. 
+  
+  **Example:** Using Command-line Options for Configuration
+
+  ```shell
+  sensu-agent start --namespace=default --backend-url=ws://backend-1:8081,ws://backend-2:8081 --log-level=warn
+  ```
+  
+- **YAML Config File:**
+
+  Every configuration option has a corresponding YAML property. 
+  
+  - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
+  - For options that can have a list of values, use the YAML list format.
+
+  **Example (`agent.yaml`):** Using a YAML Config File for Configuration
+
+  ```yaml
+  namespace: "default"
+  backend-url:
+    - "ws://backend-1:8081"
+    - "ws://backend-2:8081"
+  log-level: "warn"
+  ```
+  
+  To use the config file, pass the name of the config file via the `--config-file` option.  
+  
+  ```shell
+  sensu-agent start --config-file=agent.yaml
+  ```
+
+- **Environment Variable:**
+
+  Every configuration option also has a corresponding environment variable.
+  - All Sensu environment variable names are prefixed with `SENSU_`, followed by the corresponding option name in capitalized letters.
+  - Option values should be enclosed in quotes.
+  - If the name of the configuration option has multiple words, separated the words with an underscore (`_`).
+  - For options that can have a list of values, separate the values with a space (` `).
+
+  **Example:** Using Environment Variables for Configuration
+
+  ```shell
+  SENSU_NAMESPACE="default" SENSU_BACKEND_URL="ws://backend-1:8081 ws://backend-2:8081" SENSU_LOG_LEVEL="warn" sensu-agent start
+  ```
 
 ### Keepalives
 

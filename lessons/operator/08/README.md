@@ -69,7 +69,7 @@ Service checks can be written in any programming or scripting language, includin
 
 ### Subscriptions and Check Scheduling
 
-In Sensu, *subscriptions* are equivalent to topics in a traditional [pub/sub](https://en.wikipedia.org/wiki/Publish–subscribe_pattern) model. Agents are the subscribers and the backend is the publisher.
+In Sensu, *subscriptions* are equivalent to topics in a traditional [pub/sub](https://en.wikipedia.org/wiki/Publish–subscribe_pattern) model. The backend is the publisher and the agents is the subscriber.
 
 Checks are scheduled at pre-set intervals. The backend automatically publishes a request, and agents who are subscribed to the topic receive the request. The agent then performs the corresponding check, and sends the event data to the backend for processing via the observability pipeline.
 
@@ -165,8 +165,6 @@ Default values can also be provided as a fallback for [unmatched tokens](https:/
 - **`{{ .labels.url }}`:** replaced by the target entity "url" label
 - **`{{ .labels.disk_warning | default "85%" }}`:** replaced by the target entity "disk_warning" label; if the label is not set then the default/fallback value of `85%` will be used
 
-==TODO: add an example check config w/ .labels.disk_warning label==
-
 Tokens can be used to configure dynamic monitoring jobs (e.g. enabling node-based configuration overrides for things like alerting threshold, etc).
 
 Let's modify our check from the previous exercise using some tokens.
@@ -232,7 +230,7 @@ Then, we can use a token to read that value when the check is executed, and give
 
 1. TODO: Add annotation to an entity?
 
-## Metrics Collection and Extractions
+## Metrics Collection and Processing
 
 One common use case for checks is to collect system and service metrics (e.g. cpu, memory, or disk utilization; or api response times).
 
@@ -282,15 +280,17 @@ If an event containing metrics is configured with one or more `output_metric_han
 
 > **NOTE:** Checks may be configured with multiple `handlers` and `output_metric_handlers`, enabling service health checking, alerting, _and_ metrics collection in a single check.
 
-### EXERCISE 3: Tagging and Handling Metrics Using Checks
+### EXERCISE 3: Tagging and Processing Metrics Using Checks
 
 #### Scenario
 
-You have some existing metrics providers which provide output in Nagios format, which you want to store in InfluxDB. You also want to capture some additional information about the entity and have the metrics, along with it's context be handled by the pipeline.  
+You have some existing monitoring plugins which provide output in Nagios format, which you want to store in a data platform like Sumo Logic or InfluxDB. 
+You also want to capture some additional metadata about the server or service along with the metrics, and have it processed as a single unit by the pipeline.
 
 #### Solution
 
-This can be accomplished by configuring the check to expect Nagios format via the `output_metric_format` option, and configuring a metrics-specific storage handler via `output_metric_handlers`. We can also add additional metadata to the event using `output_metric_tags`.
+This can be accomplished by configuring the check to expect Nagios formatted metrics by using the `output_metric_format` option, and configuring a metrics-specific storage handler via `output_metric_handlers`. 
+We can also add additional metadata to the event using `output_metric_tags`.
 
 #### Steps
 

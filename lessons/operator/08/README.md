@@ -232,7 +232,70 @@ Then, we can use a token to read that value when the check is executed, and give
    sensuctl check info disk-usage --format yaml
    ```
 
-1. TODO: Add annotation to an entity?
+1. **Update the Agent Configuration to Add Annotations.**
+
+   There are two ways to add the needed annotations, either by updating the entity configuration or the agent configuration.
+   In this exercise we will update the agent configuration.
+
+   1. **Stop the Agent**
+   
+      If you started your agent in the previous exercise using the `sensu-agent start` command, you can stop the agent by pressing `Control-C` in your terminal.
+      
+   1. **Edit the Agent Configuration**
+
+      In [Lesson 7](../07/README.md) we started an agent, and created a `agent.yaml` file containing most of its configuration.
+
+      Add `disk_usage_warning_threshold` and `disk_usage_critical_threshold` to the `annotations` list:
+
+      ```yaml
+      ---
+      backend_url: ws://127.0.0.1:8080
+      name: workshop
+      labels:
+        foo: bar
+        environment: training
+      annotations:
+        sensu.io/plugins/rockerchat/config/alias: sensu-trainee
+        disk_usage_warning_threshold: "50%"
+        disk_usage_critical_threshold: "70%"
+      deregister: true
+      ```
+      
+   2. **Restart the Agent.**
+
+      Let's start the agent from the command line, this time using a mix of environment variables and our configuration file.
+
+      **MacOS:**
+
+      ```shell
+      TMPDIR=/opt/sensu/tmp \
+      SENSU_SUBSCRIPTIONS="system/macos workshop" \
+      sudo -E sensu-agent start \
+      --config-file /opt/sensu/agent.yaml \
+      --cache-dir /opt/sensu/sensu-agent/cache \
+      --user ${SENSU_USER} \
+      --password ${SENSU_PASSWORD}
+      ```
+ 
+      **Windows (PowerShell):**
+ 
+      ```powershell
+      ${Env:SENSU_SUBSCRIPTIONS}="system/windows workshop" `
+      sensu-agent start `
+      --config-file "${Env:UserProfile}\Sensu\agent.yaml" `
+      --user ${Env:SENSU_USER} `
+      --password ${Env:SENSU_PASSWORD}
+      ```
+
+      **Linux:**
+
+      ```shell
+      SENSU_SUBSCRIPTIONS="system/linux workshop" \
+      sudo -E -u sensu sensu-agent start \
+      --config-file "/etc/sensu/agent.yaml" \
+      --user ${SENSU_USER} \
+      --password ${SENSU_PASSWORD}
+      ```
 
 ## Metrics Collection and Processing
 

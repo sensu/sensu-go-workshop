@@ -20,6 +20,10 @@
 
 ## Goals
 
+In this lesson we will learn how to create, configure, and schedule _checks_, and how to select which hosts to run them on, using subscriptions.
+You will learn more detail about how the backend and agents communicate, and how to integrate existing monitoring plugins.
+This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
+
 ## What are Checks?
 
 In Sensu, *checks* are monitoring jobs that are managed by the Sensu control plane, and executed by Sensu Agents.
@@ -432,3 +436,5 @@ Proxy entities are discussed in greater detail in [Lesson 13: Introduction to Pr
 [Share your feedback on Lesson 08](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-08&title=Lesson%2008%20Feedback)
 
 [Lesson 9: Introduction to Check Hooks](../09/README.md#readme)
+
+[setup_workshop]: ../02/README.md#readme

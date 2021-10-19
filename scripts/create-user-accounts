@@ -2,6 +2,7 @@
 
 USERS_RBAC=${1:-"config/sensu/rbac"}
 SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
+SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
 
 check_deps() {
@@ -35,25 +36,18 @@ validate_api_url() {
 }
 
 create_user_accounts() {
-  /usr/local/bin/sensuctl create -r -f ${USERS_RBAC}
+  /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${USERS_RBAC}
   if [ $? -ne 0 ]; then
     echo "Error encountered while creating workshop user accounts"
     exit 2
   else
     echo "Successfully created the following workshop user accounts:"
     echo
-    sensuctl namespace list --format tabular
+    /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} user list --format tabular
   fi
 }
 
 echo "Creating Sensu user accounts..."
-wait-for-sensuctl
-if [ $? -gt 0 ]; then
-  echo "Failed to create Sensu user accounts."
-  echo ""
-  sleep 5
-  exit 2
-fi
 check_deps && \
 validate_io && \
 validate_api_url && \

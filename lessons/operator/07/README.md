@@ -247,7 +247,7 @@ Stop the agent, modify the configuration, then restart the agent.
      foo: bar
      environment: training
    annotations:
-     sensu.io/plugins/rockerchat/config/alias: sensu-trainee
+     sensu.io/plugins/rocketchat/config/alias: sensu-trainee
 
    deregister: true
    ```

@@ -106,11 +106,11 @@ To accomplish this, we can configure a check that will periodically pull the dis
    type: CheckConfig
    api_version: core/v2
    metadata:
-     name: disk
+     name: disk-usage
    spec:
      command: check-disk-usage --warning 80.0 --critical 90.0
      runtime_assets:
-     - sensu/check-disk-usage:0.4.2
+     - sensu/check-disk-usage:0.5.0
      publish: true
      interval: 30
      subscriptions:
@@ -122,6 +122,8 @@ To accomplish this, we can configure a check that will periodically pull the dis
      - system/linux/disk
      timeout: 10
      check_hooks: []
+     handlers:
+     - rocketchat
    ```
 
    Notice the values of `subscriptions` and `interval` – these will instruct Sensu to publish checks every 30 seconds on any agent with the `system/macos`, `system/windows`, or `system/linux` subscriptions.
@@ -144,7 +146,7 @@ To accomplish this, we can configure a check that will periodically pull the dis
    ```shell
      Name                       Command                       Interval   Cron   Timeout   TTL                                            Subscriptions                                             Handlers              Assets              Hooks   Publish?   Stdin?   Metric Format   Metric Handlers
     ────── ───────────────────────────────────────────────── ────────── ────── ───────── ───── ────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────────────────────────────── ─────── ────────── ─────────────────────── ─────────────────
-     disk   check-disk-usage --warning 80.0 --critical 90.0         30               10     0   system/macos,system/macos/disk,system/windows,system/windows/disk,system/linux,system/linux/disk              sensu/check-disk-usage:0.4.2           true       false
+     disk-usage   check-disk-usage --warning 80.0 --critical 90.0         30               10     0   system/macos,system/macos/disk,system/windows,system/windows/disk,system/linux,system/linux/disk              sensu/check-disk-usage:0.4.2           true       false
    ```
 
 **NEXT:** Do you see the `disk` check in the output?
@@ -167,7 +169,7 @@ Default values can also be provided as a fallback for [unmatched tokens](https:/
 
 - **`{{ .name }}`:** replaced by the target entity name
 - **`{{ .labels.url }}`:** replaced by the target entity "url" label
-- **`{{ .labels.disk_warning | default "85%" }}`:** replaced by the target entity "disk_warning" label; if the label is not set then the default/fallback value of `85%` will be used
+- **`{{ .labels.disk_warning | default "85.0" }}`:** replaced by the target entity "disk_warning" label; if the label is not set then the default/fallback value of `85.0` will be used
 
 Tokens can be used to configure dynamic monitoring jobs (e.g. enabling node-based configuration overrides for things like alerting threshold, etc).
 
@@ -203,7 +205,7 @@ Then, we can use a token to read that value when the check is executed, and give
        --warning {{ .annotations.disk_usage_warning_threshold | default "80.0" }}
        --critical {{ .annotations.disk_usage_critical_threshold | default "90.0" }}
      runtime_assets:
-     - sensu/check-disk-usage:0.4.2
+     - sensu/check-disk-usage:0.5.0
      publish: true
      interval: 30
      subscriptions:
@@ -215,6 +217,8 @@ Then, we can use a token to read that value when the check is executed, and give
      - system/linux/disk
      timeout: 10
      check_hooks: []
+     handlers:
+     - rocketchat
    ```
 
    This configuration makes the disk usage warning and critical thresholds configurable via entity annotations (`disk_usage_warning_threshold` and `disk_usage_critical_threshold`).
@@ -255,9 +259,9 @@ Then, we can use a token to read that value when the check is executed, and give
         foo: bar
         environment: training
       annotations:
-        sensu.io/plugins/rockerchat/config/alias: sensu-trainee
-        disk_usage_warning_threshold: "50%"
-        disk_usage_critical_threshold: "70%"
+        sensu.io/plugins/rocketchat/config/alias: sensu-trainee
+        disk_usage_warning_threshold: "50.0"
+        disk_usage_critical_threshold: "70.0"
       deregister: true
       ```
       
@@ -365,23 +369,84 @@ We can also add additional metadata to the event using `output_metric_tags`.
 
    Modify `disk.yaml` with the following contents (adding `output_metric_format`, `output_metric_handlers`, and `output_metric_tags` fields):
 
-   == TODO: Write the YAML for this! ==
+   ```yaml
+   ---
+   type: CheckConfig
+   api_version: core/v2
+   metadata:
+     name: disk-usage
+   spec:
+     command: >-
+       check-disk-usage
+       --metrics
+       --warning {{ .annotations.disk_usage_warning_threshold | default "80.0" }}
+       --critical {{ .annotations.disk_usage_critical_threshold | default "90.0" }}
+     runtime_assets:
+     - sensu/check-disk-usage:0.5.0
+     publish: true
+     interval: 30
+     subscriptions:
+     - system/macos
+     - system/macos/disk
+     - system/windows
+     - system/windows/disk
+     - system/linux
+     - system/linux/disk
+     timeout: 10
+     check_hooks: []
+     handlers:
+     - rocketchat
+     output_metric_format: prometheus_text
+     output_metric_handlers:
+     - sumologic-metrics
+     output_metric_tags:
+     - name: entity
+      value: "{{ .name }}"
+     - name: namespace
+       value: "{{ .namespace }}"
+   ```
 
-   These fields instruct Sensu what metric format to expect as output from the check, which handler(s) should be used to process the metrics, and what tags should be added to the metrics.
-   
-   The metric formats Sensu can extract from check output as of this writing are: `nagios_perfdata`, `graphite_plaintext`, `influxdb_line`, `opentsdb_line`, and `prometheus_text`. StatsD metrics are also supported, but only via the Sensu Agent StatsD API.
+   > **Understanding the YAML**
+   >
+   > We made a number of small changes here. These fields instruct Sensu what metric format to expect as output from the check, which handler(s) should be used to process the metrics, and what tags should be added to the metrics:
+   > 
+   > - **Added `--metrics` option to `check-disk-usage`.** 
+   >  This tells the check to change it's output from the human-readable format we were using previously to instead output in Prometheus format.
+   > - **Added `output_metric_format: prometheus_text`.**
+   >  This tells Sensu to expect Prometheus formatted output from the check.
+   >  The backend will parse the check's output into structured data in the event's `metrics` property.
+   >
+   > - **Added `output_metric_handlers` list with `sumologic-metrics` handler.**
+   >  This tells the backend to send the metrics data to the Sumologic handler, which will record it in the data platform.
+   >
+   > - **Added `output_metric_tags` property.**
+   >  This defines two tags, `entity` and `namespace`, which we will extract using the tokens `.name` and `.namespace`.
+   >  These tags will be added as metadata in the `metrics` data structure on _each metric_.
 
-2. **Update the Check using `sensuctl create`.**
+1. **Update the Check using `sensuctl create`.**
 
    ```shell
    sensuctl create -f disk.yaml
    ```
 
-   Verify that the check was successfully created:
+1. **Verify that the Check was Successfully Created.**
 
    ```shell
    sensuctl check info disk-usage --format yaml
    ```
+1. **Verify that the Check Produces an Event.**
+
+   ```shell
+   sensuctl event list
+   ```
+
+1. **Inspect the Event Output.**
+
+   ```shell
+   sensuctl event info workshop disk-usage --format yaml
+   ```
+
+**NEXT:** If you can see the check running, with event data being produced with the Prometheus output style, you're ready to move on to the next step.
 
 ## Discussion
 

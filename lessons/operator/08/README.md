@@ -262,6 +262,7 @@ Then, we can use a token to read that value when the check is executed, and give
         sensu.io/plugins/rocketchat/config/alias: sensu-trainee
         disk_usage_warning_threshold: "50.0"
         disk_usage_critical_threshold: "70.0"
+      agent-managed-entity: true
       deregister: true
       ```
       

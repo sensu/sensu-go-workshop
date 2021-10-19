@@ -141,6 +141,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --backend-url ${SENSU_BACKEND_URL} \
    --namespace ${SENSU_NAMESPACE} \
    --subscriptions system/macos,workshop \
+   --agent-managed-entity true \
    --deregister true \
    --cache-dir /opt/sensu/sensu-agent/cache \
    --user ${SENSU_USER} \
@@ -156,6 +157,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --namespace ${Env:SENSU_NAMESPACE} `
    --subscriptions system/windows,workshop `
    --deregister true `
+   --agent-managed-entity true `
    --user ${Env:SENSU_USER} `
    --password ${Env:SENSU_PASSWORD}
    ```
@@ -169,6 +171,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --namespace ${SENSU_NAMESPACE} \
    --subscriptions system/linux,workshop \
    --deregister true \
+   --agent-managed-entity true \
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
    ```
@@ -249,6 +252,7 @@ Stop the agent, modify the configuration, then restart the agent.
    annotations:
      sensu.io/plugins/rocketchat/config/alias: sensu-trainee
 
+   agent-managed-entity: true
    deregister: true
    ```
 

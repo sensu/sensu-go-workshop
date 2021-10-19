@@ -1,6 +1,7 @@
 #!/bin/sh
 
 SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
+SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
 SENSU_CLUSTER_CONFIG=${SENSU_CLUSTER_CONFIG:-"config/sensu/cluster"}
 SENSU_CLUSTER_EXTRAS=${SENSU_CLUSTER_EXTRAS:-""}
@@ -13,10 +14,7 @@ VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
 VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
-ROCKETCHAT_ADDR=${ROCKETCHAT_ADDR:-"http://rocketchat:5000"}
-ROCKETCHAT_ADMIN_USER=${ROCKETCHAT_ADMIN_USER:-"admin"}
-ROCKETCHAT_ADMIN_PASSWORD=${ROCKETCHAT_ADMIN_PASSWORD:-"admin"}
-ROCKETCHAT_USER_PASSWORD=${WORKSHOP_PASSWORD:-"workshop"}
+
 check_deps() {
   for DEP in sensuctl vault
   do
@@ -58,7 +56,7 @@ validate_api_urls() {
 
 seed_cluster() {
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
-  /usr/local/bin/sensuctl create -r -f ${SENSU_CLUSTER_CONFIG}
+  /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_CONFIG}
   if [ $? -ne 0 ]; then
     echo "Error encountered while seeding workshop cluster configuration"
     exit 2
@@ -72,7 +70,7 @@ seed_extras() {
       exit 2
     else
       echo "Applying extra configuration from ${SENSU_CLUSTER_EXTRAS}"
-      /usr/local/bin/sensuctl create -r -f ${SENSU_CLUSTER_EXTRAS}
+      /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_EXTRAS}
       if [ $? -ne 0 ]; then
         echo "Error encountered while seeding workshop cluster extras"
         exit 2
@@ -82,10 +80,10 @@ seed_extras() {
 }
 
 seed_namespaces() {
-  for NAMESPACE in $(/usr/local/bin/sensuctl namespace list --format json | jq -r .[].name)
+  for NAMESPACE in $(/usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} namespace list --format json | jq -r .[].name)
   do
     echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
-    /usr/local/bin/sensuctl create -r -f ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
+    /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
     if [ $? -ne 0 ]; then
       echo "Error encountered while seeding workshop user namespaces"
       exit 2
@@ -94,65 +92,8 @@ seed_namespaces() {
 }
 
 seed_chat_users() {
-	result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}")
-	if [ $? -gt 0 ]; then
-  		echo "Failed to auth with rocketchat"
-  		echo ""
-  		exit 2
-	fi
-	token=$(echo $result | jq -r .data.authToken)
-	id=$(echo $result | jq -r .data.userId)
-	echo "Rocket Chat Admin Token: ${token}"
-	echo "Rocket Chat Admin Id: ${id}"
-	curl -s -H "X-Auth-Token: ${token}" -H "X-User-Id: ${id}" ${ROCKETCHAT_ADDR}/api/v1/me > /dev/null
-	if [ $? -gt 0 ]; then
-  		echo "rocketchat token/id are invalid"
-  		echo ""
-  		exit 2
-	fi
-	result=$(curl -sS -H "X-Auth-Token: ${token}" \
-             -H "X-User-Id: ${id}" \
-             -H "Content-type:application/json" \
-	     ${ROCKETCHAT_ADDR}/api/v1/roles.addUserToRole \
-	     -d "{ \"roleName\": \"bot\" , \"username\": \"${ROCKETCHAT_ADMIN_USER}\" }")
- 	if [ $(echo $result | jq -r .success) != "true" ]; then
-  		echo "rocketchat user admin not added to role bot"
-  		echo ""
-  		exit 2
-	fi
-  	for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
-    		export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
-    		export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
-	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
-                     -H "X-User-Id: ${id}" \
-                     -H "Content-type:application/json" \
-                     ${ROCKETCHAT_ADDR}/api/v1/users.create \
-		     -d "{\"name\": \"${USERNAME}\", \"email\": \"${USERNAME_ORIGINAL}\", \"password\": \"${ROCKETCHAT_USER_PASSWORD}\", \"username\": \"${USERNAME}\"}")
-		if [ $? -gt 0 ]; then
-  			echo "rocketchat user not created for $USERNAME"
-  			echo ""
-  			exit 2
-		fi
-	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
-                     -H "X-User-Id: ${id}" \
-                     -H "Content-type:application/json" \
-		     ${ROCKETCHAT_ADDR}/api/v1/users.getStatus?username=${USERNAME})
-		if [ $(echo $result | jq -r .success) != "true" ]; then
-  			echo "rocketchat user not created for $USERNAME"
-  			echo ""
-  			exit 2
-		fi
-	        result=$(curl -sS -H "X-Auth-Token: ${token}" \
-                     -H "X-User-Id: ${id}" \
-                     -H "Content-type:application/json" \
-		     ${ROCKETCHAT_ADDR}/api/v1/roles.addUserToRole \
-		     -d "{ \"roleName\": \"bot\" , \"username\": \"${USERNAME}\" }")
-		if [ $(echo $result | jq -r .success) != "true" ]; then
-  			echo "rocketchat user $USERNAME not added to role bot"
-  			echo ""
-  			exit 2
-		fi
-	done
+  echo "TODO: seed Mattermost data!"
+  echo ""
 }
 
 seed_user_envrc_files() {
@@ -163,7 +104,7 @@ seed_user_envrc_files() {
     if [ -z ${PASSWORD} ]; then
       export PASSWORD=${WORKSHOP_PASSWORD}
     fi
-    export USER_API_KEY=$(sensuctl api-key grant ${USERNAME} | awk -F "/" '{print $NF}')
+    export USER_API_KEY=$(/usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} api-key grant ${USERNAME} | awk -F "/" '{print $NF}')
     echo "Generating user .envrc file: ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc"
     cat ${SENSU_WORKSHOP_ENVRC_TEMPLATE} | envsubst | tee ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc > /dev/null 2>&1
     echo "Generating user .envrc.ps1 file: ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc.ps1"
@@ -179,35 +120,14 @@ seed_secrets() {
     vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
     vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/${NAME} | jq .data.data
   done
-  result=$(curl -s -XPOST ${ROCKETCHAT_ADDR}/api/v1/login -d "user=${ROCKETCHAT_ADMIN_USER}&password=${ROCKETCHAT_ADMIN_PASSWORD}")
-  if [ $? -gt 0 ]; then
-  	echo "Failed to auth with rocketchat"
-  	echo ""
-  	exit 2
-  fi
-  rc_token=$(echo $result | jq -r .data.authToken)
-  rc_id=$(echo $result | jq -r .data.userId)
-  rc_user=${ROCKETCHAT_ADMIN_USER}
-  rc_password=${ROCKETCHAT_ADMIN_PASSWORD}
-  rc_channel="#general"
-  rc_url="http://rocketchat:5000"
-  echo "Seeding Vault with secret key: ${VAULT_SECRET_PATH_PREFIX}/rocketchat"
-  vault kv put ${VAULT_SECRET_PATH_PREFIX}/rocketchat url=${rc_url} token=${rc_token} id=${rc_id} user=${rc_user} password=${rc_password} channel=${rc_channel} > /dev/null 2>&1
-  vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/rocketchat | jq .data.data
 }
 
 echo "Seeding Sensu Go Workshop resources..."
-wait-for-sensuctl
-if [ $? -gt 0 ]; then
-  echo "Failed to create Sensu user accounts."
-  echo ""
-  exit 2
-fi
 check_deps && \
 validate_io && \
 validate_api_urls && \
-seed_cluster && \
 seed_extras && \
+seed_cluster && \
 seed_namespaces && \
 seed_user_envrc_files && \
 seed_chat_users && \

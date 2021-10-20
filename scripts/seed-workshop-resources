@@ -29,14 +29,17 @@ check_deps() {
 validate_io() {
   if [ ! -d ${VAULT_WORKSHOP_SEEDS} ]; then
     echo "Missing or invalid namespace seeding secrets: \"${VAULT_WORKSHOP_SEEDS}\" (must be a directory)"
+    echo ""
     exit 2
   fi
   if [ ! -d ${SENSU_WORKSHOP_SEEDS} ]; then
     echo "Missing or invalid namespace seeding resources: \"${SENSU_WORKSHOP_SEEDS}\" (must be a directory)"
+    echo ""
     exit 2
   fi
   if [ ! -d ${SENSU_WORKSHOP_USER_ENV_FILES} ]; then
     echo "Missing or invalid env file path: \"${SENSU_WORKSHOP_USER_ENV_FILES}\" (must be a directory)"
+    echo ""
     exit 2
   fi
 }
@@ -45,20 +48,24 @@ validate_api_urls() {
   curl -XGET ${SENSU_API_URL}/health > /dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo "No Sensu API found at ${SENSU_API_URL}"
+    echo ""
     exit 2
   fi
   curl -XGET ${VAULT_ADDR}/v1/sys/health > /dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo "No Vault API found at ${VAULT_ADDR}"
+    echo ""
     exit 2
   fi
 }
 
 seed_cluster() {
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
+  sleep 5
   /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_CONFIG}
   if [ $? -ne 0 ]; then
     echo "Error encountered while seeding workshop cluster configuration"
+    echo ""
     exit 2
   fi
 }
@@ -67,12 +74,14 @@ seed_extras() {
   if [ ! -z ${SENSU_CLUSTER_EXTRAS} ]; then
     if [ ! -d ${SENSU_CLUSTER_EXTRAS} ]; then
       echo "Missing or invalid cluster extras: \"${SENSU_CLUSTER_EXTRAS}\" (must be a directory)"
+      echo ""
       exit 2
     else
       echo "Applying extra configuration from ${SENSU_CLUSTER_EXTRAS}"
       /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_EXTRAS}
       if [ $? -ne 0 ]; then
         echo "Error encountered while seeding workshop cluster extras"
+        echo ""
         exit 2
       fi
     fi
@@ -86,6 +95,7 @@ seed_namespaces() {
     /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
     if [ $? -ne 0 ]; then
       echo "Error encountered while seeding workshop user namespaces"
+      echo ""
       exit 2
     fi
   done
@@ -93,14 +103,13 @@ seed_namespaces() {
 
 seed_chat_users() {
   echo "Initializing Mattermost service..."
-  echo ""
-  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --validate
+  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --validate > /dev/null 2>&1
   if [ $? -gt 0 ]; then
     echo "Failed to initialize Mattermost via bulk import."
     echo ""
     exit 2
   fi
-  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --apply
+  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --apply > /dev/null 2>&1
   if [ $? -gt 0 ]; then
     echo "Failed to initialize Mattermost via bulk import."
     echo ""
@@ -126,6 +135,7 @@ seed_user_envrc_files() {
     echo "Generating user .envrc.ps1 file: ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc.ps1"
     cat ${SENSU_WORKSHOP_PS1_TEMPLATE} | envsubst | tee ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc.ps1 > /dev/null 2>&1
   done
+  echo ""
 }
 
 seed_secrets() {
@@ -136,6 +146,7 @@ seed_secrets() {
     vault kv put ${VAULT_SECRET_PATH_PREFIX}/${NAME} @${VAULT_WORKSHOP_SEEDS}/${SECRET} > /dev/null 2>&1
     vault kv get --format json ${VAULT_SECRET_PATH_PREFIX}/${NAME} | jq .data.data
   done
+  echo ""
 }
 
 echo "Seeding Sensu Go Workshop resources..."

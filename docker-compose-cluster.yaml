@@ -13,14 +13,19 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1024M
+          cpus: "1.0"
+          memory: "2048M"
+        reservations:
+          cpus: "0.5"
+          memory: "1024M"
     labels:
     - io.sensu.role=sensu-backend
     ports: []
     environment:
-    - SENSU_TIMESCALEDB_DSN
+    - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_ETCD_CLIENT_URLS
     - SENSU_NO_EMBED_ETCD=true
+    - SENSU_WORKSHOP_ENV_SECRET
     - SUMOLOGIC_HTTP_SOURCE_URL
     volumes:
     - type: volume
@@ -33,8 +38,8 @@ services:
       retries: 6
     command: >-
       sensu-backend start
-      --log-level=debug
-      --debug=true
+      --log-level=warn
+      --debug=false
       --no-embed-etcd
       --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS}
 
@@ -406,9 +411,11 @@ services:
       args:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
+      - MATTERMOST_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - etcd
+    - mattermost
     deploy:
       resources:
         limits:

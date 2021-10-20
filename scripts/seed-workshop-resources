@@ -92,8 +92,24 @@ seed_namespaces() {
 }
 
 seed_chat_users() {
-  echo "TODO: seed Mattermost data!"
+  echo "Initializing Mattermost service..."
   echo ""
+  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --validate
+  if [ $? -gt 0 ]; then
+    echo "Failed to initialize Mattermost via bulk import."
+    echo ""
+    exit 2
+  fi
+  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --apply
+  if [ $? -gt 0 ]; then
+    echo "Failed to initialize Mattermost via bulk import."
+    echo ""
+    exit 2
+  else 
+    echo "Successfully initialized Mattermost service!"
+    echo ""
+    exit 0
+  fi
 }
 
 seed_user_envrc_files() {

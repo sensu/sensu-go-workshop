@@ -68,7 +68,9 @@ services:
     - SENSU_API_PORT
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
-    volumes: []
+    volumes:
+    - type: tmpfs
+      target: /var/lib/sensu
     healthcheck:
       test: wget -q -O- http://127.0.0.1:3031/healthz
       interval: 10s

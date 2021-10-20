@@ -15,9 +15,6 @@ services:
         limits:
           cpus: "1.0"
           memory: "2048M"
-        reservations:
-          cpus: "0.5"
-          memory: "1024M"
     labels:
     - io.sensu.role=sensu-backend
     ports: []
@@ -208,7 +205,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 64M
     labels:
     - io.sensu.role=sensu-agent
     ports:
@@ -343,6 +340,10 @@ services:
   # See: https://mattermost.com
   mattermost:
     image: mattermost/mattermost-team-edition:${MATTERMOST_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
     - io.sensu.role=chat
     ports:

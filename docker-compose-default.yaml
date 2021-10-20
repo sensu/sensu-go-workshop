@@ -13,9 +13,6 @@ services:
         limits:
           cpus: "1.0"
           memory: "2048M"
-        reservations:
-          cpus: "0.5"
-          memory: "1024M"
     labels:
     - io.sensu.role=sensu-backend
     ports:

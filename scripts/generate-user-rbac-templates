@@ -70,7 +70,7 @@ generate_user_templates() {
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
       export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
       if [ ${PASSWORD} == "null" ]; then
-        export PASSWORD=${WORKSHOP_PASSWORD}
+        export PASSWORD="${WORKSHOP_DEFAULT_TRAINEE_PASSWORD}"
       fi
       export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
       if [ ${PASSWORD_HASH} == "null" ]; then

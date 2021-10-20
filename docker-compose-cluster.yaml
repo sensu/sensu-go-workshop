@@ -136,7 +136,7 @@ services:
       source: etcd_data
       target: /var/lib/etcd
     healthcheck:
-      test: wget -q -O- http://127.0.0.1:2379/health
+      test: ETCDCTL_API=3 etcdctl --endpoints=http://127.0.0.1:2379 endpoint health
       interval: 10s
       timeout: 5s
       retries: 6
@@ -309,7 +309,15 @@ services:
     environment:
     - VAULT_DEV_ROOT_TOKEN_ID
     - VAULT_DEV_LISTEN_ADDRESS
-    volumes: []
+    volumes:
+      - type: volume
+        source: workshop_data
+        target: /vault/logs
+        consistency: consistent
+      - type: volume
+        source: workshop_data
+        target: /vault/file
+        consistency: consistent
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
       interval: 10s
@@ -352,6 +360,10 @@ services:
     - type: volume
       source: mattermost_config
       target: /mattermost/config
+      consistency: consistent
+    - type: volume
+      source: mattermost_data
+      target: /mattermost/data
       consistency: consistent
     - type: bind
       source: ./config/mattermost/data.jsonl
@@ -450,18 +462,15 @@ services:
       target: /workshop/config/vault
       consistency: consistent
     - type: volume
-      source: sensuctl_data
-      target: /root/.config
-    - type: volume
       source: user_data
       target: /users
     command: |-
       init-workshop
 
 volumes:
-  sensu_data:
+  workshop_data:
     driver: local
-  sensuctl_data:
+  sensu_data:
     driver: local
   etcd_data:
     driver: local

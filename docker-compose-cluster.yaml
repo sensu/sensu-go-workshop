@@ -342,14 +342,20 @@ services:
     - MATTERMOST_ADMIN_PASSWORD=${MATTERMOST_ADMIN_PASSWORD}
     - MM_SQLSETTINGS_DRIVERNAME=postgres
     - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_ADMIN_USER}:${MATTERMOST_ADMIN_PASSWORD}@postgres/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
+    - MM_TEAMSETTINGS_ENABLEOPENSERVER=false
+    - MM_PASSWORDSETTINGS_MINIMUMLENGTH=8
+    - MM_PASSWORDSETTINGS_LOWERCASE=true
+    - MM_PASSWORDSETTINGS_UPPERCASE=false
+    - MM_PASSWORDSETTINGS_NUMBER=false
+    - MM_PASSWORDSETTINGS_SYMBOL=false
     volumes:
     - type: volume
       source: mattermost_config
       target: /mattermost/config
       consistency: consistent
-    - type: volume
-      source: mattermost_data
-      target: /mattermost/data
+    - type: bind
+      source: ./config/mattermost/data.jsonl
+      target: /mattermost/data/data.jsonl
       consistency: consistent
     - type: volume
       source: mattermost_logs
@@ -413,8 +419,8 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_PASSWORD
-    - ROCKETCHAT_ADMIN_USER
-    - ROCKETCHAT_ADMIN_PASSWORD
+    - MATTERMOST_ADMIN_USER
+    - MATTERMOST_ADMIN_PASSWORD
     - SENSU_CLUSTER_EXTRAS=config/sensu/store
     volumes:
     - type: bind
@@ -425,7 +431,7 @@ services:
       target: /workshop/.env
     - type: bind
       source: ./${COMPOSE_FILE}
-      target: /workshop/docker-compose.yaml
+      target: /workshop/${COMPOSE_FILE}
     - type: bind
       source: ./docker
       target: /workshop/docker

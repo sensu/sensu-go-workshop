@@ -4,14 +4,17 @@ ARG MATTERMOST_VERSION
 
 # Use multi-stage Dockerfile to fetch desired sensuctl version
 FROM sensu/sensu:${SENSU_CLI_VERSION} AS sensu
+LABEL stage=builder
 RUN sensuctl version
 
 # Use multi-stage Dockerfile to fetch desired vault version
 FROM vault:${VAULT_VERSION} AS vault
+LABEL stage=builder
 RUN vault version
 
 # Use multi-stage Dockerfile to fetch desired mmctl version
 FROM golang:1.17-alpine as mattermost
+LABEL stage=builder
 RUN apk add git
 RUN git clone https://github.com/mattermost/mmctl.git
 RUN cd mmctl && CGO_ENABLED=0 go build -ldflags '-s -w -extldflags "-static"'

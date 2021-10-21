@@ -12,7 +12,6 @@
 - [Encountering "command not found" errors when running `sensu-agent` on MacOS](#encountering-command-not-found-errors-when-running-sensu-agent-on-macos)
 - [How to access Sensu Agent logs when starting the agent via systemd](#how-to-access-sensu-agent-logs-when-starting-the-agent-via-systemd)
 - [Help installing a Sensu Agent](#help-installing-a-sensu-agent)
-- [Using the `sensuctl` container as a sandboxed workstation](#using-the-sensuctl-container-as-a-sandboxed-workstation)
 - [Copy files into running containers](#copy-files-into-running-containers)
 - [Delete trainee namespaces](#delete-trainee-namespaces)
 - [Unable to execute Powershell scripts on a Windows workstation](#unable-to-execute-powershell-scripts-on-a-windows-workstation)
@@ -401,19 +400,6 @@ For more information on managing system `$PATH`, please consult the `path_helper
 ```shell
 sudo journalctl -fu sensu-agent
 ```
-
-## Using the `sensuctl` container as a sandboxed workstation
-
-This workshop includes a Docker container image with `sensuctl` and some additional helper utilities pre-installed.
-This Docker image can be used as a "clean" workstation environment to avoid conflicts on your local workstation.
-
-```
-cd sensu-go-workshop
-sudo docker-compose run --entrypoint="" sensuctl /bin/ash
-```
-
-You should now be presented with a prompt inside the running container.
-This container has a volume mount of the contents of your local `sensu-go-workshop/` directory, so files you edit from your favorite editor on your local workstation will also be available inside the running container (at `/root/workshop`).
 
 ## Copy files into running containers
 

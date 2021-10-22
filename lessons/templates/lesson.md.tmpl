@@ -1,0 +1,101 @@
+#!/bin/sh
+# This is an executable Bash template for making a new lesson.
+# Provide the following variables on the commandline, or the template will ask for them.
+# Content will be presented on STDOUT. 
+#
+# Examples:
+#
+# $ ./lesson.md.tmpl 13 "Monitoring Unlucky Services"
+# $ ./lesson.md.tmpl 13 "Monitoring Unlucky Services" > ../operator/13/README.md
+
+# define template input parameters
+LESSON_NO="${1:-`read -p 'Enter lesson number: ' input && echo $input`}"
+TITLE="${2:-`read -p 'Enter title: ' input && echo $input`}"
+
+# define some generated blocks in variables
+LESSON_FEEDBACK="[Share your feedback on Lesson ${LESSON_NO}](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-`printf '%02d' ${LESSON_NO}`&title=Lesson%20${LESSON_NO}%20Feedback)"
+NEXT_LESSON="[Next Lesson](../`printf '%02d' $((LESSON_NO+1))`/README.md#readme)"
+if [ "${LESSON_NO}" -gt 1 ]; then 
+  PREV_LESSON="[Previous Lesson](../`printf '%02d' $((LESSON_NO-1))`/README.md#readme)"
+fi
+
+# define the template.
+cat  << EOF
+# Lesson ${LESSON_NO}: ${TITLE}
+
+<!-- TOC, 2 levels deep -->
+- [Goals](#goals)
+- [Topic 1](#topic-1)
+  - [Exercise 1: Exercise Title](#exercise-1-exercise-title)
+- [Topic 2](#topic-2)
+  - [Exercise 2: Exercise Title](#exercise-2-exercise-title)
+- [Discussion](#discussion)
+- [Learn More](#learn-more)
+
+## Goals
+<!-- Explicitly define the audience, what they will learn, and any assumed pre-reqs -->
+
+In this lesson we will introduce the ...
+You will learn how to ...
+
+This lesson is intended for operators of Sensu and assumes you have [set up a local workshop environment][setup_workshop].
+
+## Topic 1
+<!-- Short topic text, no more than 500 words -->
+
+### EXERCISE 1: Exercise Title
+
+#### Scenario
+<!-- Describe the situation/problem that the operator is in, in terms of what they want to accomplish. -->
+
+#### Solution
+<!-- Describe how this is solved within Sensu -->
+
+#### Steps
+
+1. **Step 1 Description**
+
+1. **Step 2 Description**
+
+
+## Topic 2
+<!-- Short topic text, no more than 500 words -->
+
+### EXERCISE 2: Exercise Title
+
+#### Scenario
+<!-- Describe the situation/problem that the operator is in, in terms of what they want to accomplish. -->
+
+#### Solution
+<!-- Describe how this is solved within Sensu -->
+
+#### Steps
+<!-- Walk through the steps to acheive this, ideally 3-5 steps total -->
+
+1. **Step 1 Title**
+
+1. **Step 2 Title**
+
+1. **Step 3 Title
+
+
+## Discussion
+<!-- Brief summary of what we learned. -->
+<!-- Add a subsection for any additional information about what we covered, other topics of interest, use cases, etc -->
+
+## Learn More
+<!-- Add related links that expand on the topic here. -->
+- [[Whitepaper] "Whitepaper Title" (domain.name)](#)
+- [[Blog Post] "Blog Post Title" (domain.name)](#)
+- [[Documentation] "Documentation Title" (domain.name)](#)
+
+## Next Steps
+${LESSON_FEEDBACK}
+${NEXT_LESSON}
+${PREV_LESSON}
+
+<!-- Some Commonly Used Named Links -->
+[setup_workshop]: ../02/README.md#readme
+[sensu_api_docs]: https://docs.sensu.io/sensu-go/latest/api/
+
+EOF

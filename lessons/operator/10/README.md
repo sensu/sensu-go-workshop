@@ -1,176 +1,187 @@
-# Lesson 10: Introduction to Assets
+# Lesson 10: Introduction to Silencing & Scheduled Maintenance
 
-- [Overview](#overview)
-- [Why not containers?](#why-not-containers?)
-- [How it works](#how-it-works)
-- [Advanced topics](#advanced-topics)
-  - [CLI command plugins](#cli-command-plugins)
-  - [Plugin SDK](#plugin-sdk)
-- [EXERCISE: register an asset](#exercise-register-an-asset)
-- [EXERCISE: configure a custom asset](#exercise-configure-a-custom-asset)
-- [EXERCISE: package a shell script as an asset](#exercise-package-a-shell-script-as-an-asset)
-- [Learn more](#learn-more)
+## Goals
 
-## Overview
+In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go. 
+You will learn how to target individual incidents on a single host, specific incidents spanning multiple hosts, and even bulk silencing all incidents across multiple hosts.
+You will also learn some new ways to integrate monitoring with your existing automation systems.
+This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
-==TODO: on-demand monitoring instrumentation.
-We've already been using Assets so far in our training, but they were pre-configured.==
+## Alert Supression
 
-## Why not containers?
+Generating alerts is a critical function of monitoring systems.
+Keeping those alerts in check so as to avoid "alert fatigue" is a top priority
+Once Sensu alerts us to an incident that requires further investigation, we can surpress subsequent notifications using [Silences][silencing-docs].
 
-==TODO: because cross-platform (Windows);
-lower-level implementation (PATH, LD_LIBRARY_PATH, etc) that doesn't require a pre-installed runtime (CRI).==
+### What is Silencing?
 
-## How it works
+Sensu’s silencing capability allows you to suppress event handler execution on an ad hoc basis so you can plan maintenance and reduce alert fatigue.
+Silences are created on an ad hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
+Some popular use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
 
-==TODO: packaging, hosting, configuration (builds, url, sha512, filters);
-Bonsai (the "Docker Hub" for Sensu Go).==
+### EXERCISE 1: Silence an Alert
 
-## Advanced topics
+#### Scenario
 
-### CLI command plugins
+You are on-call and have received an alert from Sensu regarding an incident that requires attention from an operator.
+Since you are the first person to respond to the incident, you want to acknowledge the incident and configure Sensu to disable alerts for the next hour minutes, or until the service is restored (which ever comes first).
 
-### Plugin SDK
+#### Solution
 
-==TODO: awareness;
-developer training (coming soon).==
+To accomplish this we will use `sensuctl` to configure a silence and disable event processing.
 
-## EXERCISE: register an asset
+#### Steps
 
-==TODO: `sensuctl asset add`, and `sensuctl create -f` (with downloaded asset yaml from Bonsai).==
+1. **Configure a service health check to monitor an example application.**
 
-## EXERCISE: configure a custom asset
-
-## EXERCISE: package a shell script as an asset
-
-1. Create a simple shell script.
-
-   Create a file named `helloworld.sh` and make it executable:
-
-   ```
-   touch helloworld.sh
-   chmod +x helloworld.sh
-   ```
-
-   Edit `helloworld.sh` with the following contents:
-
-   ```sh
-   #!/bin/sh
-   echo "Hello, ${1:-workshop} world!"
-   if [ $? -eq 0 ]; then
-     exit 0
-   else
-     exit 2
-   fi
-   ```
-
-   To test this script try executing it with and without an argument:
-
-   ```shell
-   sh helloworld.sh
-   sh helloworld.sh Sensu
-   ```
-
-   The output should look like this:
-
-   ```shell
-   Hello, workshop world!
-   Hello, Sensu world!
-   ```
-
-**NEXT:** if you have a working `helloworld.sh` script, you're ready to move on to the next exercise!
-
-1. Package the shell script in a g-zip compressed tarball.
-
-   ```
-   mkdir -p helloworld-0.1/bin
-   mv helloworld.sh helloworld-0.1/bin/
-   tar -czf helloworld-0.1.tar.gz -C helloworld-0.1/ .
-   export SENSU_ASSET_SHA512=$(sha512sum helloworld-0.1.tar.gz | cut -d' ' -f1)
-   ```
-
-   Verify the contents of the asset using the `tar --list` command:
-
-   ```shell
-   tar --list -f helloworld-0.1.tar.gz
-   ```
-
-   The output should look like this:
-
-   ```shell
-   ./
-   ./bin/
-   ./bin/helloworld.sh
-   ```
-
-**NEXT:** if you have successfully packaged your `helloworld.sh` script in a g-zip compressed tarball, then you're ready to move on to the next exercise!
-
-1. Upload the asset to a private asset server (e.g. Artifactory).
-
-   Visit the workshop Artifactory service (see http://127.0.0.1:8882 for self-guided users) and login with the default adminstrator credentials (username: `admin`, password: `password`).
-
-   TODO: upload an asset to Artifactory.
-
-1. Configure a Check + Asset template.
-
-   Copy the following contents to a file called `helloworld.yaml`:
+   Copy and paste the following contents to a file named `app.yaml`. 
+   This will enable HTTP endpoint monitoring of a simple demo app in the workshop environment.
 
    ```yaml
    ---
-   # Example check configuration
    type: CheckConfig
    api_version: core/v2
    metadata:
-     name: helloworld
+     name: app-health
    spec:
-     command: sh helloworld.sh {{ .system.os }}
+     command: http-check --url http://workshop_app_1:8080/healthz
      runtime_assets:
-     - helloworld:0.1
+     - sensu/http-checks:0.4.0
      publish: true
+     proxy_entity_name: app01
      subscriptions:
-     - linux
+     - workshop
      interval: 30
      timeout: 10
-     check_hooks: []
+     handlers:
+     - mattermost
+   ```
 
+1. **Add the `not_silenced` filter to your alert handler.**
+
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) and updated in [Lesson 6](/lessons/operator/06/README.md#readme).
+   Replace the contents of `mattermost.yaml` with the following:
+
+   ```yaml
    ---
-   # Custom asset definition
-   type: Asset
+   type: Handler
    api_version: core/v2
    metadata:
-     name: helloworld:0.1
+     name: mattermost
    spec:
-     builds:
-     - url: "http://artifactory:8082/artifactory/sensu/helloworld-0.1.tar.gz"
-       sha512: "${SENSU_ASSET_SHA512}"
-       headers:
-       - "Authorization: Bearer ${ARTIFACTORY_TOKEN}"
-       filters:
-       - "entity.system.os == 'linux'"
+     type: pipe
+     command: >-
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.3.2
+     timeout: 10
+     filters:
+     - is_incident
+     - not_silenced
+     secrets:
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
 
-**NEXT:** if you have created a configuration `helloworld.yaml` template, then you're ready to move on to the next step.
+   > **Understanding the YAML:**
+   > - We added `not_silenced` the `filters:` array.
+   > - We _removed_ `filter-repeated` from the filters array so we can better observe the effect of silencing
 
-1. Create the Check and Asset resources using `sensuctl create -f`.
+1. **Trigger an incident**
+
+   The demo app provided in this workshop has a built-in `/healthz` API that we can toggle between healthy (`200 OK`) and unhealthy (`500 Internal Server Error`) states by sending an HTTP POST request.
+   Let's trigger a failure in the app that will result in an alert in Mattermost.
+
+   **Mac and Linux:**
+   
+   ```shell
+   curl -i -X POST http://127.0.0.1:9000/healthz
+   curl -i -X GET http://127.0.0.1:9000/healthz
+   ```
+   
+   **Windows (Powershell):**
+   
+   ```shell
+   Invoke-RestMethod -Method POST -Uri "http://127.0.0.1:9000/healthz"
+   Invoke-RestMethod -Method GET -Uri "http://127.0.0.1:9000/healthz"
+   ```
+   
+   If you see output like `HTTP/1.1 500 Internal Server Error`, then you're ready to move on to the next step.
+   
+   > _NOTE: if you see an error like `curl: (7) Failed to connect to localhost port 9000: Connection refused` it may be that Docker assigned a different port to your app container.
+   > To obtain the current port mapping number run `sudo docker-compose port app 8080`._
+
+1. **Create a silence entry.**
+
+   Let's use the `sensuctl silenced create` to create a silencing rule to disable alerts for this incident.
+   Since we're just getting started, let's just silence alerts for a few minutes. 
+   In a typical scenario you might silence alerts for an hour or more while you investigate an incident.
 
    ```shell
-   sensuctl create -f helloworld.yaml
+   sensuctl silenced create --interactive
+   ? Namespace: default
+   ? Subscription: *
+   ? Check: app-health
+   ? Begin time: now
+   ? Expiry in Seconds: 120
+   ? Expire on Resolve: No
+   ? Reason: My first silence!
+   Created
    ```
+   
+   > **Understanding the command:**
+   > - Setting `Subscription:*` or leaving the Subscription field blank means the silence will apply to events matching any subscription.
+   > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
+   > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts. 
+   > - The "Reason" field lets us leave a comment or provide a description for the silence.
 
-   Verify that your check and asset resource were created using `senscutl` or the Sensu web app.
 
+1. **Restore demo app to healthy status (curl -XPOST localhost:9000/healthz)**
+
+   **Mac and Linux users:**
+   
+   ```shell
+   curl -i -X POST http://127.0.0.1:9000/healthz
+   curl -i -X GET http://127.0.0.1:9000/healthz
    ```
-   sensuctl check info helloworld --format yaml
-   sensuctl asset info helloworld:0.1 --format yaml
+   
+   **Windows users:**
+   
+   ```shell
+   TODO
    ```
+   
 
-## Learn more
+## Bulk Silencing
 
-## Next steps
+### Silencing all alerts on multiple hosts
 
-[Share your feedback on Lesson 10](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-10&title=Lesson%2010%20Feedback)
+### Silencing alerts from a specific service across multiple hosts
 
-[Lesson 11: Introduction to Silencing & Scheduled Maintenance](../11/README.md#readme)
+### EXERCISE 2: Bulk Silencing
 
+## Scheduled Maintenance
 
+### What is a scheduled maintenance window?
 
+Scheduled maintenance window is a silence that starts and ends in the future. 
+
+## EXERCISE 3: Configure a scheduled maintenance window
+
+TODO
+
+## Discussion
+
+TODO: recap lesson.
+
+### Maintenance Mode vs Scheduled Maintenance
+
+Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction (which inevitably requires coordination/scheduling of humans).
+Maintenance mode is a useful practice when an automated system is performing automated maintenance... Sensu Silenced API allows automated systems to put a host in "maintenance mode" at the beginning of an automated maintenance, and then remove the silence when the automated maintenance task is completed.
+
+[setup_workshop]: ../02/README.md#readme
+[silencing-docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/

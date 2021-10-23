@@ -1,175 +1,178 @@
-# Lesson 9: Introduction to Check Hooks
+# Lesson 9: Introduction to Hooks
 
-- [Overview](#overview)
-- [Use cases](#use-cases)
-- [Advanced topics](#advanced-topics)
-- [EXERCISE 1: configure a check hook](#exercise-1-configure-a-check-hook)
-- [Learn more](#learn-more)
-- [Next steps](#next-steps)
+- [Goals](#goals)
+- [What are Hooks?](#what-are-hooks)
+  - [Exercise 1: Capture Check Context Using a Hook](#exercise-1-capture-check-context-using-a-hook)
+- [Discussion](#discussion)
+- [Learn More](#learn-more)
 
+## Goals
 
-## Overview
+In this lesson we will introduce _check hooks_. 
+You will learn how to use hooks to provide additional context to your check output. 
 
-Sensu Check Hooks are commands the Sensu Agent executes in response to a monitoring job (check) result.
-Because these hooks are executed before event data is sent to the Sensu observabilty pipeline, they are great for enriching events with valuable context.
-Sensu Check Hooks are designed for a form of SRE automation that we refer to as "automated diagnosis" – a codification of the actions an SRE or operations engineer might take to triage a monitoring incident (e.g. tail a log file or check the process table).
-By automating diagnosis, Sensu can produce alerts and incidents full of context that can help IT Operations reduce mean time to recovery (MTTR).
+This lesson is intended for operators of Sensu and assumes you have [set up a local workshop environment][setup_workshop].
 
-**Example**
+## What are Hooks? 
 
-```yaml
----
-type: HookConfig
-api_version: core/v2
-metadata:
-  name: nginx-config-validation
-  annotations:
-    description: |
-      Validate NGINX configuration to ensure that service interruption isn't
-      the result of invalid configuration.
-spec:
-  command: sudo nginx -t
-  timeout: 10
+In Sensu a _hook_ is a command that an agent executes in response to a check result.
+Because hooks are executed before the event is sent to the backend, they are great for enriching events with additional context.
 
----
-type: CheckConfig
-api_version: core/v2
-metadata:
-  name: nginx-status
-spec:
-  command: >-
-    check-nginx-status.rb
-    --url {{ .annotations.check_nginx_status_url | default "http://127.0.0.1:80/nginx_status" }}
-  runtime_assets:
-    - sensu-plugins/sensu-plugins-nginx:3.1.2
-    - sensu/sensu-ruby-runtime:0.0.10
-  publish: true
-  interval: 30
-  subscriptions:
-    - nginx
-  timeout: 10
-  check_hooks:
-    - warning:
-        - nginx-config-validation
-    - critical:
-        - nginx-config-validation
-    - unknown:
-        - nginx-config-validation
-  handlers:
-    - rocketchat
-    - slack
-```
+We refer to this practice as  _automated diagnosis_. 
+Hooks automate the actions an SRE or operations engineer might take to triage an incident (e.g. tail a log file or check the process table).
 
-In this example, we have configured a check hook to test NGINX configuration (`nginx -t`) to ensure the configuration is still valid.
+### EXERCISE 1: Capture Check Context Using a Hook
 
-## Use cases
+#### Scenario
 
-Sensu Check Hooks are for collecting additional context (event enrichment), and should not be used for remediation purposes.
+The `disk-usage` check is reporting an error because the disk is becoming full.
+It would be helpful to include a list of files in the temp directory to see if there is a large temp file that we could delete.
+Instead of shelling into the machine directly to get this information, you'd rather have Sensu capture it for you.
 
-Some example Check Hook use cases include:
+#### Solution
 
-- Tail a log file (e.g. collect the last 30 seconds of log output)
-- Check the system process table
-- Validate configuration files
-- Check file system metadata (e.g. last accessed or modified dates)
-- Inspect processes (e.g. use `lsof` to see what files or ports a process is accessing)
-- Check installed package version information
+A check hook can be used to execute an additional command conditionally, based on the status of the check.
+We can create a hook to list the files in the temp directory, and include that output alongside the regular check output.
 
-Many of the best check hook use cases make use of native system commands (e.g. `ps`, `tail`, `lsof`, `traceroute`, `nslookup`, `curl`, etc), but Check Hooks can also execute custom scripts.
+#### Steps
 
-## Advanced topics
-
-### Check Hook reuse
-
-Sensu Go Check Hooks are first-class API resources, which offers several benefits:
-
-- Hooks can be reused across multiple monitoring jobs (checks)
-- Access controls can be configured to restrict certain users from creating or modifying Hooks (e.g. end-users can be granted read-only access to authorized Hooks that are managed by Sensu administrators)
-- Hook resource templates that automate common actions can be shared between teams, or even between organizations (i.e. in the Sensu Community)
-
-## EXERCISE: configure a check hook
-
-1. **Configure a Hook to evaluate the process tree.**
-
-   Copy the following contents to a file named `ps.yaml`
-
+1. **Create a Hook to List Files in the Temp Directory**
+   
+   Copy and paste the following contents to a file named `ls-temp.yaml`.
+   
    ```yaml
    ---
    type: HookConfig
    api_version: core/v2
    metadata:
-     name: process-table
+     name: ls-temp
    spec:
-     command: ps -aux
+     command: ls -alh /var/tmp
      timeout: 10
      stdin: false
      runtime_assets: []
-   ---
-   type: HookConfig
-   api_version: core/v2
-   metadata:
-     name: process-table-windows
-   spec:
-     command: tasklist /svc
-     timeout: 10
-     stdin: false
-     runtime_assets: []
+    
    ```
 
-1. **Create the Hook using `sensuctl create -f`.**
+   Then create the hook using `sensuctl create`:
 
    ```shell
-   sensuctl create -f ps.yaml
+   sensuctl create -f ls-temp.yaml
    ```
 
-   Verify that the hook was created:
+1. **Add the Hook to the Check Configuration**
 
-   ```
-   sensuctl hook info process-table --format yaml
-   ```
-
-1. **Update the check configuration template to use the new Hook(s).**
-
-   Let's modify the check template we created in [Lesson 8](/lessons/operator/08/README.md#readme) (e.g. `disk.yaml`), and replace the `check_hooks: []` line with the following:
-
-   **Mac and Linux users:**
-
+   Modify the check template we created in [Lesson 8](/lessons/operator/08/README.md#readme) (e.g. `disk.yaml`), and replace the `check_hooks: []` line with the following:
+   
    ```yaml
    check_hooks:
    - non-zero:
-     - process-table
+     - ls-temp
    ```
 
-   **Windows users:**
-
-   ```yaml
-   check_hooks:
-   - non-zero:
-     - process-table-windows
-   ```
-
-   In practice you may find it appropriate to bundle certain check hooks alongside the corresponding checks (e.g. add the check hook configuration to the check template file).
-
-1. **Update the check using `sensuctl create -f`.**
+   Then update the check using `sensuctl create`:
 
    ```shell
-   sensuctl create -f disk.yaml
+   sensuctl create -f disk-usage.yaml
    ```
+   
+   > **PROTIP:** In practice, it is often convenient to bundle check hooks alongside the corresponding checks, by including both configurations in the same YAML file.
 
-   Now verify that the check was updated using `sensuctl` or the Sensu web app.
+1. **Verify the Configuration**
+
+   Verify that the check was updated using `sensuctl check info`.
 
    ```shell
    sensuctl check info disk-usage --format yaml
    ```
 
-## Learn more
+1. **Verify the Output**
 
+   Verify that the hook output was included, by inspecting the event created by the `disk-usage` check:
+
+   ```shell
+   sensuctl event info workshop disk-usage --format json
+   ```
+
+   In the event JSON, the property `.check.hooks` should look something like this:
+
+   **Example Output**
+   
+   ```json
+   "hooks": [
+      {
+        "metadata": {
+          "name": "ls-temp",
+          "namespace": "default",
+          "labels": {
+            "sensu.io/managed_by": "sensuctl"
+          },
+          "created_by": "sensu"
+        },
+        "command": "ls -alh /var/tmp",
+        "timeout": 10,
+        "stdin": false,
+        "runtime_assets": null,
+        "duration": 0.021055335,
+        "executed": 1634953321,
+        "issued": 0,
+        "output": "total 0\ndrwxrwxrwt   5 root     wheel   160B Oct 22 17:35 .\ndrwxr-xr-x  32 root     wheel   1.0K Oct 19 10:24 ..\ndrwxr-xr-x   3 root     wheel    96B Sep 15 10:52 aud\nsrw-r--r--   1 thoward  wheel     0B Sep 30 10:32 filesystemui.socket\ndrwxr-xr-x   2 root     wheel    64B Sep 15 10:52 kernel_panics\n",
+        "status": 0
+      }
+   ]
+   ```
+
+## Discussion
+
+In this lesson you learned how to create a hook that added some additional context to a check.
+
+Hooks are reusable resources that can enrich your data and save a lot of time when debugging.
+
+### Hooks are Not Remediations
+
+It may seem like hooks would also be a perfect tool for automatic remediations.
+However, we strongly discourge using hooks for this.
+
+Remediations are best done using handlers, like the [`sensu-remediation-handler`], or the product-specific handlers for [Ansible Tower][sensu-ansible-handler], [Rundeck][sensu-rundeck-handler], and [SaltStack][sensu-saltstack-handler].
+
+The main difference is that handlers are run by the backend, so logging, secret injection, auditing, and access via the dashboard are available.
+A hook is a simple command, run on the agent, without the rest of hte infrastructure that the backend and pipeline provide.
+
+Learn more about automated remediations in our [Patterns and Workflows](#) _(coming soon!)_.
+
+### Uses Cases
+
+So, now that we know how you should *not* use hooks, here are some examples of use cases we *do* suggest:
+
+- Tail a log file
+- Check the system process table
+- Validate configuration files
+- Check file system metadata (e.g. last accessed or modified dates)
+- Inspect processes (e.g. use `lsof` to see what files or ports a process is accessing)
+- Check installed package version information
+- Check kernel version and platform information
+
+For full details, read the [hooks reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/). 
+
+### Hook Assets 
+
+Like checks, hooks are able to specify assets that they need to run.
+If your hook needs more complex behaviour than a simple one-line shell action, consider packaging it as an asset instead of in-line in the YAML configuration.
+
+## Learn More
 - [[Documentation] "Sensu Hooks Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/)
 - [[Blog Post] "Using Check Hooks" (sensu.io)](https://sensu.io/blog/using-check-hooks-a739a362961f)
 - [[Blog Post] "Alert fatigue, part 3: automating triage & remediation with check hooks & handlers" (sensu.io)](https://sensu.io/blog/alert-fatigue-part-3-automating-triage-remediation-with-checks-hooks-handlers)
 
-## Next steps
+## Next Steps
 
-[Share your feedback on Lesson 09](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-09&title=Lesson%2009%20Feedback)
+[Next - Lesson 10: Introduction to Silencing & Scheduled Maintenance](../10/README.md#readme)
 
-[Lesson 10: Introduction to Assets](../10/README.md#readme)
+[Previous - Lesson 8: Introduction to Checks](../08/README.md#readme)
+
+[Feedback - Share your feedback on Lesson 9](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-09&title=Lesson%209%20Feedback)
+
+<!-- Some Commonly Used Named Links -->
+[setup_workshop]: ../02/README.md#readme
+[sensu_api_docs]: https://docs.sensu.io/sensu-go/latest/api/
+

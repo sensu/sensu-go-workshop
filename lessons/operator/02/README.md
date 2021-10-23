@@ -84,7 +84,7 @@ The `docker-compose-default.yaml` defines the configuration of the following con
      - `sensu-backend`: A [Sensu backend](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/backend/), [API](https://docs.sensu.io/sensu-go/latest/api/), and [dashboard](https://docs.sensu.io/sensu-go/latest/web-ui/)
      - `sensu-agent`: A Sensu [agent](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/) node
    - A chat-ops environment, for alerting:
-     - `rocketchat`: [Rocket.Chat](https://rocket.chat/), a web-based chat app similar to Slack
+     - `mattermost`: [Mattermost](https://mattermost.com), a web-based chat app similar to Slack
      - `mongo`: [MongoDB](https://www.mongodb.com/), Rocket.Chat's database
    - A telemetry stack:
      - `influxdb`: [InfluxDB](https://www.influxdata.com/) for metrics storage

@@ -5,15 +5,6 @@
 The following issues would help improve the overall product UX as well as the
 lessons contained in this workshop:
 
-1. **Sensuctl contexts**
-
-   - Sensuctl should read from `$SENSU_CONFIG_DIR` environment variable
-   - Sensuctl config files should include the username
-
-   Related:
-
-   - https://github.com/sensu/sensu-go/issues/2316
-
 1. **"Named API Keys"**
 
    - Improvements here would eliminate a lof of explanation around how to
@@ -38,20 +29,4 @@ lessons contained in this workshop:
    Related:
 
    - https://github.com/sensu/sensu-go/issues/2623
-
-1. **The `sensuctl user hash-password` command requires valid configuration.**
-
-   Related:
-
-   - https://github.com/sensu/sensu-go/issues/4003
-
-## Bugs
-
-The following bugs may impact trainees ability to complete the workshop:
-
-1. **Error fetching assets on MacOS.**
-
-   Related:
-
-   - https://github.com/sensu/sensu-go/issues/4262
 

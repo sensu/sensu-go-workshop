@@ -53,12 +53,39 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Modify a handler configuration template to use a built-in filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `mattermost.yaml`), and replace the `filters: []` line with the following:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme).
+   Replace the contents of `mattermost.yaml` with the following:
 
    ```yaml
-   filters:
-   - is_incident
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: mattermost
+   spec:
+     type: pipe
+     command: >-
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.3.2
+     timeout: 10
+     filters:
+     - is_incident
+     secrets:
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
+
+   > **Understanding the YAML:**
+   > - We replaced the `filters: []` line with the following:
+   >   ```yaml
+   >   filters:
+   >   - is_incident
+   >   ```
 
 1. **Update the handler using `sensuctl create -f`.**
 
@@ -197,13 +224,36 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Modify a handler configuration template to use a custom filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `mattermost.yaml`), and update the `filters` field with the following:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme).
+   Replace the contents of `mattermost.yaml` with the following:
 
    ```yaml
-   filters:
-   - is_incident
-   - filter-repeated
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: mattermost
+   spec:
+     type: pipe
+     command: >-
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.3.2
+     timeout: 10
+     filters:
+     - is_incident
+     - filter-repeated
+     secrets:
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
+
+   > **Understanding the YAML:**
+   > - We added `filter-repeated` the `filters:` array.
 
 1. **Update the handler using `sensuctl create -f`.**
 

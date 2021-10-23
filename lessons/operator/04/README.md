@@ -57,7 +57,7 @@ Your SRE team primarily communicates via a chat app like [Slack] or [Mattermost]
 #### Solution
 
 To accomplish this we will use the [sensu-slack-handler].
-Because Mattermost is API-compatible with Slack, we can use the Slack handler with Mattermost.
+Because Mattermost is [API-compatible with Slack][mattermost-api], we can use the Slack handler with Mattermost.
 The handler will send event data to a channel in the workshop Mattermost instance.
 
 #### Steps
@@ -78,7 +78,7 @@ The handler will send event data to a channel in the workshop Mattermost instanc
        sensu-slack-handler
        --channel "#alerts"
        --username SensuGo
-       --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
        --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
      - sensu/sensu-slack-handler:1.3.2
@@ -296,6 +296,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [sumologic]: https://sumologic.com
 [slack]: https://slack.com/
 [mattermost]: https://https://mattermost.com
+[mattermost-api]: https://docs.mattermost.com/developer/integration-faq.html#what-does-slack-compatible-mean
 [bonsai]: https://bonsai.sensu.io/
 [bonsai_handlers]: https://bonsai.sensu.io/assets?q=handler
 [prometheus]: https://prometheus.io/

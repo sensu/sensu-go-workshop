@@ -2,7 +2,7 @@
 
 ## Goals
 
-In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go. 
+In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go.
 You will learn how to target individual incidents on a single host, specific incidents spanning multiple hosts, and even bulk silencing all incidents across multiple hosts.
 You will also learn some new ways to integrate monitoring with your existing automation systems.
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
@@ -28,13 +28,15 @@ Since you are the first person to respond to the incident, you want to acknowled
 
 #### Solution
 
-To accomplish this we will use `sensuctl` to configure a silence and disable event processing.
+To accomplish this we will configure a silence to suppress an alert (i.e. disabling event processing).
+We'll use `sensuctl` to configure silencing in this lesson.
+You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11].
 
 #### Steps
 
 1. **Configure a service health check to monitor an example application.**
 
-   Copy and paste the following contents to a file named `app.yaml`. 
+   Copy and paste the following contents to a file named `app.yaml`.
    This will enable HTTP endpoint monitoring of a simple demo app in the workshop environment.
 
    ```yaml
@@ -48,7 +50,7 @@ To accomplish this we will use `sensuctl` to configure a silence and disable eve
      runtime_assets:
      - sensu/http-checks:0.4.0
      publish: true
-     proxy_entity_name: app01
+     proxy_entity_name: workshop_app_1
      subscriptions:
      - workshop
      interval: 30
@@ -57,7 +59,7 @@ To accomplish this we will use `sensuctl` to configure a silence and disable eve
      - mattermost
    ```
 
-1. **Add the `not_silenced` filter to your alert handler.**
+1. **Add the `not_silenced` filter to handlers.**
 
    Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) and updated in [Lesson 6](/lessons/operator/06/README.md#readme).
    Replace the contents of `mattermost.yaml` with the following:
@@ -77,7 +79,7 @@ To accomplish this we will use `sensuctl` to configure a silence and disable eve
        --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
        --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
-     - sensu/sensu-slack-handler:1.3.2
+     - sensu/sensu-slack-handler:1.4.0
      timeout: 10
      filters:
      - is_incident
@@ -97,34 +99,43 @@ To accomplish this we will use `sensuctl` to configure a silence and disable eve
    Let's trigger a failure in the app that will result in an alert in Mattermost.
 
    **Mac and Linux:**
-   
+
    ```shell
-   curl -i -X POST http://127.0.0.1:9000/healthz
-   curl -i -X GET http://127.0.0.1:9000/healthz
+   curl -i -X POST http://127.0.0.1:9001/healthz
+   curl -i -X GET http://127.0.0.1:9001/healthz
    ```
-   
+
    **Windows (Powershell):**
+
+   ```shell
+   Invoke-RestMethod -Method POST -Uri "http://127.0.0.1:9001/healthz"
+   Invoke-RestMethod -Method GET -Uri "http://127.0.0.1:9001/healthz"
+   ```
+
+   You should see output like `HTTP/1.1 500 Internal Server Error`. 
+   _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
+   To obtain the current port mapping number run `sudo docker-compose port app 8080`._
+   
+   Within a few moments, Sensu should begin reporting the failure. 
+   Run the `sensuctl event list` command to see the incident:
    
    ```shell
-   Invoke-RestMethod -Method POST -Uri "http://127.0.0.1:9000/healthz"
-   Invoke-RestMethod -Method GET -Uri "http://127.0.0.1:9000/healthz"
+   $ sensuctl event list
+         Entity         Check                                        Output                                      Status   Silenced             Timestamp           
+    ───────────────── ──────────── ───────────────────────────────────────────────────────────────────────────── ──────── ────────── ───────────────────────────────
+     workshop_app_1    app-health   http-check CRITICAL: HTTP Status 500 for http://workshop_app_1:8080/healthz        2   true       2021-10-23 15:34:11 -0700 PDT
    ```
-   
-   If you see output like `HTTP/1.1 500 Internal Server Error`, then you're ready to move on to the next step.
-   
-   > _NOTE: if you see an error like `curl: (7) Failed to connect to localhost port 9000: Connection refused` it may be that Docker assigned a different port to your app container.
-   > To obtain the current port mapping number run `sudo docker-compose port app 8080`._
 
 1. **Create a silence entry.**
 
    Let's use the `sensuctl silenced create` to create a silencing rule to disable alerts for this incident.
-   Since we're just getting started, let's just silence alerts for a few minutes. 
+   Since we're just getting started, let's just silence alerts for a few minutes.
    In a typical scenario you might silence alerts for an hour or more while you investigate an incident.
 
    ```shell
    sensuctl silenced create --interactive
    ? Namespace: default
-   ? Subscription: *
+   ? Subscription: entity:workshop_app_1
    ? Check: app-health
    ? Begin time: now
    ? Expiry in Seconds: 120

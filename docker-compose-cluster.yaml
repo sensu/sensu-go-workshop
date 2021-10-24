@@ -209,9 +209,9 @@ services:
         limits:
           memory: 64M
     labels:
-    - io.sensu.role=sensu-agent
+    - io.sensu.role=app
     ports:
-    - 8080/tcp
+    - 9001-9005:8080/tcp
     environment:
     - DB_HOST=${APP_DB_HOST}
     - DB_PORT=${APP_DB_PORT}
@@ -376,6 +376,10 @@ services:
     - type: bind
       source: ./config/mattermost/data.jsonl
       target: /mattermost/data/data.jsonl
+      consistency: consistent
+    - type: bind
+      source: ./config/mattermost/profile.jpg
+      target: /mattermost/profile.jpg
       consistency: consistent
     - type: volume
       source: mattermost_logs

@@ -13,11 +13,9 @@ LABEL stage=builder
 RUN vault version
 
 # Use multi-stage Dockerfile to fetch desired mmctl version
-FROM golang:1.17-alpine as mattermost
+FROM mattermost/mattermost-team-edition:${MATTERMOST_VERSION} as mattermost
 LABEL stage=builder
-RUN apk add git
-RUN git clone https://github.com/mattermost/mmctl.git
-RUN cd mmctl && CGO_ENABLED=0 go build -ldflags '-s -w -extldflags "-static"'
+RUN /mattermost/bin/mmctl version
 
 # Build the workshop workstation image
 #
@@ -32,13 +30,14 @@ RUN cd mmctl && CGO_ENABLED=0 go build -ldflags '-s -w -extldflags "-static"'
 # - docker
 # - docker-compose
 # - mmctl
-# - workshop /scripts utilities
+#
 FROM alpine:latest AS workshop
+RUN apk add curl jq gettext docker-cli docker-compose && mkdir /lib64
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/
 COPY --from=vault /bin/vault /usr/local/bin/vault
-COPY --from=mattermost /go/mmctl/mmctl /usr/local/bin/mmctl
+COPY --from=mattermost /mattermost/bin/mmctl /usr/local/bin/mmctl
+COPY --from=mattermost /lib64/* /lib64/
 ENV PATH=$PATH:/usr/local/bin/scripts
-RUN apk add curl jq gettext docker-cli docker-compose
 
 WORKDIR /workshop/

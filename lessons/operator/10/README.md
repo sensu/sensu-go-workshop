@@ -262,15 +262,17 @@ Scheduled maintenance window is a silence that starts and ends in the future.
 
 #### Scenario
 
-You are planning a maintenance activity
+You are planning a maintenance activity in which certain infrastructure services may become unavailable.
 
 #### Solution
+
+We'll use `sensuctl` to configure a silencing rule and avoid generating false-positive alerts during the planned maintenance window.
 
 #### Steps
 
 1. **Get the current date and time in RFC3339 format:**
 
-   Get the current time in RFC3339 or RFC8601 format.
+   Get the current date and time in RFC3339 or RFC8601 format.
 
    **MacOS:**
 

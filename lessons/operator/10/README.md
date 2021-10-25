@@ -19,12 +19,12 @@
 
 In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go.
 You will learn how to target individual incidents on a single host, specific incidents spanning multiple hosts, and even bulk silencing all incidents across multiple hosts.
-You will also learn some new ways to integrate monitoring with your existing automation systems.
+You will also learn some new ways to integrate observability with your existing automation systems.
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## Alert Suppression
 
-Generating alerts is a critical function of monitoring systems.
+Generating alerts is a critical function of observability systems.
 Keeping those alerts in check so as to avoid "alert fatigue" is a top priority
 Once Sensu alerts us to an incident that requires further investigation, we can surpress subsequent notifications using [Silences][silencing-docs].
 

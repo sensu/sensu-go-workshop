@@ -78,11 +78,11 @@ services:
       retries: 6
     command: >-
       sensu-agent start
-      --log-level=info
+      --log-level=warn
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
-      --statsd-event-handlers influxdb
+      --statsd-event-handlers sumologic-metrics
       --password ${SENSU_AGENT_PASSWORD}
 
   # Postgres
@@ -128,34 +128,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-
-  # Demo App
-  #
-  # See: https://github.com/portertech/demo-app
-  app:
-    image: portertech/demo-app:latest
-    deploy:
-      resources:
-        limits:
-          memory: 64M
-    labels:
-    - io.sensu.role=app
-    ports:
-    - 9001-9005:8080/tcp
-    environment:
-    - DB_HOST=${APP_DB_HOST}
-    - DB_PORT=${APP_DB_PORT}
-    - DB_USER=${APP_DB_USERNAME}
-    - DB_PASS=${APP_DB_PASSWORD}
-    - DB_NAME=${APP_DB_NAME}
-    volumes: []
-    healthcheck:
-      test: curl -XGET -I http://127.0.0.1:8080/healthz
-      interval: 10s
-      timeout: 5s
-      retries: 6
-    command: >-
-      /usr/bin/demo-app
 
   # Sensu Asset Server
   #
@@ -287,6 +259,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+
+  # Demo App
+  #
+  # See: https://github.com/portertech/demo-app
+  app:
+    image: portertech/demo-app:latest
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    labels:
+    - io.sensu.role=sensu-agent
+    ports:
+    - 8080/tcp
+    environment:
+    - DB_HOST=${APP_DB_HOST}
+    - DB_PORT=${APP_DB_PORT}
+    - DB_USER=${APP_DB_USERNAME}
+    - DB_PASS=${APP_DB_PASSWORD}
+    - DB_NAME=${APP_DB_NAME}
+    volumes: []
+    healthcheck:
+      test: curl -XGET -I http://127.0.0.1:8080/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: >-
+      /usr/bin/demo-app
 
   # Configurator
   #

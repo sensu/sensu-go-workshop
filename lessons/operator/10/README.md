@@ -38,10 +38,13 @@ Some popular use cases for silencing include alert acknowledgement, and overall 
 
 Sensu's silencing implementation is intended to a broad variety of use cases.
 For this reason, silenced events are not automatically discarded by Sensu.
-Event processing can be disabled for silenced events using the built-in `not_silenced` event filter.
+Sensu compares incoming events against configured silencing rules and annotates matching events with an `is_silenced: true` property.
+Event processing can be disabled for silenced events using the built-in [`not_silenced` event filter][not-silenced].
+
+The `not_silenced` filter only allows processing of events that are _not silenced_ (i.e. any event that does not have `event.check.is_silenced` set to `true`).
 This filter can be applied to handlers on a case-by-case basis.
 Most users typically enable the `not_silenced` filter on all alerting and incident management handlers (e.g. Slack or Pagerduty).
-To learn more about event filters in Sensu Go, please visit [Lesson 6][lesson-6].
+To learn more about event filters in Sensu Go, please review [Lesson 6][lesson-6] of this workshop.
 
 ### EXERCISE 1: Silence an Alert
 
@@ -347,6 +350,7 @@ Some third-party automation tools such as Rundeck offer [built-in integration wi
 [setup_workshop]: ../02/README.md#readme
 [silencing-docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/
 [silencing-api]: https://docs.sensu.io/sensu-go/latest/api/silenced/
+[not-silenced]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#built-in-filter-not_silenced
 
 <!-- Lesson references-->
 [lesson-4]: /lessons/operator/04/README.md#readme

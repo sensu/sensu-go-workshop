@@ -3,14 +3,14 @@
 - [Goals](#goals)
 - [Alert Suppression](#alert-suppression)
   - [What is Silencing?](#what-is-silencing)
-  - [The `not_silenced` filter](#the-not-silenced-filter)
+  - [The `not_silenced` Filter](#the-not-silenced-filter)
   - [EXERCISE 1: Silence an Alert](#exercise-1-silence-an-alert)
 - [Bulk Silencing](#bulk-silencing)
-  - [Silencing alerts on multiple hosts](#silencing-alerts-on-multiple-hosts)
+  - [Silencing Alerts on Multiple Hosts](#silencing-alerts-on-multiple-hosts)
   - [EXERCISE 2: Bulk Silencing](#exercise-2-bulk-silencing)
 - [Scheduled Maintenance](#scheduled-maintenance)
-  - [What is a scheduled maintenance window?](#what-is-a-scheduled-maintenance-window)
-  - [EXERCISE 3: Configure a scheduled maintenance window](#exercise-3-configure-a-scheduled-maintenance-window)
+  - [What is a Scheduled Maintenance Window?](#what-is-a-scheduled-maintenance-window)
+  - [EXERCISE 3: Configure a Scheduled Maintenance Window](#exercise-3-configure-a-scheduled-maintenance-window)
 - [Discussion](#discussion)
   - [Scheduled Maintenance vs Maintenance Mode](#scheduled-maintenance-vs-maintenance-mode)
 - [Next steps](#next-steps)
@@ -34,7 +34,7 @@ Sensu’s silencing capability allows you to suppress event handler execution on
 Silences are created on an ad hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
 Some popular use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
 
-### The `not_silenced` filter
+### The `not_silenced` Filter
 
 Sensu's silencing implementation is intended to a broad variety of use cases.
 For this reason, silenced events are not automatically discarded by Sensu.
@@ -184,7 +184,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 In certain circumstances it can be helpful to silence incidents in bulk.
 Sensu supports silencing specific incidents spanning multiple hosts, and even bulk silencing multiple incidents across multiple hosts.
 
-### Silencing alerts on multiple hosts
+### Silencing Alerts on Multiple Hosts
 
 Sensu silences are applied to events by matching two event properties: subscription (`event.entity.subscriptions` or `event.check.subscriptions`), and the check name (`event.check.metadata.name`).
 These configuration parameters offer
@@ -251,11 +251,11 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 
 ## Scheduled Maintenance
 
-### What is a scheduled maintenance window?
+### What is a Scheduled Maintenance Window?
 
 Scheduled maintenance window is a silence that starts and ends in the future.
 
-### EXERCISE 3: Configure a scheduled maintenance window
+### EXERCISE 3: Configure a Scheduled Maintenance Window
 
 #### Scenario
 

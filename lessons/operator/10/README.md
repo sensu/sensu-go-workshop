@@ -19,6 +19,15 @@ Sensu’s silencing capability allows you to suppress event handler execution on
 Silences are created on an ad hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
 Some popular use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
 
+### The `not_silenced` filter
+
+Sensu's silencing implementation is intended to a broad variety of use cases.
+For this reason, silenced events are not automatically discarded by Sensu.
+Event processing can be disabled for silenced events using the built-in `not_silenced` event filter.
+This filter can be applied to handlers on a case-by-case basis.
+Most users typically enable the `not_silenced` filter on all alerting and incident management handlers (e.g. Slack or Pagerduty).
+To learn more about event filters in Sensu Go, please visit [Lesson 6][lesson-6].
+
 ### EXERCISE 1: Silence an Alert
 
 #### Scenario
@@ -30,7 +39,7 @@ Since you are the first person to respond to the incident, you want to acknowled
 
 To accomplish this we will configure a silence to suppress an alert (i.e. disabling event processing).
 We'll use `sensuctl` to configure silencing in this lesson.
-You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11].
+You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11][lesson-11].
 
 #### Steps
 
@@ -61,7 +70,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 
 1. **Add the `not_silenced` filter to handlers.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) and updated in [Lesson 6](/lessons/operator/06/README.md#readme).
+   Let's modify the handler template we created in [Lesson 4][lesson-4] and updated in [Lesson 6][lesson-6].
    Replace the contents of `mattermost.yaml` with the following:
 
    ```yaml
@@ -112,19 +121,21 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    Invoke-RestMethod -Method GET -Uri "http://127.0.0.1:9001/healthz"
    ```
 
-   You should see output like `HTTP/1.1 500 Internal Server Error`. 
+   You should see output like `HTTP/1.1 500 Internal Server Error`.
    _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
-   To obtain the current port mapping number run `sudo docker-compose port app 8080`._
-   
-   Within a few moments, Sensu should begin reporting the failure. 
+   To obtain the current port mapping number run `sudo docker port workshop_app_1`._
+
+   Within a few moments, Sensu should begin reporting the failure.
    Run the `sensuctl event list` command to see the incident:
-   
+
    ```shell
    $ sensuctl event list
-         Entity         Check                                        Output                                      Status   Silenced             Timestamp           
+         Entity         Check                                        Output                                      Status   Silenced             Timestamp
     ───────────────── ──────────── ───────────────────────────────────────────────────────────────────────────── ──────── ────────── ───────────────────────────────
      workshop_app_1    app-health   http-check CRITICAL: HTTP Status 500 for http://workshop_app_1:8080/healthz        2   true       2021-10-23 15:34:11 -0700 PDT
    ```
+
+   If you are seeing alerts in Mattermost, you're ready to move on to the next step.
 
 1. **Create a silence entry.**
 
@@ -143,56 +154,192 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    ? Reason: My first silence!
    Created
    ```
-   
+
+   As soon as you create this silence, the alerts in Mattermost should be surpressed for 2 minutes.
+   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
+
    > **Understanding the command:**
-   > - Setting `Subscription:*` or leaving the Subscription field blank means the silence will apply to events matching any subscription.
+   > - Setting `Subscription: entity:workshop_app_1` means the silence will only apply to events matching a single entity named `workshop_app_1`.
    > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
-   > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts. 
+   > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
    > - The "Reason" field lets us leave a comment or provide a description for the silence.
-
-
-1. **Restore demo app to healthy status (curl -XPOST localhost:9000/healthz)**
-
-   **Mac and Linux users:**
-   
-   ```shell
-   curl -i -X POST http://127.0.0.1:9000/healthz
-   curl -i -X GET http://127.0.0.1:9000/healthz
-   ```
-   
-   **Windows users:**
-   
-   ```shell
-   TODO
-   ```
-   
 
 ## Bulk Silencing
 
-### Silencing all alerts on multiple hosts
+In certain circumstances it can be helpful to silence incidents in bulk.
+Sensu supports silencing specific incidents spanning multiple hosts, and even bulk silencing multiple incidents across multiple hosts.
+
+### Silencing alerts on multiple hosts
+
+Sensu silences are applied to events by matching two event properties: subscription (`event.entity.subscriptions` or `event.check.subscriptions`), and the check name (`event.check.metadata.name`).
+These configuration parameters offer
+
+- Silencing a specific check on a specific entity:
+
+  ```
+  subscription: entity:1-424242
+  check: app-health
+  ```
+
+- Silencing a specific check on any entity:
+
+  ```
+  subscription: *
+  check: app-health
+  ```
+
+- Silencing any check on a specific subscription:
+
+  ```
+  subscription: postgres
+  check: *
+  ```
 
 ### Silencing alerts from a specific service across multiple hosts
 
 ### EXERCISE 2: Bulk Silencing
 
+#### Scenario
+
+You are responding to an incident or managing a maintenance operation involving multiple nodes.
+
+#### Solution
+
+To accomplish this we will configure a silence to suppress multiple alerts (i.e. disabling event processing).
+We'll use `sensuctl` to configure silencing in this lesson.
+You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11].
+
+#### Steps
+
+1. **Create a silence entry.**
+
+   Let's use the `sensuctl silenced create` to create a silencing rule to disable alerts for this incident.
+
+   ```shell
+   sensuctl silenced create --interactive
+   ? Namespace: default
+   ? Subscription: entity:workshop_app_1
+   ? Check: app-health
+   ? Begin time: now
+   ? Expiry in Seconds: 120
+   ? Expire on Resolve: No
+   ? Reason: My first silence!
+   Created
+   ```
+
+   As soon as you create this silence, the alerts in Mattermost should be surpressed for 2 minutes.
+   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
+
+   > **Understanding the command:**
+   > - Setting `Subscription: workshop` means the silence will apply to events on any host that is a member of the `workshop` subscription.
+   > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
+   > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
+   > - The "Reason" field lets us leave a comment or provide a description for the silence.
+
 ## Scheduled Maintenance
 
 ### What is a scheduled maintenance window?
 
-Scheduled maintenance window is a silence that starts and ends in the future. 
+Scheduled maintenance window is a silence that starts and ends in the future.
 
-## EXERCISE 3: Configure a scheduled maintenance window
+### EXERCISE 3: Configure a scheduled maintenance window
 
-TODO
+#### Scenario
+
+You are planning a maintenance activity
+
+#### Solution
+
+#### Steps
+
+1. **Get the current date and time in RFC3339 format:**
+
+   Get the current time in RFC3339 or RFC8601 format.
+
+   **MacOS:**
+
+   ```
+   date +"%Y-%m-%d %H:%M:%S %z"
+   date +"%Y-%m-%dT%H:%M:%S%z"
+   ```
+
+   **Windows (Powershell):**
+
+   ```
+   Get-Date -Format "yyyy-MM-dd HH:mm:ss K"
+   Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
+   ```
+
+   **Linux:**
+
+   ```
+   date +"%Y-%m-%d %H:%M:%S %:z"
+   date +"%Y-%m-%dT%H:%M:%S%:z"
+   ```
+
+1. **Create a silence entry.**
+
+   Let's use the `sensuctl silenced create` to create a silencing rule for a scheduled maintenance window.
+   _NOTE: Please modify the begin time to be 2-3 minutes in the future; the macOS `time` utility isn't RFC compliant, so you'll need to add a colon to the timezone offset (e.g. `-07:00` instead of `-0700`)._
+
+   ```shell
+   sensuctl silenced create --interactive
+   ? Namespace: default
+   ? Subscription: entity:workshop_app_1
+   ? Check: *
+   ? Begin time: 2021-12-26 00:00:00 -07:00
+   ? Expiry in Seconds: 120
+   ? Expire on Resolve: No
+   ? Reason: Scheduled maintenance example!
+   Created
+   ```
+
+   When the configured "Begin time" is reached, the alerts in Mattermost should be surpressed for 2 minutes.
+   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
+
+   > **Understanding the command:**
+   > - Setting `Subscription: entity:workshop_app_1` means the silence will only apply to events matching a single entity named `workshop_app_1`
+   > - Setting `Check: *` or leaving the Check blank means the silence will apply to any event on the configured subscription; in this case we're effectively suppressing all alerts on a specific host.
+   > - Setting "Begin time" in the future allows us to configure scheduled maintenance windows!
+   > - The "Reason" field lets us leave a comment or provide a description for the silence – very helpful to remind your future self why you created the scheduled maintenance window.
 
 ## Discussion
 
-TODO: recap lesson.
+In this lesson we explored different ways to suppress event handling in Sensu Go and covered the popular use cases for [Sensu Silences][silencing-docs].
+You learned how to create and manage silences using `sensuctl`, and disable silenced event processing using the built-in `not_silenced` filter.
+Keep reading to learn about additional use cases for Sensu Silences.
 
-### Maintenance Mode vs Scheduled Maintenance
+### Scheduled Maintenance vs Maintenance Mode
 
-Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction (which inevitably requires coordination/scheduling of humans).
-Maintenance mode is a useful practice when an automated system is performing automated maintenance... Sensu Silenced API allows automated systems to put a host in "maintenance mode" at the beginning of an automated maintenance, and then remove the silence when the automated maintenance task is completed.
+Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction because human involvement generally has to be coordinated/scheduled in advance.
+In today's world of cloud computing, many maintenance tasks are heavily automated and performed in an unattended manner.
+In these scenarios, automation tools can do the work of creating ad-hoc silencing rules that begin immediately and have no expiration.
+Once the automated maintenace task is completed, the silence can be deleted.
+This practice of integrating automation tools with Sensu is often referred to as "maintenance mode".
+Maintenance mode can be configured by scripting `sensuctl` commands, or by direct integration with the [Sensu Silencing API][silencing-api].
+Some third-party automation tools such as Rundeck offer [built-in integration with Sensu][rundeck-integration] for easy adoption of automated maintenance mode as a practice.
 
+## Learn More
+
+* [[Documentation] "Silencing Overview" (docs.sensu.io)][silencing-docs]
+* [[Documentation] "Silencing API" (docs.sensu.io)][silencing-api]
+
+## Next Steps
+
+[Share your feedback on Lesson 04](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-10&title=Lesson%2010%20Feedback)
+
+[Lesson 5: Introduction to Events][next lesson]
+
+<!-- Docs references -->
 [setup_workshop]: ../02/README.md#readme
 [silencing-docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/
+[silencing-api]: https://docs.sensu.io/sensu-go/latest/api/silenced/
+
+<!-- Lesson references-->
+[lesson-4]: /lessons/operator/04/README.md#readme
+[lesson-6]: /lessons/operator/06/README.md#readme
+[lesson-10]: /lessons/operator/10/README.md#readme
+[next lesson]: /lessons/operator/11/README.md#readme
+
+<!-- External references -->
+[rundeck-integration]: https://docs.rundeck.com/docs/manual/workflow-steps/sensu.html

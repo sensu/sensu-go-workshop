@@ -1,5 +1,20 @@
 # Lesson 10: Introduction to Silencing & Scheduled Maintenance
 
+- [Goals](#goals)
+- [Alert Suppression](#alert-suppression)
+  - [What is Silencing?](#what-is-silencing)
+  - [The `not_silenced` filter](#the-not-silenced-filter)
+  - [EXERCISE 1: Silence an Alert](#exercise-1-silence-an-alert)
+- [Bulk Silencing](#bulk-silencing)
+  - [Silencing alerts on multiple hosts](#silencing-alerts-on-multiple-hosts)
+  - [EXERCISE 2: Bulk Silencing](#exercise-2-bulk-silencing)
+- [Scheduled Maintenance](#scheduled-maintenance)
+  - [What is a scheduled maintenance window?](#what-is-a-scheduled-maintenance-window)
+  - [EXERCISE 3: Configure a scheduled maintenance window](#exercise-3-configure-a-scheduled-maintenance-window)
+- [Discussion](#discussion)
+  - [Scheduled Maintenance vs Maintenance Mode](#scheduled-maintenance-vs-maintenance-mode)
+- [Next steps](#next-steps)
+
 ## Goals
 
 In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go.
@@ -7,7 +22,7 @@ You will learn how to target individual incidents on a single host, specific inc
 You will also learn some new ways to integrate monitoring with your existing automation systems.
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
-## Alert Supression
+## Alert Suppression
 
 Generating alerts is a critical function of monitoring systems.
 Keeping those alerts in check so as to avoid "alert fatigue" is a top priority
@@ -194,8 +209,6 @@ These configuration parameters offer
   subscription: postgres
   check: *
   ```
-
-### Silencing alerts from a specific service across multiple hosts
 
 ### EXERCISE 2: Bulk Silencing
 

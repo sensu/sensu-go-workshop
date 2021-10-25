@@ -18,20 +18,21 @@
 ## Goals
 
 In this lesson we will learn about [Silencing][silencing-docs] in Sensu Go.
-You will learn how to target individual incidents on a single host, specific incidents spanning multiple hosts, and even bulk silencing all incidents across multiple hosts.
+You will learn how to target individual incidents on a single host, specific incidents spanning multiple hosts, and bulk silencing all incidents across multiple hosts.
 You will also learn some new ways to integrate observability with your existing automation systems.
+
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## Alert Suppression
 
 Generating alerts is a critical function of observability systems.
-Keeping those alerts in check so as to avoid "alert fatigue" is a top priority
-Once Sensu alerts us to an incident that requires further investigation, we can surpress subsequent notifications using [Silences][silencing-docs].
+Keeping those alerts in check so as to avoid "alert fatigue" is a top priority.
+Once Sensu alerts us to an incident that requires further investigation, we can suppress subsequent notifications using [Silences][silencing-docs].
 
 ### What is Silencing?
 
-Sensu’s silencing capability allows you to suppress event handler execution on an ad hoc basis so you can plan maintenance and reduce alert fatigue.
-Silences are created on an ad hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
+Sensu’s silencing capability allows you to suppress event handler execution on an ad-hoc basis so you can plan maintenance and reduce alert fatigue.
+Silences are created on an ad-hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
 Some popular use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
 
 ### The `not_silenced` Filter
@@ -173,7 +174,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    Created
    ```
 
-   As soon as you create this silence, the alerts in Mattermost should be surpressed for 2 minutes.
+   As soon as you create this silence, the alerts in Mattermost should be suppressed for 2 minutes.
    Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
 
    > **Understanding the command:**
@@ -243,7 +244,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    Created
    ```
 
-   As soon as you create this silence, the alerts in Mattermost should be surpressed for 2 minutes.
+   As soon as you create this silence, the alerts in Mattermost should be suppressed for 2 minutes.
    Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
 
    > **Understanding the command:**
@@ -312,7 +313,7 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
    Created
    ```
 
-   When the configured "Begin time" is reached, the alerts in Mattermost should be surpressed for 2 minutes.
+   When the configured "Begin time" is reached, the alerts in Mattermost should be suppressed for 2 minutes.
    Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
 
    > **Understanding the command:**
@@ -325,14 +326,14 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
 
 In this lesson we explored different ways to suppress event handling in Sensu Go and covered the popular use cases for [Sensu Silences][silencing-docs].
 You learned how to create and manage silences using `sensuctl`, and disable silenced event processing using the built-in `not_silenced` filter.
-Keep reading to learn about additional use cases for Sensu Silences.
 
 ### Scheduled Maintenance vs Maintenance Mode
 
-Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction because human involvement generally has to be coordinated/scheduled in advance.
+Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction because that human involvement generally has to be coordinated/scheduled in advance.
 In today's world of cloud computing, many maintenance tasks are heavily automated and performed in an unattended manner.
 In these scenarios, automation tools can do the work of creating ad-hoc silencing rules that begin immediately and have no expiration.
-Once the automated maintenace task is completed, the silence can be deleted.
+Once the automated maintenance task is completed, the silence can be deleted.
+
 This practice of integrating automation tools with Sensu is often referred to as "maintenance mode".
 Maintenance mode can be configured by scripting `sensuctl` commands, or by direct integration with the [Sensu Silencing API][silencing-api].
 Some third-party automation tools such as Rundeck offer [built-in integration with Sensu][rundeck-integration] for easy adoption of automated maintenance mode as a practice.
@@ -358,6 +359,7 @@ Some third-party automation tools such as Rundeck offer [built-in integration wi
 [lesson-4]: /lessons/operator/04/README.md#readme
 [lesson-6]: /lessons/operator/06/README.md#readme
 [lesson-10]: /lessons/operator/10/README.md#readme
+[lesson-11]: /lessons/operator/11/README.md#readme
 [next lesson]: /lessons/operator/11/README.md#readme
 
 <!-- External references -->

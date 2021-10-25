@@ -20,6 +20,7 @@ Because hooks are executed before the event is sent to the backend, they are gre
 
 We refer to this practice as  _automated diagnosis_. 
 Hooks automate the actions an SRE or operations engineer might take to triage an incident (e.g. tail a log file or check the process table).
+By automating these actions, Sensu makes it easier to differentiate between a false-positive alert and a priority incident.
 
 ### EXERCISE 1: Capture Check Context Using a Hook
 
@@ -133,12 +134,12 @@ Hooks are reusable resources that can enrich your data and save a lot of time wh
 It may seem like hooks would also be a perfect tool for automatic remediations.
 However, we strongly discourge using hooks for this.
 
-Remediations are best done using handlers, like the [`sensu-remediation-handler`], or the product-specific handlers for [Ansible Tower][sensu-ansible-handler], [Rundeck][sensu-rundeck-handler], and [SaltStack][sensu-saltstack-handler].
+Remediations are best done using handlers, like the [`sensu-remediation-handler`][sensu-remediation-handler], or the product-specific handlers for [Ansible Tower][sensu-ansible-handler], [Rundeck][sensu-rundeck-handler], and [SaltStack][sensu-saltstack-handler].
 
 The main difference is that handlers are run by the backend, so logging, secret injection, auditing, and access via the dashboard are available.
-A hook is a simple command, run on the agent, without the rest of hte infrastructure that the backend and pipeline provide.
+A hook is a simple command, run on the agent, without the rest of the infrastructure that the backend and pipeline provide.
 
-Learn more about automated remediations in our [Patterns and Workflows](#) _(coming soon!)_.
+Learn more about automated remediations in our [Patterns and Workflows](#) section  _(coming soon!)_.
 
 ### Uses Cases
 
@@ -151,13 +152,14 @@ So, now that we know how you should *not* use hooks, here are some examples of u
 - Inspect processes (e.g. use `lsof` to see what files or ports a process is accessing)
 - Check installed package version information
 - Check kernel version and platform information
+- Literally any action you might perform as an operator to get additional context about an alert
 
 For full details, read the [hooks reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/). 
 
 ### Hook Assets 
 
 Like checks, hooks are able to specify assets that they need to run.
-If your hook needs more complex behaviour than a simple one-line shell action, consider packaging it as an asset instead of in-line in the YAML configuration.
+If your hook needs more complex behavior than a simple one-line shell action, consider packaging it as an asset instead of in-line in the YAML configuration.
 
 ## Learn More
 - [[Documentation] "Sensu Hooks Reference" (docs.sensu.io)](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/)
@@ -175,4 +177,8 @@ If your hook needs more complex behaviour than a simple one-line shell action, c
 <!-- Some Commonly Used Named Links -->
 [setup_workshop]: ../02/README.md#readme
 [sensu_api_docs]: https://docs.sensu.io/sensu-go/latest/api/
+[sensu-remediation-handler]: https://github.com/sensu/sensu-remediation-handler 
+[sensu-ansible-handler]: https://bonsai.sensu.io/assets/sensu/sensu-ansible-handler
+[sensu-rundeck-handler]: https://bonsai.sensu.io/assets/sensu/sensu-rundeck-handler
+[sensu-saltstack-handler]: https://bonsai.sensu.io/assets/sensu/sensu-saltstack-handler
 

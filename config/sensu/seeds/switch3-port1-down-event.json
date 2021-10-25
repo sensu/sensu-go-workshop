@@ -1,0 +1,70 @@
+{
+  "type": "Event",
+  "api_version": "core/v2",
+  "metadata": {},
+  "spec": {
+    "timestamp": 1615358668,
+    "entity": {
+      "metadata": {
+        "name": "switch3-port1",
+        "labels": {
+	  "link_id": "1291503_1226173",
+	  "link_monitoring": "true"
+        }
+      },
+      "entity_class": "network-port",
+      "subscriptions": [],
+      "user": "workshop",
+      "deregister": true,
+      "deregistration_handler": "deregister",
+      "system": {
+        "os": "Workshop",
+        "platform": "Sensu Go",
+        "platform_family": "Training",
+        "platform_version": "6.2.7",
+        "arch": "arm",
+        "hostname": "switch3",
+        "network": {
+          "interfaces": [
+            {
+              "addresses": [
+                "127.0.0.1/8",
+                "::1/128"
+              ],
+              "mac": "00:00:00:00:00:00",
+              "name": "lo"
+            },
+            {
+              "addresses": [
+                "10.0.0.1/8"
+              ],
+              "mac": "00:00:00:00:00:00",
+              "name": "eth0"
+            }
+          ]
+        }
+      }
+    },
+    "check": {
+      "metadata": {
+        "name": "port-status",
+        "labels": {}
+      },
+      "command": "collect_port_status",
+      "interval": 60,
+      "subscriptions": [
+        "workshop"
+      ],
+      "publish": true,
+      "handlers": [
+        "port_alert"
+      ],
+      "issued": 1615358668,
+      "executed": 1615358668,
+      "duration": 7.3678,
+      "status": 1,
+      "output": "et-0/0/1:DOWN (in=0.9/out=0.6/error-in-rate=0.0/error-out-rate=0.0/discard-in=0/discard-out=0):(1 DOWN)\n"
+    },
+    "metrics": {}
+  }
+}

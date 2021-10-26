@@ -3,15 +3,15 @@
 - [Goals](#goals)
 - [What is a Sensu Asset?](#what-is-a-sensu-asset)
   - [Cross-Platform Packaging Solution](#cross-platform-packaging-solution)
-  - [Assets are optional](#asset-are-optional)
-  - [EXERCISE 1: Register an Asset](#lesson-1-register-an-asset)
+  - [Assets are optional](#assets-are-optional)
+  - [EXERCISE 1: Register an Asset](#exercise-1-register-an-asset)
 - [How are Sensu Assets Distributed?](#how-are-sensu-assets-distributed)
   - [Bonsai: The Sensu Asset Index](#bonsai-the-sensu-asset-index)
-  - [HTTP + GNU Tarballs + SHA512 Verification](#http--gnu-tarballs--sha512-verification)
+  - [HTTP + GNU Tarballs + SHA512 Verification](##http--gnu-tarballs--sha-verification)
   - [EXERCISE 2: Mirroring Assets](#exercise-2-mirroring-assets)
 - [Packaging Custom Assets](#packaging-custom-assets)
   - [Sensu Asset Packaging Format](#sensu-asset-packaging-format)
-  - [EXERCISE 3: Package a Custom Script as a Sensu Asset](#exercise-3-package-a-custom-script-as-an-asset)
+  - [EXERCISE 3: Package a Custom Script as a Sensu Asset](#exercise-3-package-a-custom-script-as-a-sensu-asset)
 - [Discussion](#discussion)
   - [Why Not OCI-compliant Containers](#why-not-oci-compliant-containers)
   - [Sensu Assets Support All Programming Languages](#sensu-assets-support-all-programming-languages)
@@ -31,17 +31,6 @@ Sensu provides built-in support for real-time distribution of Sensu Assets to ag
 In fact, you may have already noticed that this workshop environment is pre-configured with dozens of assets.
 Take a look at the various YAML files you've already created during this workshop – many of them include references to `runtime_assets`.
 To see a list of assets in this workshop environment, run the `sensuctl asset list` command.
-
-### Execution Environment Management
-
-A Sensu Asset is a tarball containing a `bin/`, `lib/`, and `include/` directories.
-When Sensu Assets are used by a Sensu backend or Sensu agent, the execution environment is temporarily modified as follows:
-
-- `{PATH_TO_ASSET}/bin` is injected into the `PATH` environment variable
-- `{PATH_TO_ASSET}/lib` is injected into the `LD_LIBRARY_PATH` environment variable (or equivalent)
-- `{PATH_TO_ASSET}/include` is injected into the CPATH environment variable (or equivalent)
-
-When Sensu modified these environment variables, it gives the corresponding asset path the priority (e.g. `PATH=/path/to/asset/bin:$PATH`).
 
 ### Cross-Platform Packaging Solution
 
@@ -192,7 +181,7 @@ Once verified, Sensu extracts the asset into a local cache directory (configurab
 Sensu assets are published to Bonsai via GitHub repositories that are configured with a `.bonsai.yml` file.
 Please visit the Sensu documentation to learn more about [publishing assets to Bonsai][bonsai-publishing].
 
-### HTTP + Tarballs + SHA Verification
+### HTTP + GNU Tarballs + SHA Verification
 
 Bonsai is a fantastic resource for the [Sensu Community] to discover and share open source Sensu plugins, but Sensu users with security hardening requierments or operate air-gapped infrastructure will need to host their own Sensu assets.
 Thanks to the simplicity of the Sensu Asset implementation – it's just HTTP + GNU Tarballs + SHA512 – hosting your own Sensu Assets is easy.
@@ -291,6 +280,15 @@ We will mirror a Sensu Asset downloaded from Bonsai and host it via a simple HTT
 ## Packaging custom assets
 
 ### Sensu Asset Packaging Format
+
+A Sensu Asset is a tarball containing a `bin/`, `lib/`, and `include/` directories.
+When Sensu Assets are used by a Sensu backend or Sensu agent, the execution environment is temporarily modified as follows:
+
+- `{PATH_TO_ASSET}/bin` is injected into the `PATH` environment variable
+- `{PATH_TO_ASSET}/lib` is injected into the `LD_LIBRARY_PATH` environment variable (or equivalent)
+- `{PATH_TO_ASSET}/include` is injected into the CPATH environment variable (or equivalent)
+
+When Sensu modifies these environment variables, it gives the corresponding asset path the priority (e.g. `PATH=/path/to/asset/bin:$PATH`).
 
 ### EXERCISE 3: Package a Custom Script as a Sensu Asset
 
@@ -503,7 +501,7 @@ In case it's not already obvious: [we really love Go][gopher]!
 
 ![](img/gopher.png)
 
-### Sensu Asset Tools and Resources
+### Sensu Asset Tooling and Resources
 
 Coming soon.
 

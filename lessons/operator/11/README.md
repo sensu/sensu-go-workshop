@@ -1,4 +1,4 @@
-# Lesson 11: Introduction to the Sensu Web Application
+# Lesson 11: Using the Sensu Web App
 
 <!-- TOC GFM -->
 

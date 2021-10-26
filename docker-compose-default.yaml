@@ -57,7 +57,7 @@ services:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
     environment:
-    - SENSU_BACKEND_URL
+    - SENSU_BACKEND_URL=ws://sensu-backend:8081
     - SENSU_AGENT_PASSWORD
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS

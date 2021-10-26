@@ -9,7 +9,6 @@
   - [Silencing Alerts on Multiple Hosts](#silencing-alerts-on-multiple-hosts)
   - [EXERCISE 2: Bulk Silencing](#exercise-2-bulk-silencing)
 - [Scheduled Maintenance](#scheduled-maintenance)
-  - [What is a Scheduled Maintenance Window?](#what-is-a-scheduled-maintenance-window)
   - [EXERCISE 3: Configure a Scheduled Maintenance Window](#exercise-3-configure-a-scheduled-maintenance-window)
 - [Discussion](#discussion)
   - [Scheduled Maintenance vs Maintenance Mode](#scheduled-maintenance-vs-maintenance-mode)
@@ -182,11 +181,11 @@ To accomplish this we will configure a _silence_ which will selectively disable 
    ```
 
    As soon as you create this silence, the alerts in Mattermost should be suppressed for 2 minutes.
-   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
-
+   Wait until the silence expires, and alerts start appearing in Mattermost again, then move on to the next exercise.
+   
    > **Understanding the command:**
    > - Setting `Subscription: entity:workshop_app_1` means the silence will only apply to events matching a single entity named `workshop_app_1`.
-   > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
+   > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the `app-health` check
    > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
    > - The "Reason" field lets us leave a comment or provide a description for the silence.
 
@@ -198,23 +197,24 @@ Sensu supports silencing specific incidents spanning multiple hosts, and even bu
 ### Silencing Alerts on Multiple Hosts
 
 Sensu silences are applied to events by matching two event properties: subscription (`event.entity.subscriptions` or `event.check.subscriptions`), and the check name (`event.check.metadata.name`).
-These configuration parameters offer
 
-- Silencing a specific check on a specific entity:
+You can configure these in the following ways:
+
+- Silence a specific check on a specific entity:
 
   ```
   subscription: entity:1-424242
   check: app-health
   ```
 
-- Silencing a specific check on any entity:
+- Silence a specific check on any entity:
 
   ```
   subscription: *
   check: app-health
   ```
 
-- Silencing any check on a specific subscription:
+- Silence any check on a specific subscription:
 
   ```
   subscription: postgres
@@ -226,12 +226,11 @@ These configuration parameters offer
 #### Scenario
 
 You are responding to an incident or managing a maintenance operation involving multiple nodes.
+You want to silence all the nodes at once instead of having to silence each one individually.
 
 #### Solution
 
-To accomplish this we will configure a silence to suppress multiple alerts (i.e. disabling event processing).
-We'll use `sensuctl` to configure silencing in this lesson.
-You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11].
+To accomplish this we will configure a silence using a wider subscription, which will silence events coming from _all_ subscribed hosts, instead of just one specific host.
 
 #### Steps
 
@@ -255,9 +254,9 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    Created
    ```
 
-   As soon as you create this silence, the alerts in Mattermost should be suppressed for 2 minutes.
-   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
-
+   The alerts in Mattermost will be suppressed for 2 minutes.
+   Wait until the silence expires, and alerts start appearing in Mattermost again, then move on to the next exercise.
+   
    > **Understanding the command:**
    > - Setting `Subscription: workshop` means the silence will apply to events on any host that is a member of the `workshop` subscription.
    > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
@@ -266,9 +265,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 
 ## Scheduled Maintenance
 
-### What is a Scheduled Maintenance Window?
-
-Scheduled maintenance window is a silence that starts and ends in the future.
+A scheduled maintenance window is a silence that starts and ends in the future.
 
 ### EXERCISE 3: Configure a Scheduled Maintenance Window
 
@@ -284,7 +281,7 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
 
 1. **Get the current date and time in RFC3339 format:**
 
-   Get the current date and time in RFC3339 or RFC8601 format.
+   Get the current date and time in [RFC3339] or [RFC8601] format.
 
    **MacOS:**
 
@@ -309,8 +306,9 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
 
 1. **Create a silence entry.**
 
-   Let's use the `sensuctl silenced create` to create a silencing rule for a scheduled maintenance window.
-   _NOTE: Please modify the begin time to be 2-3 minutes in the future; the macOS `time` utility isn't RFC compliant, so you'll need to add a colon to the timezone offset (e.g. `-07:00` instead of `-0700`)._
+   Let's use `sensuctl silenced create` to create a silencing rule for a scheduled maintenance window.
+
+   > _NOTE: Please modify the begin time to be 2-3 minutes in the future; the macOS `time` utility isn't RFC compliant, so you'll need to add a colon to the timezone offset (e.g. `-07:00` instead of `-0700`)._
 
    ```shell
    sensuctl silenced create --interactive
@@ -330,7 +328,7 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
    ```
 
    When the configured "Begin time" is reached, the alerts in Mattermost should be suppressed for 2 minutes.
-   Wait until the silence expires – when alerts appear in Mattermost again – then move on to the next exercise.
+   Wait until the silence expires, and alerts start appearing in Mattermost again, then move on to the next exercise.
 
    > **Understanding the command:**
    > - Setting `Subscription: entity:workshop_app_1` means the silence will only apply to events matching a single entity named `workshop_app_1`
@@ -340,24 +338,24 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
 
 ## Discussion
 
-In this lesson we explored different ways to suppress event handling in Sensu Go and covered the popular use cases for [Sensu Silences][silencing-docs].
+In this lesson we explored different ways to suppress event handling in Sensu Go and covered some common use cases for [Sensu Silences][silencing-docs].
 You learned how to create and manage silences using `sensuctl`, and disable silenced event processing using the built-in `not_silenced` filter.
 
 ### Scheduled Maintenance vs Maintenance Mode
 
-Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction because that human involvement generally has to be coordinated/scheduled in advance.
-In today's world of cloud computing, many maintenance tasks are heavily automated and performed in an unattended manner.
-In these scenarios, automation tools can do the work of creating ad-hoc silencing rules that begin immediately and have no expiration.
-Once the automated maintenance task is completed, the silence can be deleted.
+Scheduled maintenance is a useful practice when a particular maintenance window requires human interaction because that human involvement generally has to be coordinated in advance.
+Many maintenance tasks are heavily automated and performed in an unattended manner.
+In these scenarios, automation tools can programmatically create ad-hoc silencing rules that begin immediately and have no expiration.
+When the maintenance task completes, it can delete the silence.
 
 This practice of integrating automation tools with Sensu is often referred to as "maintenance mode".
 Maintenance mode can be configured by scripting `sensuctl` commands, or by direct integration with the [Sensu Silencing API][silencing-api].
-Some third-party automation tools such as Rundeck offer [built-in integration with Sensu][rundeck-integration] for easy adoption of automated maintenance mode as a practice.
+Some third-party automation tools such as Rundeck offer [built-in integration with Sensu][rundeck-integration] for easy adoption of automated maintenance mode.
 
 ## Learn More
 
-* [[Documentation] "Silencing Overview" (docs.sensu.io)][silencing-docs]
-* [[Documentation] "Silencing API" (docs.sensu.io)][silencing-api]
+- [[Documentation] "Silencing Overview" (docs.sensu.io)][silencing-docs]
+- [[Documentation] "Silencing API" (docs.sensu.io)][silencing-api]
 
 ## Next Steps
 
@@ -380,3 +378,5 @@ Some third-party automation tools such as Rundeck offer [built-in integration wi
 
 <!-- External references -->
 [rundeck-integration]: https://docs.rundeck.com/docs/manual/workflow-steps/sensu.html
+[RFC3339]: https://datatracker.ietf.org/doc/html/rfc3339
+[RFC8601]: https://datatracker.ietf.org/doc/html/rfc8601

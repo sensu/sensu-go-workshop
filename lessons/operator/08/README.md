@@ -401,7 +401,7 @@ We can also add additional metadata to the event using `output_metric_tags`.
      - sumologic-metrics
      output_metric_tags:
      - name: entity
-      value: "{{ .name }}"
+       value: "{{ .name }}"
      - name: namespace
        value: "{{ .namespace }}"
    ```

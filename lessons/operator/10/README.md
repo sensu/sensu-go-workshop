@@ -31,9 +31,9 @@ Once Sensu alerts us to an incident that requires further investigation, we can 
 
 ### What is Silencing?
 
-Sensu’s silencing capability allows you to suppress event handler execution on an ad-hoc basis so you can plan maintenance and reduce alert fatigue.
-Silences are created on an ad-hoc basis using `sensuctl`, the Sensu Silenced API, or the Sensu web app.
-Some popular use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
+Silencing allows you to suppress event handler execution on an ad-hoc basis so you can plan maintenance and reduce alert fatigue.
+Silences are created using `sensuctl`, the Silenced API, or the web app.
+Some common use cases for silencing include alert acknowledgement, and overall reduction of alert fatigue.
 
 ### The `not_silenced` Filter
 
@@ -52,13 +52,11 @@ To learn more about event filters in Sensu Go, please review [Lesson 6][lesson-6
 #### Scenario
 
 You are on-call and have received an alert from Sensu regarding an incident that requires attention from an operator.
-Since you are the first person to respond to the incident, you want to acknowledge the incident and configure Sensu to disable alerts for the next hour minutes, or until the service is restored (which ever comes first).
+Since you are the first person to respond to the incident, you want to acknowledge the incident, and disable alerts for the next hour while you fix it.
 
 #### Solution
 
-To accomplish this we will configure a silence to suppress an alert (i.e. disabling event processing).
-We'll use `sensuctl` to configure silencing in this lesson.
-You can also configure silences from the Sensu Go web app, which we'll introduce in [Lesson 11][lesson-11].
+To accomplish this we will configure a _silence_ which will selectively disable event processing and suppress the alerts.
 
 #### Steps
 
@@ -141,8 +139,8 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
    ```
 
    You should see output like `HTTP/1.1 500 Internal Server Error`.
-   _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
-   To obtain the current port mapping number run `sudo docker port workshop_app_1`._
+   > _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
+   > To obtain the current port mapping number run `sudo docker port workshop_app_1`._
 
    Within a few moments, Sensu should begin reporting the failure.
    Run the `sensuctl event list` command to see the incident:
@@ -160,7 +158,7 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 
    Let's use the `sensuctl silenced create` to create a silencing rule to disable alerts for this incident.
    Since we're just getting started, let's just silence alerts for a few minutes.
-   In a typical scenario you might silence alerts for an hour or more while you investigate an incident.
+   In a real-world scenario you might silence alerts for an hour or more while you investigate an incident.
 
    ```shell
    sensuctl silenced create --interactive

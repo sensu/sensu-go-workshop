@@ -60,7 +60,7 @@ You'd like to only get ones that indicate there's some kind of problem or possib
 ### Solution
 
 To accomplish this, we'll put a filter in front of the Rocket.Chat handler.
-We will use the built-in filter `is_incident` on the `rocketchat` handler.
+We will use the built-in filter `is_incident` on the `mattermost` handler.
 This filter will only let events be processed by the handler if they have a non-zero exit status.
 
 ### Steps

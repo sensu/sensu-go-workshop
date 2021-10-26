@@ -14,7 +14,7 @@ config/sensu/rbac/*
 
 # ignore workshop artifacts
 slack.yaml
-rocketchat.yaml
+mattermost.yaml
 influxdb.yaml
 filter-repeated.yaml
 disk.yaml

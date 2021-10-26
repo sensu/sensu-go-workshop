@@ -1,23 +1,13 @@
-# ignore sensuctl config files (if using sensuctl sandbox container)
-.config
-.sensu
-
-# ignore cluster config files
-license.json
-config/sensu/cluster/*
-config/sensu/rbac/*
-
 # ignore user env files
 # git update-index --assume-unchanged .envrc .envrc.ps1
 .envrc
 .envrc.ps1
 
+# ignore cluster config files
+license.json
+config/sensu/rbac/*
+
 # ignore workshop artifacts
-slack.yaml
-mattermost.yaml
-influxdb.yaml
-filter-repeated.yaml
-disk.yaml
 *.zip
 *.tar.gz
 

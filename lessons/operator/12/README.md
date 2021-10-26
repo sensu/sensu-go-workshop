@@ -22,11 +22,11 @@
 ## Goals
 
 In this lesson we will learn about [Sensu Assets], a lightweight packaging and distribution solution for cloud native observability.
-You learn how to register new assets, mirror assets for use in secured production environments, and package custom assets for use with Sensu Go.
+You will learn how to register new assets, mirror assets for use in secured production environments, and package custom scripts as assets.
 
 ## What is a Sensu Asset?
 
-[Sensu Assets], or Dynamic Runtime Assets, are [plugins] for the Sensu monitoring platform.
+Sensu Assets, or Dynamic Runtime Assets, are [plugins] for the Sensu monitoring platform.
 Sensu provides built-in support for real-time distribution of Sensu Assets to agents, enabling on-demand observability.
 In fact, you may have already noticed that this workshop environment is pre-configured with dozens of assets.
 Take a look at the various YAML files you've already created during this workshop – many of them include references to `runtime_assets`.
@@ -37,8 +37,8 @@ To see a list of assets in this workshop environment, run the `sensuctl asset li
 Sensu Assets are a cross-platform packaging solution, with support for Linux, Windows, FreeBSD, Solaris, AIX, and MacOS.
 This broad compatibility is possible thanks a simple design based on features that are common across all modern operating systems (e.g. `PATH` environment variables).
 
-Sensu Asset resources contain information used to determine which is the correct "build" of an asset to download for a given system.
-This multi-build asset system works in tandem with the Sensu agent's built-in platform discovery, which detects operating system platform and version info, as well as CPU architectures.
+Sensu Asset resources contain information used to determine the correct "build" of an asset to deploy for a given system.
+This multi-build asset system works in tandem with the Sensu agent's built-in platform discovery, which detects operating system and version info, as well as CPU architectures.
 Sensu Assets provide a seamless solution for distribution of plugins that have been cross-compiled for multiple operating systems and architectures.
 
 **Example multi-build Sensu Asset**
@@ -71,8 +71,8 @@ spec:
 
 Various Sensu components support execution of external programs.
 For example, Sensu checks and pipe handlers execute `command`s (see [Lesson 4] and [Lesson 7] for more information about checks and handlers).
-Sensu doesn't have any hard requirements about how these executable programs are installed.
-Plugins can be installed by a traditional configuration management system, or via Sensu Assets.
+Sensu doesn't place any specific requirements about where or _how_ these executable programs are installed.
+Plugins can be installed by a traditional configuration management system like [Puppet], [Chef], or [Ansible] – or via Sensu Assets.
 
 Sensu Assets can also be used in tandem with alternate installation methods, making it easy to adopt Sensu Assets over time (i.e. there's no need for a wholesale migration to Sensu Assets).
 
@@ -122,7 +122,7 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
    sensuctl event list
    ```
 
-   You should see a `check-nginx` event reporting a "command not found" error with a message like `sh: http-check: not found`.
+   You should see a `service-health` event reporting a "command not found" error with a message like `sh: http-check: not found`.
 
 1. **Add the missing asset.**
 
@@ -166,7 +166,7 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
    sensuctl event list
    ```
 
-   You should see a `check-nginx` event reporting a service status with a message like `http-check OK: HTTP Status 200 for http://sensu-assets:80`.
+   You should see a `service-health` event reporting a service status with a message like `http-check OK: HTTP Status 200 for http://sensu-assets:80`.
 
 ## How are Sensu Assets distributed?
 
@@ -183,7 +183,7 @@ Please visit the Sensu documentation to learn more about [publishing assets to B
 
 ### HTTP + GNU Tarballs + SHA Verification
 
-Bonsai is a fantastic resource for the [Sensu Community] to discover and share open source Sensu plugins, but Sensu users with security hardening requierments or operate air-gapped infrastructure will need to host their own Sensu assets.
+Bonsai is a fantastic resource for the [Sensu Community] to discover and share open source Sensu plugins, but Sensu users with security hardening requirements or "air-gapped" infrastructure will need to host their own Sensu assets.
 Thanks to the simplicity of the Sensu Asset implementation – it's just HTTP + GNU Tarballs + SHA512 – hosting your own Sensu Assets is easy.
 
 ### EXERCISE 2: Mirroring Assets
@@ -202,6 +202,7 @@ We will mirror a Sensu Asset downloaded from Bonsai and host it via a simple HTT
 1. **Download a Sensu Asset**
 
    Download 64-bit Linux, Windows, and MacOS builds of the Sensu Go [check-disk-usage] asset into the `assets` directory.
+   _NOTE: in the workshop Docker network, any files added to the `assets/` directory will be HTTP fetchable at a URL like `http://sensu-assets/assets/<filename>`._
 
    **MacOS or Linux:**
 
@@ -282,6 +283,7 @@ We will mirror a Sensu Asset downloaded from Bonsai and host it via a simple HTT
 ### Sensu Asset Packaging Format
 
 A Sensu Asset is a tarball containing a `bin/`, `lib/`, and `include/` directories.
+Sensu Asset tarballs may be optionally gzipped.
 When Sensu Assets are used by a Sensu backend or Sensu agent, the execution environment is temporarily modified as follows:
 
 - `{PATH_TO_ASSET}/bin` is injected into the `PATH` environment variable
@@ -289,6 +291,8 @@ When Sensu Assets are used by a Sensu backend or Sensu agent, the execution envi
 - `{PATH_TO_ASSET}/include` is injected into the CPATH environment variable (or equivalent)
 
 When Sensu modifies these environment variables, it gives the corresponding asset path the priority (e.g. `PATH=/path/to/asset/bin:$PATH`).
+Did you notice?
+Plugins or scripts with dynamically linked libraries can be packaged as assets thanks to management of [the `LD_LIBRARY_PATH` environment variable][shared libraries].
 
 ### EXERCISE 3: Package a Custom Script as a Sensu Asset
 
@@ -302,7 +306,7 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
 
 #### Steps
 
-1. **Create subdirectories for your custom plugin.**
+1. **Create subdirectories for a multi-build Sensu Asset.**
 
    **Mac and Linux:**
 
@@ -477,12 +481,13 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
 
 ## Discussion
 
-In this lesson
+In this lesson we learned the basics of Sensu Assets – a cross-platform packaging and distribution solution for Sensu plugins.
+We covered the most common Asset operations, including registering new assets, mirroring assets, and packaging custom scripts as assets.
 
 ### Why Not OCI-compliant Containers?
 
 Many Sensu users have inquired about the reasoning behing Sensu Assets as a packaging format in place of something like [OCI-compliant container images][oci images] (e.g. Docker images).
-The short answer is that container images require a runtime to be installed, which is a heavy external dependency.
+The short answer is that running container images require a runtime to be pre-installed, which is a heavy external dependency.
 Furthermore, container support on non-Linux platforms is somewhat limited.
 In contrast, Sensu Assets can be supported by any ["mostly POSIX-compliant" operating system][posix] with zero external dependencies.
 
@@ -536,10 +541,14 @@ Coming soon.
 [gopher]: img/gopher.png
 
 <!-- External links -->
+[puppet]: https://puppet.com
+[chef]: https://www.chef.io
+[ansible]: https://www.ansible.com
 [checksums]: https://en.wikipedia.org/wiki/Checksum
 [sha512]: https://en.wikipedia.org/wiki/SHA-2
 [artifactory]: https://jfrog.com/artifactory/
 [nginx]: https://www.nginx.com
+[shared libraries]: https://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
 [container runtime]: https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 [oci images]: https://opencontainers.org
 [posix]: https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems

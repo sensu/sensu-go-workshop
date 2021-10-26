@@ -1,4 +1,4 @@
-# Lesson 10: Introduction to Assets
+# Lesson 12: Introduction to Assets
 
 - [Goals](#goals)
 - [What is a Sensu Asset?](#what-is-a-sensu-asset)

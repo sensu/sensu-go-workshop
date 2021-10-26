@@ -235,7 +235,7 @@ We can manually create an event using common shell tools like `curl` or PowerShe
      i-424242         my-app       ERROR: failed to connect to database.        2   false      2021-03-10 15:58:25 -0800 PST   0784e60b-96b1-4226-a151-13a645abdf67
    ```
 
-   But what about the handler we configured in [Lesson 4](/lessons/04/README.md#readme)?
+   But what about the handler we configured in [Lesson 4](/lessons/operator/04/README.md#readme)?
    If you expected that Sensu would process this event using that handler, you might have noticed that nothing happened.
 
 **NEXT:** Let's move on to the next exercise to see how event handling works in practice.
@@ -310,7 +310,7 @@ Let's create an event that will be processed using the Mattermost handler we con
 
 
    This time, because this event defines handlers, the backend will generate an alert in Mattermost.
-   To view the alert, open up [Mattermost](http://127.0.0.1:8065/) and login using the default credentials (username: `sensu`, password: `sensu`)."
+   To view the alert, open up [Mattermost](http://127.0.0.1:8065/) and login using the default credentials (username: `sensu`, password: `sensu`).
 
 1. **Send an Event with a Successful Exit Status.**
 

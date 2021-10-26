@@ -6,18 +6,15 @@
 - [A Visual Overview of Your System](#a-visual-overview-of-your-system)
   - [EXERCISE 1: Entity Scavenger Hunt](#exercise-1-entity-scavenger-hunt)
 - [Navigating Between Namespaces](#navigating-between-namespaces)
-  - [EXERCISE 2: Select the `default` Namespace](#exercise-2-select-the-default-namespace)
+  - [EXERCISE 2: Select a Namespace](#exercise-2-select-a-namespace)
 - [View Event Data](#view-event-data)
   - [EXERCISE 3: View All Events](#exercise-3-view-all-events)
 - [View Inventory Data](#view-inventory-data)
   - [EXERCISE 4: View Agent Entities](#exercise-4-view-agent-entities)
-  - [EXERCISE 5: Search for a Specific Entity](#exercise-5-search-for-a-specific-entity)
-- [View and Create Silences](#view-and-create-silences)
-  - [EXERCISE 6: Create a Silence for an Entity](#exercise-6-create-a-silence-for-an-entity)
-  - [EXERCISE 7: Create a Silence for a Check on a Specific Entity](#exercise-7-create-a-silence-for-a-check-on-a-specific-entity)
-  - [EXERCISE 8: Delete a Silence](#exercise-8-delete-a-silence)
+- [Managing Silences](#managing-silences)
+  - [EXERCISE 5: Create a Silence for an Entity](#exercise-5-create-a-silence-for-an-entity)
 - [View and Modify Resource Configurations](#view-and-modify-resource-configurations)
-  - [EXERCISE 9: Modify a Check](#exercise-9-modify-a-check)
+  - [EXERCISE 6: Modify a Check](#exercise-6-modify-a-check)
 - [Discussion](#discussion)
   - [Web App is Just Another API Client](#web-app-is-just-another-api-client)
 - [Learn More](#learn-more)
@@ -45,6 +42,7 @@ open https://127.0.0.1:3000
 ### EXERCISE 1: Entity Scavenger Hunt
 
 #### Scenario
+
 You want a quick visual understanding of the state of your system.
 While `sensuctl` provides a versatile tool, it's a little too granular.
 You'd like to see a big-picture view from your web browser.
@@ -219,6 +217,12 @@ This list has search and filter controls as well as some handy bulk functions li
    https://user-images.githubusercontent.com/478164/138918610-fc2f0e74-4ba5-4308-9f73-f7efead9220c.mov
 
 ## Managing Silences
+
+Users can use the Sensu web app to silence individual events (for a single entity), all events produced by a specific check (across multiple entit
+ies), or all events for a specific entity.
+
+Silencing may be applied from various different locations in the Sensu web app, with prompts to configure the silencing rules (which check and/or
+entity should be silenced), schedule (e.g. to begin immediately, or create a "scheduled maintenance" window), and the reason for the silencing.
 
 ### EXERCISE 5: Create a Silence for an Entity
 

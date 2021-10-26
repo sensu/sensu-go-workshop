@@ -300,7 +300,7 @@ To learn more about the Sensu APIs, please checkout the [Sensu API Reference Doc
 <!-- Add related links that expand on the topic here. -->
 - [[Blog Post] "A Primer on Sensu Dashboards" (sensu.io)](https://sensu.io/blog/a-primer-on-sensu-dashboards-eb0940293a)
 - [[Documentation] "View and manage resources in the web UI" (sensu.io)](https://docs.sensu.io/sensu-go/latest/web-ui/view-manage-resources/)
-- [[Documentation] "Search in the web UI" (sensu.io)])(https://docs.sensu.io/sensu-go/latest/web-ui/search/)
+- [[Documentation] "Search in the web UI" (sensu.io)](https://docs.sensu.io/sensu-go/latest/web-ui/search/)
 
 ## Next Steps
 

@@ -83,8 +83,8 @@ First, we will configure some helpful environment variables, download the `sensu
    **Example Output:**
 
    ```shell
-   SENSU_VERSION=6.2.7
-   SENSU_BUILD=4449
+   SENSU_VERSION=6.5.1
+   SENSU_BUILD=5325
    SENSU_BACKEND_HOST=127.0.0.1
    SENSU_NAMESPACE=default
    SENSU_USER=sensu

@@ -179,10 +179,9 @@ To show all events, we need to remove this filter.
    Hit enter to update the list.
 
    **Browser**
-  
-   <img alt="Remove Default Filter" src="img/remove-default-filter.gif" height="450px" />
-
-
+ 
+   https://user-images.githubusercontent.com/478164/138917565-6a3c0b3f-8e49-4957-9671-e4769eb3d0a7.mov
+   
 ## View Inventory Data 
 
 In a [previous lesson][lesson-3] we discussed how Sensu can be used to mantain an inventory of nodes.
@@ -217,8 +216,7 @@ This list has search and filter controls as well as some handy bulk functions li
 
    > _NOTE:_ You can also click on any entity to view its properties in detail. 
 
-
-   <img alt="Entity Search" src="img/entity-search.gif" height="700px" />
+   https://user-images.githubusercontent.com/478164/138918610-fc2f0e74-4ba5-4308-9f73-f7efead9220c.mov
 
 ## Managing Silences
 
@@ -245,7 +243,7 @@ To configure a silence for a specific entity, we can navigate to to entity detai
 
    If you add a check name, it will silence only events from that check, or if you leave that as default, it will silence all events coming from that entity. 
 
-   <img alt="managing silences in the web app" src="img/manage-silences.gif" height="700px" />
+   https://user-images.githubusercontent.com/478164/138918724-2818d4ab-2171-4f12-964d-55cdef2a505d.mov
 
 1. **Delete a silence.**
 
@@ -258,7 +256,16 @@ To configure a silence for a specific entity, we can navigate to to entity detai
    
 ## View and Modify Resource Configurations 
 
+The Sensu web app also provides access to the core monitoring configuration, including Checks, Fitlers, Mutators, and Handlers.
+The configuration views may be accessed from the navigation sidebar.
+Each of the configuration resources provides list + detail views, as well as the ability to create and/or edit configuration resources (e.g. modify check or handler configuration), assuming the user has the appropriate RBAC permissions.
+
+![The configuration navigation](img/03-13-check-edit-view.png)
+
 ### EXERCISE 6: Modify a Check
+_Coming Soon..._
+
+<!--
 
 #### Scenario
 
@@ -269,19 +276,27 @@ To configure a silence for a specific entity, we can navigate to to entity detai
 1. **Step 1 Description**
 
 1. **Step 2 Description**
+-->
 
 ## Discussion
-<!-- Brief summary of what we learned. -->
-<!-- Add a subsection for any additional information about what we covered, other topics of interest, use cases, etc -->
+
+In this lesson you learned the basics of how to navigate the Sensu Web Application, including how to view inventory, add and remove silences, and modify check configurations. 
 
 ### Web App is Just Another API Client
 
+Sensu's monitoring as code solution is possible thanks to a robust set of APIs.
+The Sensu web app and CLI are effectively just API clients that streamline access to these APIs.
+Both tools have access to the same information and give you the power to view and change Sensu resources, using different paradigms.
+Use whichever tool works best for your workflow.
+
+To learn more about the Sensu APIs, please checkout the [Sensu API Reference Documentation](https://docs.sensu.io/sensu-go/latest/api/) and [Sensu
+ Developer Workshop](/README.md#developer-workshop) (coming soon).
 
 ## Learn More
 <!-- Add related links that expand on the topic here. -->
-- [[Whitepaper] "Whitepaper Title" (domain.name)](#)
-- [[Blog Post] "Blog Post Title" (domain.name)](#)
-- [[Documentation] "Documentation Title" (domain.name)](#)
+- [[Blog Post] "A Primer on Sensu Dashboards" (sensu.io)](https://sensu.io/blog/a-primer-on-sensu-dashboards-eb0940293a)
+- [[Documentation] "View and manage resources in the web UI" (sensu.io)](https://docs.sensu.io/sensu-go/latest/web-ui/view-manage-resources/)
+- [[Documentation] "Search in the web UI" (sensu.io)])(https://docs.sensu.io/sensu-go/latest/web-ui/search/)
 
 ## Next Steps
 

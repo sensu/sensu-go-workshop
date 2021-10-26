@@ -85,7 +85,6 @@ The `docker-compose-default.yaml` defines the configuration of the following con
      - `sensu-agent`: A Sensu [agent](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/) node
    - A chat-ops environment, for alerting:
      - `mattermost`: [Mattermost](https://mattermost.com), a web-based chat app similar to Slack
-     - `mongo`: [MongoDB](https://www.mongodb.com/), Rocket.Chat's database
    - A telemetry stack:
      - `influxdb`: [InfluxDB](https://www.influxdata.com/) for metrics storage
      - `grafana`: [Grafana](https://grafana.com/) for visualization
@@ -100,7 +99,7 @@ The basic flow of information in this environment looks something like this:
 - The agent observes the application and generates _events_, which are sent to the _backend_ container.
 - The backend will make decisions about the _event_ based on the user defined configuration.
 
-Depending on the configuration, and the details of the event, the backend may raise _alerts_ which are sent to _Rocket.Chat_, or send _events_ containing _metrics_ to _InfluxDb_ to be recorded. The _Grafana_ dashboard visualizes the metrics stored in InfluxDB.
+Depending on the configuration, and the details of the event, the backend may raise _alerts_ which are sent to _Mattermost_, or send _events_ containing _metrics_ to _InfluxDb_ to be recorded. The _Grafana_ dashboard visualizes the metrics stored in InfluxDB.
 
 Access to these third-party services requires authentication.
 Secrets are securely delivered through _HashiCorp Vault_ directly to the backend.
@@ -206,10 +205,10 @@ The installation and configuration is automated for you, so you can start using 
       The Sensu Web UI should be available at [http://127.0.0.1:3000](http://127.0.0.1:3000).
       Login with the user `sensu` and password `sensu`.
 
-   1. **Check that Rocket.Chat is Running**
+   1. **Check that Mattermost is Running**
 
-      The Rocket.Chat app should be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
-      Login with the user `sensu` and password `sensu`.
+      The Mattermost app should be available at [http://127.0.0.1:8065](http://127.0.0.1:8065).
+      Login with the user `sensu` and password `workshop`.
 
 1. **Configure Environment Variables.** <a name="configure-environment-variables"></a>
 
@@ -262,7 +261,7 @@ The installation and configuration is automated for you, so you can start using 
    ```
 
 
-**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Rocket.Chat](http://127.0.0.1:5000) apps, and your environment variables are all set, then you're ready to start the workshop!
+**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Mattermost](http://127.0.0.1:8065) apps, and your environment variables are all set, then you're ready to start the workshop!
 
 ## Discussion
 
@@ -352,7 +351,7 @@ As usual, we welcome contributions of all kinds!
 - [[Documentation] "Workshop Troubleshooting Guide" (github.com)](https://github.com/sensu/sensu-go-workshop/blob/latest/TROUBLESHOOTING.md)
 - [[Documentation] "Docker Compose" (docker.com)](https://docs.docker.com/compose/)
 - [[Documentation] "HashiCorp Vault Documentation" (vaultproject.io)](https://www.vaultproject.io/docs)
-- [[Documentation] "Rocket.Chat Documentation" (rocket.chat)](https://docs.rocket.chat/)
+- [[Documentation] "Mattermost Documentation" (docs.mattermost.com)](https://docs.mattermost.com)
 - [[Documentation] "InfluxDB Documentation" (influxdata.com)](https://docs.influxdata.com/influxdb/v2.0/)
 
 ## Next Steps

@@ -128,7 +128,45 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+  # OpenLDAP
+  #
+  # LDAP authentication provider
+  #
+  #
+  openldap:
+    build:
+      context: ./docker/openldap
+      dockerfile: Dockerfile
+    labels:
+    - io.sensu.role=ldap-server
+    healthcheck:
+      test: curl -s -I -A "Docker health check (curl)" http://127.0.0.1:80/
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
+    container_name: openldap
+    restart: always
+
+    environment:
+      - ORG_NAME=Sensu
+      - ORG_DNS=example.com
+      - ORG_DN=dc=example,dc=com
+      - SERVER_FQDN=ldap.example.com
+      - ROOT_SECRET=password
+    ports:
+      - '389:389'
+      - '636:636'
+    volumes:
+    - type: volume
+      source: openldap_config
+      target: /config
+      consistency: consistent
+    - type: volume
+      source: openldap_data
+      target: /var/lib/ldap
+      consistency: consistent
+  
   # Sensu Asset Server
   #
   # Serve Sensu Assets over HTTP using NGINX.
@@ -402,4 +440,8 @@ volumes:
   mattermost_plugins:
     driver: local
   mattermost_plugins_extra:
+    driver: local
+  openldap_data:
+    driver: local
+  openldap_config:
     driver: local

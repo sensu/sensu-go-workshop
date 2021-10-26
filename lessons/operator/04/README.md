@@ -81,7 +81,7 @@ The handler will send event data to a channel in the workshop Mattermost instanc
        --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
        --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
-     - sensu/sensu-slack-handler:1.3.2
+     - sensu/sensu-slack-handler:1.4.0
      timeout: 10
      filters: []
      secrets:
@@ -90,7 +90,7 @@ The handler will send event data to a channel in the workshop Mattermost instanc
    ```
 
    > **Understanding the YAML:**
-   > - The asset identifier `sensu/sensu-slack-handler:1.3.2` instructs the backend to download the handler executable from [Bonsai].
+   > - The asset identifier `sensu/sensu-slack-handler:1.4.0` instructs the backend to download the handler executable from [Bonsai].
    > - The `--description-template` option uses a [handler template][handler_template_docs] to format the event into a message string.
    > - The handler is configured using environment variables and secrets available to the Sensu backend.
 
@@ -113,7 +113,7 @@ The handler will send event data to a channel in the workshop Mattermost instanc
    ```shell
      Name    Type   Timeout     Filters     Mutator            Execute            Environment Variables               Assets
     ─────── ────── ───────── ───────────── ───────── ─────────────────────────── ─────────────────────── ─────────────────────────────────
-    mattermost   pipe     10   is_incident           RUN:  sensu-mattermost-handler                      sensu/sensu-slack-handler:1.3.2
+    mattermost   pipe     10   is_incident           RUN:  sensu-mattermost-handler                      sensu/sensu-slack-handler:1.4.0
    ```
 
    Do you see the `mattermost` handler in the output?

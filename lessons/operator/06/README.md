@@ -87,7 +87,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
        --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
        --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
-     - sensu/sensu-slack-handler:1.3.2
+     - sensu/sensu-slack-handler:1.4.0
      timeout: 10
      filters:
      - is_incident
@@ -307,7 +307,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
        --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
        --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
-     - sensu/sensu-slack-handler:1.3.2
+     - sensu/sensu-slack-handler:1.4.0
      timeout: 10
      filters:
      - is_incident

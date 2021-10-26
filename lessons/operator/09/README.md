@@ -74,7 +74,7 @@ We can create a hook to list the files in the temp directory, and include that o
    Then update the check using `sensuctl create`:
 
    ```shell
-   sensuctl create -f disk-usage.yaml
+   sensuctl create -f disk.yaml
    ```
    
    > **PROTIP:** In practice, it is often convenient to bundle check hooks alongside the corresponding checks, by including both configurations in the same YAML file.

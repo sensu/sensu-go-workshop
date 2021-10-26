@@ -208,7 +208,7 @@ The installation and configuration is automated for you, so you can start using 
    1. **Check that Mattermost is Running**
 
       The Mattermost app should be available at [http://127.0.0.1:8065](http://127.0.0.1:8065).
-      Login with the user `sensu` and password `workshop`.
+      Login with the user `sensu` and password `sensu`.
 
 1. **Configure Environment Variables.** <a name="configure-environment-variables"></a>
 

@@ -345,9 +345,9 @@ Some third-party automation tools such as Rundeck offer [built-in integration wi
 
 ## Next Steps
 
-[Share your feedback on Lesson 04](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-10&title=Lesson%2010%20Feedback)
+[Share your feedback on Lesson 10](https://github.com/sensu/sensu-go-workshop/issues/new?template=lesson_feedback.md&labels=feedback%2Clesson-10&title=Lesson%2010%20Feedback)
 
-[Lesson 5: Introduction to Events][next lesson]
+[Lesson 11: Using the Sensu web app][next lesson]
 
 <!-- Docs references -->
 [setup_workshop]: ../02/README.md#readme

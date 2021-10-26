@@ -42,12 +42,35 @@ See below for the complete list of lesson plans.
 - [Lesson 08: Introduction to Checks](/lessons/operator/08/README.md#readme)
 - [Lesson 09: Introduction to Check Hooks](/lessons/operator/09/README.md#readme)
 - [Lesson 10: Introduction to Silencing](/lessons/operator/10/README.md#readme)
-- [Lesson 11: Introduction to Silencing & Scheduled Maintenance](/lessons/operator/11/README.md#readme) (coming soon)
-- [Lesson 12: Introduction to Mutators](/lessons/operator/12/README.md#readme) (coming soon)
-- [Lesson 13: Introduction to Proxy Entities & Proxy Checks](/lessons/operator/13/README.md#readme) (coming soon)
-- [Lesson 14: Introduction to Namespaces & RBAC](/lessons/operator/14/README.md#readme) (coming soon)
-- [Lesson 15: Introduction to Secrets Management](/lessons/operator/15/README.md#readme) (coming soon)
-- [Lesson 16: Advanced Topics](/lessons/operator/16/README.md#readme) (coming soon)
+- [Lesson 11: Using the Sensu Web App](/lessons/operator/11/README.md#readme)
+- [Lesson 12: Introduction to Sensu Assets](/lessons/operator/12/README.md#readme)
+
+### Additional Lessons Coming Soon
+
+**Sensu Go Building Blocks 201**
+
+- [Lesson 13: Introduction to Entities](/lessons/operator/13/README.md#readme) (coming soon)
+- [Lesson 14: Introduction to Proxy Checks](/lessons/operator/14/README.md#readme) (coming soon)
+- [Lesson 15: Introduction to Mutators](/lessons/operator/15/README.md#readme) (coming soon)
+
+**Sensu Go Administration 101**
+
+- [Lesson 16: Introduction to Namespaces & RBAC](/lessons/operator/16/README.md#readme) (coming soon)
+- [Lesson 17: Introduction to Secrets Management](/lessons/operator/17/README.md#readme) (coming soon)
+- [Lesson 18: Introduction to Configuration Pruning](/lessons/operator/18/README.md#readme) (coming soon)
+- [Lesson 19: Introduction to API Exports](/lessons/operator/19/README.md#readme) (coming soon)
+
+**Sensu Go Patterns & Workflows**
+
+- [Lesson 20: Automated Deregistration](#) (coming soon)
+- [Lesson 21: CMDB Integration](#) (coming soon)
+- [Lesson 22: Dead Man's Switches](#) (coming soon)
+- [Lesson 23: Probes & Discovery Checks](#) (coming soon)
+- [Lesson 24: Service Discovery](#) (coming soon)
+- [Lesson 25: Automated Remediation](#) (coming soon)
+- [Lesson 26: Sensu CLI Plugins](#) (coming soon)
+- [Lesson 27: Monitoring as Code with SensuFlow™](#) (coming soon)
+
 
 ### Developer Workshop
 

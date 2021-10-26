@@ -2,45 +2,44 @@
 type: Asset
 api_version: core/v2
 metadata:
-  name: sensu/check-disk-usage:0.5.0
-  labels: 
+  name: sensu/check-disk-usage:0.6.0
   annotations:
-    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/sensu/check-disk-usage
-    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/sensu/check-disk-usage
+    io.sensu.bonsai.url: https://bonsai.sensu.io/assets/nixwiz/check-disk-usage
+    io.sensu.bonsai.api_url: https://bonsai.sensu.io/api/v1/assets/nixwiz/check-disk-usage
     io.sensu.bonsai.tier: Community
-    io.sensu.bonsai.version: 0.5.0
-    io.sensu.bonsai.namespace: sensu
+    io.sensu.bonsai.version: 0.6.0
+    io.sensu.bonsai.namespace: nixwiz
     io.sensu.bonsai.name: check-disk-usage
-    io.sensu.bonsai.tags: ''
+    io.sensu.bonsai.tags: disk, windows
 spec:
   builds:
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_windows_amd64.tar.gz
-    sha512: 8d681f1c309434ad080b8fd715f4136edb55225bdcfb09bbd75d1586951f7b24086e8d1aa1dbb6e7d69ff917756652ead810d66f49506dccdd705e8f932c50a1
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_windows_amd64.tar.gz
+    sha512: 0b1df35dc409f7dc8ea849c828036983a5759b6c6ed5940ff1a491b17eb60ca73349dfa9dada73acde0f653a8267c119853771f03b729fd4a95c81e817f9cedb
     filters:
     - entity.system.os == 'windows'
     - entity.system.arch == 'amd64'
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_darwin_amd64.tar.gz
-    sha512: 0e39c7cabc0bc9423e61a57496668046ff40cf4845bd020fcbe4e325f4b47df95a1311bc51ad22d967200ba1a132618eec57aef3b6b166a92fc2362c484b4033
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_darwin_amd64.tar.gz
+    sha512: dcbe19998d1804c8708836c3ec0a7568442ed8f9b33d7d430dc4e1ef59e37f516648b3147344e79c6deb2ad095f588971e37de1f9f9ef1fac558eacc21c184c7
     filters:
     - entity.system.os == 'darwin'
     - entity.system.arch == 'amd64'
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_linux_armv7.tar.gz
-    sha512: '0986873b105ed9ad2b0afde2fab770170c971cfd44451c9518f8475fa49df68940313ebda013b070dbea573689b56e89da87d875c8c98d8b85b566344b83f238'
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_linux_armv7.tar.gz
+    sha512: bc382b5b8c9bc70a3be64f4af6686640a852417696357fafcc63faa0f2f7538475cb847444ddcbb3c9486a40725e21a3a2a8c2e3493ff6a0bdfb6d5458ebd683
     filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'armv7'
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_linux_arm64.tar.gz
-    sha512: d8646f15fe3afe64b9c546d9e7c37dbf4b0f1b75a7823deea574d085d109789bd27293196b1c5b60b9f1f4b81d19942ec5266509b2726ee4faed629a597f1a83
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_linux_arm64.tar.gz
+    sha512: 05a0f21ccd93a418eedc596b3b8257a7d34f521e13b8de0d9621c25782829b082391a670e8705f792cd03eddfd36fc965afc6ea3f0f0923202abaebbaabf5467
     filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'arm64'
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_linux_386.tar.gz
-    sha512: 68e0f2d3ca1fb4296db418d06f3c8162f8a84443464d167cafaf49e36ac9cf338737c7f34fa4f8861e0d47c930274e375ad0e49015ab895d64dd35301c5db4f8
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_linux_386.tar.gz
+    sha512: abd19787ac7c81d99058e48ce678e22dee866bae15d587431838f449876fac255f8c1e8c738342225e459b363af5f8b3b22171c9bc858605ea7bebbf143933e4
     filters:
     - entity.system.os == 'linux'
     - entity.system.arch == '386'
-  - url: https://assets.bonsai.sensu.io/0759638733a16bab2996a0f9f32a7a13389d49d5/check-disk-usage_0.5.0_linux_amd64.tar.gz
-    sha512: 0a6b8d8d5fdd9e81650fc585bc066cf4f6e6784aa94abcec3023878cacec5d255306d19fc6e435c88ebd069636b891b99efe0c1923b2bc5d9de699740e6cc271
+  - url: https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_linux_amd64.tar.gz
+    sha512: fa25e317ba8aa3e23d9e3d3c54081ca4529aeba2e7ee437a2bf1ed8cfb3fbf70cd0380eb8cc427a9be17515e437f6346949381cc7ce47f37493e32eb8372ded8
     filters:
     - entity.system.os == 'linux'
     - entity.system.arch == 'amd64'

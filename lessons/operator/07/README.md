@@ -49,7 +49,7 @@ You have a server, container, connected device, or service that you want to mana
 
 #### Solution
 
-Install a Sensu Agent. 
+Install a Sensu Agent.
 The agent runs as a separate process that observes your system.
 It can run directly on the system you are observing, or anywhere on the network.
 Once it is installed, you can update its configuration and behavior dynamically without the need to redeploy.
@@ -57,7 +57,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
 #### Steps
 
 > **BEFORE YOU START:**
-> 
+>
 > Make sure you have the following environment variables set:
 >
 > - `SENSU_VERSION`
@@ -66,7 +66,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
 > - `SENSU_NAMESPACE`
 > - `SENSU_USER`
 > - `SENSU_PASSWORD`
-> 
+>
 > If any are missing, review the environment setup from [Lesson 3: Using the Sensu CLI](../03/README.md#readme).
 
 1. **Download & Install the Agent**
@@ -95,11 +95,11 @@ Once it is installed, you can update its configuration and behavior dynamically 
       **Linux**
 
       ```shell
-      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz 
+      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
       ```
 
    2. **Install the Package and Cleanup**
-  
+
       Installation involves extracting and copying the `sensu-agent` executable to an approriate location on the system.
       Afterwards, we will delete the installation package.
 
@@ -175,8 +175,8 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --user ${SENSU_USER} \
    --password ${SENSU_PASSWORD}
    ```
-   
-1. ** Verify that your agent is running.** 
+
+1. ** Verify that your agent is running.**
 
    Verify that your agent is running and connected to the backend:
 
@@ -249,9 +249,6 @@ Stop the agent, modify the configuration, then restart the agent.
    labels:
      foo: bar
      environment: training
-   annotations:
-     sensu.io/plugins/rocketchat/config/alias: sensu-trainee
-
    agent-managed-entity: true
    deregister: true
    ```
@@ -318,20 +315,20 @@ For example, setting the namespace, backend url, and log level in all three form
 - **Command-Line Option:**
 
   Pass the configuration option and the value using the format `--<option_name>=<value>`.
-  
+
   - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
-  - For options that can have a list of values, separate the values with commas and no spaces. 
-  
+  - For options that can have a list of values, separate the values with commas and no spaces.
+
   **Example:** Using Command-line Options for Configuration
 
   ```shell
   sensu-agent start --namespace=default --backend-url=ws://backend-1:8081,ws://backend-2:8081 --log-level=warn
   ```
-  
+
 - **YAML Config File:**
 
-  Every configuration option has a corresponding YAML property. 
-  
+  Every configuration option has a corresponding YAML property.
+
   - If the name of the configuration option has multiple words, separated the words with a dash (`-`).
   - For options that can have a list of values, use the YAML list format.
 
@@ -344,9 +341,9 @@ For example, setting the namespace, backend url, and log level in all three form
     - "ws://backend-2:8081"
   log-level: "warn"
   ```
-  
-  To use the config file, pass the name of the config file via the `--config-file` option.  
-  
+
+  To use the config file, pass the name of the config file via the `--config-file` option.
+
   ```shell
   sensu-agent start --config-file=agent.yaml
   ```

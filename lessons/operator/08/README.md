@@ -110,7 +110,7 @@ To accomplish this, we can configure a check that will periodically pull the dis
    spec:
      command: check-disk-usage --warning 80.0 --critical 90.0
      runtime_assets:
-     - sensu/check-disk-usage:0.5.0
+     - sensu/check-disk-usage:0.6.0
      publish: true
      interval: 30
      subscriptions:
@@ -123,7 +123,7 @@ To accomplish this, we can configure a check that will periodically pull the dis
      timeout: 10
      check_hooks: []
      handlers:
-     - rocketchat
+     - mattermost
    ```
 
    Notice the values of `subscriptions` and `interval` – these will instruct Sensu to publish checks every 30 seconds on any agent with the `system/macos`, `system/windows`, or `system/linux` subscriptions.
@@ -146,7 +146,7 @@ To accomplish this, we can configure a check that will periodically pull the dis
    ```shell
      Name                       Command                       Interval   Cron   Timeout   TTL                                            Subscriptions                                             Handlers              Assets              Hooks   Publish?   Stdin?   Metric Format   Metric Handlers
     ────── ───────────────────────────────────────────────── ────────── ────── ───────── ───── ────────────────────────────────────────────────────────────────────────────────────────────────── ────────── ────────────────────────────── ─────── ────────── ─────────────────────── ─────────────────
-     disk-usage   check-disk-usage --warning 80.0 --critical 90.0         30               10     0   system/macos,system/macos/disk,system/windows,system/windows/disk,system/linux,system/linux/disk              sensu/check-disk-usage:0.4.2           true       false
+     disk-usage   check-disk-usage --warning 80.0 --critical 90.0         30               10     0   system/macos,system/macos/disk,system/windows,system/windows/disk,system/linux,system/linux/disk              sensu/check-disk-usage:0.6.0           true       false
    ```
 
 **NEXT:** Do you see the `disk` check in the output?
@@ -185,7 +185,7 @@ You've noticed that "one size fits all" is not true for your infrastructure. Whi
 
 This can be accomplished using entity annotations, tokens, and a templated check.
 First, by setting annotations on the entity we can configure a value that is unique to that entity.
-Then, we can use a token to read that value when the check is executed, and give the check executable a different configuration. 
+Then, we can use a token to read that value when the check is executed, and give the check executable a different configuration.
 
 #### Steps
 
@@ -205,7 +205,7 @@ Then, we can use a token to read that value when the check is executed, and give
        --warning {{ .annotations.disk_usage_warning_threshold | default "80.0" }}
        --critical {{ .annotations.disk_usage_critical_threshold | default "90.0" }}
      runtime_assets:
-     - sensu/check-disk-usage:0.5.0
+     - sensu/check-disk-usage:0.6.0
      publish: true
      interval: 30
      subscriptions:
@@ -218,7 +218,7 @@ Then, we can use a token to read that value when the check is executed, and give
      timeout: 10
      check_hooks: []
      handlers:
-     - rocketchat
+     - mattermost
    ```
 
    This configuration makes the disk usage warning and critical thresholds configurable via entity annotations (`disk_usage_warning_threshold` and `disk_usage_critical_threshold`).
@@ -242,9 +242,9 @@ Then, we can use a token to read that value when the check is executed, and give
    In this exercise we will update the agent configuration.
 
    1. **Stop the Agent**
-   
+
       If you started your agent in the previous exercise using the `sensu-agent start` command, you can stop the agent by pressing `Control-C` in your terminal.
-      
+
    1. **Edit the Agent Configuration**
 
       In [Lesson 7](../07/README.md) we started an agent, and created a `agent.yaml` file containing most of its configuration.
@@ -259,13 +259,12 @@ Then, we can use a token to read that value when the check is executed, and give
         foo: bar
         environment: training
       annotations:
-        sensu.io/plugins/rocketchat/config/alias: sensu-trainee
         disk_usage_warning_threshold: "50.0"
         disk_usage_critical_threshold: "70.0"
       agent-managed-entity: true
       deregister: true
       ```
-      
+
    2. **Restart the Agent.**
 
       Let's start the agent from the command line, this time using a mix of environment variables and our configuration file.
@@ -281,9 +280,9 @@ Then, we can use a token to read that value when the check is executed, and give
       --user ${SENSU_USER} \
       --password ${SENSU_PASSWORD}
       ```
- 
+
       **Windows (PowerShell):**
- 
+
       ```powershell
       ${Env:SENSU_SUBSCRIPTIONS}="system/windows workshop" `
       sensu-agent start `
@@ -356,12 +355,12 @@ If an event containing metrics is configured with one or more `output_metric_han
 
 #### Scenario
 
-You have some existing monitoring plugins which provide output in Nagios format, which you want to store in a data platform like Sumo Logic or InfluxDB. 
+You have some existing monitoring plugins which provide output in Nagios format, which you want to store in a data platform like Sumo Logic or InfluxDB.
 You also want to capture some additional metadata about the server or service along with the metrics, and have it processed as a single unit by the pipeline.
 
 #### Solution
 
-This can be accomplished by configuring the check to expect Nagios formatted metrics by using the `output_metric_format` option, and configuring a metrics-specific storage handler via `output_metric_handlers`. 
+This can be accomplished by configuring the check to expect Nagios formatted metrics by using the `output_metric_format` option, and configuring a metrics-specific storage handler via `output_metric_handlers`.
 We can also add additional metadata to the event using `output_metric_tags`.
 
 #### Steps
@@ -383,7 +382,7 @@ We can also add additional metadata to the event using `output_metric_tags`.
        --warning {{ .annotations.disk_usage_warning_threshold | default "80.0" }}
        --critical {{ .annotations.disk_usage_critical_threshold | default "90.0" }}
      runtime_assets:
-     - sensu/check-disk-usage:0.5.0
+     - sensu/check-disk-usage:0.6.0
      publish: true
      interval: 30
      subscriptions:
@@ -396,7 +395,7 @@ We can also add additional metadata to the event using `output_metric_tags`.
      timeout: 10
      check_hooks: []
      handlers:
-     - rocketchat
+     - mattermost
      output_metric_format: prometheus_text
      output_metric_handlers:
      - sumologic-metrics
@@ -410,8 +409,8 @@ We can also add additional metadata to the event using `output_metric_tags`.
    > **Understanding the YAML**
    >
    > We made a number of small changes here. These fields instruct Sensu what metric format to expect as output from the check, which handler(s) should be used to process the metrics, and what tags should be added to the metrics:
-   > 
-   > - **Added `--metrics` option to `check-disk-usage`.** 
+   >
+   > - **Added `--metrics` option to `check-disk-usage`.**
    >  This tells the check to change it's output from the human-readable format we were using previously to instead output in Prometheus format.
    > - **Added `output_metric_format: prometheus_text`.**
    >  This tells Sensu to expect Prometheus formatted output from the check.
@@ -486,8 +485,8 @@ Invoke-RestMethod -Method POST -ContentType "application/json" -Body '{"check":{
 
 ### Proxy Checks (Pollers)
 
-The Sensu scheduler can also checks for entities that are not actively managed by a Sensu agent. 
-These monitoring jobs are called *proxy checks*, or checks that target a _proxy entity_. 
+The Sensu scheduler can also checks for entities that are not actively managed by a Sensu agent.
+These monitoring jobs are called *proxy checks*, or checks that target a _proxy entity_.
 
 At a high level, a proxy check is a Sensu check with `proxy_requests`, which are query parameters Sensu will use to look for entities that should be targeted by the check.
 

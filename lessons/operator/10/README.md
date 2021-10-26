@@ -146,7 +146,12 @@ To accomplish this we will configure a _silence_ which will selectively disable 
    Run the `sensuctl event list` command to see the incident:
 
    ```shell
-   $ sensuctl event list
+   sensuctl event list
+   ```
+   
+   **Example Output**
+   
+   ```
          Entity         Check                                        Output                                      Status   Silenced             Timestamp
     ───────────────── ──────────── ───────────────────────────────────────────────────────────────────────────── ──────── ────────── ───────────────────────────────
      workshop_app_1    app-health   http-check CRITICAL: HTTP Status 500 for http://workshop_app_1:8080/healthz        2   true       2021-10-23 15:34:11 -0700 PDT
@@ -162,6 +167,10 @@ To accomplish this we will configure a _silence_ which will selectively disable 
 
    ```shell
    sensuctl silenced create --interactive
+   ```
+   
+   **Example Output**
+   ```
    ? Namespace: default
    ? Subscription: entity:workshop_app_1
    ? Check: app-health
@@ -232,8 +241,12 @@ You can also configure silences from the Sensu Go web app, which we'll introduce
 
    ```shell
    sensuctl silenced create --interactive
+   ```
+   
+   **Example Output**
+   ```
    ? Namespace: default
-   ? Subscription: entity:workshop_app_1
+   ? Subscription: workshop
    ? Check: app-health
    ? Begin time: now
    ? Expiry in Seconds: 120
@@ -301,6 +314,11 @@ We'll use `sensuctl` to configure a silencing rule and avoid generating false-po
 
    ```shell
    sensuctl silenced create --interactive
+   ```
+   
+   **Example Output**
+   
+   ```
    ? Namespace: default
    ? Subscription: entity:workshop_app_1
    ? Check: *

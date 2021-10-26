@@ -1,4 +1,6 @@
 #!/bin/sh
+wait-for-sensu-backend && \
 generate-user-rbac-templates && \
 create-user-accounts && \
-seed-workshop-resources
+seed-workshop-resources && \
+workshop-auto-discovery

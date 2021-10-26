@@ -3,7 +3,7 @@
 # Generate Sensu user RBAC templates, including (by default) a dedicated
 # Namespace will full CRUD access (via a Role + RoleBinding), limited
 # ClusterRoleBinding (with access to create but not list or read API keys),
-# and read-only access to the default namespace. To customize these defaults, 
+# and read-only access to the default namespace. To customize these defaults,
 # modify user.yaml.template or provide a custom user template.
 #
 # The script accepts four positional arguments:
@@ -40,6 +40,7 @@ validate_json() {
   cat ${USERS_JSON} | jq . > /dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo "Invalid users JSON file: \"${USERS_JSON}\""
+    echo ""
     exit 2
   fi
 }
@@ -47,26 +48,29 @@ validate_json() {
 validate_io() {
   if [ ! -f ${USERS_JSON} ]; then
     echo "Missing user JSON file: \"${USERS_JSON}\""
+    echo ""
     exit 2
   fi
   if [ ! -f ${USER_TEMPLATE} ]; then
     echo "Missing user template file: \"${USER_TEMPLATE}\""
+    echo ""
     exit 2
   fi
   if [ ! -d ${OUTPUT_DIRECTORY} ]; then
     echo "Missing output directory: \"${OUTPUT_DIRECTORY}\""
+    echo ""
     exit 2
   fi
 }
 
-create_users() {
+generate_user_templates() {
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
     if [ ! -f ${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT} ]; then
       export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
       if [ ${PASSWORD} == "null" ]; then
-        export PASSWORD=${WORKSHOP_PASSWORD}
+        export PASSWORD="${WORKSHOP_DEFAULT_TRAINEE_PASSWORD}"
       fi
       export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
       if [ ${PASSWORD_HASH} == "null" ]; then
@@ -82,6 +86,8 @@ create_users() {
       echo "Skipping user template for \"${USERNAME}\" (an RBAC template at \"${OUTPUT_DIRECTORY}/${USERNAME}.${OUTPUT_FORMAT}\" already exists)"
     fi
   done
+  echo "Successfully generated Sensu RBAC templates!"
+  echo ""
 }
 
 echo "Generating Sensu RBAC templates..."
@@ -89,13 +95,10 @@ check_deps && \
 validate_io && \
 validate_json
 if [ $? -gt 0 ]; then
-  echo ""
   exit 2
 fi
-create_users
+generate_user_templates
 if [ $? -gt 0 ]; then
-  echo ""
   exit 2
 fi
-echo ""
 exit 0

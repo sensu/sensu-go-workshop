@@ -52,59 +52,52 @@ spec:
 
 #### Scenario
 
-Your SRE team primarily communicates via a chat app like [Slack] or [RocketChat]. They want to recieve alerts as chat messages.
+Your SRE team primarily communicates via a chat app like [Slack] or [Mattermost]. They want to recieve alerts as chat messages.
 
 #### Solution
 
-To accomplish this we will use the [sensu-rocketchat-handler][sensu_rocketchat_handler].
-The handler will send event data to a channel in a [RocketChat] instance.
+To accomplish this we will use the [sensu-slack-handler].
+Because Mattermost is [API-compatible with Slack][mattermost-api], we can use the Slack handler with Mattermost.
+The handler will send event data to a channel in the workshop Mattermost instance.
 
 #### Steps
 
 1. **Create a YAML File Containing the Handler Configuration**
 
-   Copy and paste the following contents to a file named `rocketchat.yaml`:
+   Copy and paste the following contents to a file named `mattermost.yaml`:
 
    ```yaml
    ---
    type: Handler
    api_version: core/v2
    metadata:
-     name: rocketchat
-     labels:
-       sensu.io/workflow: sensu-flow/v1
+     name: mattermost
    spec:
      type: pipe
      command: >-
-       sensu-rocketchat-handler
-       --url ${ROCKETCHAT_URL}
-       --channel ${ROCKETCHAT_CHANNEL}
-       --user ${ROCKETCHAT_USER}
-       --description-template "{{ .Check.Output }}\n\n[namespace: {{.Entity.Namespace}}]"
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
      runtime_assets:
-     - sensu/sensu-rocketchat-handler:0.1.0
+     - sensu/sensu-slack-handler:1.3.2
      timeout: 10
      filters: []
      secrets:
-     - name: ROCKETCHAT_URL
-       secret: rocketchat_url
-     - name: ROCKETCHAT_CHANNEL
-       secret: rocketchat_channel
-     - name: ROCKETCHAT_USER
-       secret: rocketchat_user
-     - name: ROCKETCHAT_PASSWORD
-       secret: rocketchat_password
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
 
    > **Understanding the YAML:**
-   > - The asset identifier `sensu/sensu-rocketchat-handler:0.1.0` instructs the backend to download the handler executable from [Bonsai].
+   > - The asset identifier `sensu/sensu-slack-handler:1.3.2` instructs the backend to download the handler executable from [Bonsai].
    > - The `--description-template` option uses a [handler template][handler_template_docs] to format the event into a message string.
    > - The handler is configured using environment variables and secrets available to the Sensu backend.
 
 1. **Create the Handler Using the `sensuctl create` Command**
 
    ```shell
-   sensuctl create -f rocketchat.yaml
+   sensuctl create -f mattermost.yaml
    ```
 
    This command will create the handler configuration contained in the YAML file by sending it to the [Sensu Handler API][handler_api_docs].
@@ -120,10 +113,10 @@ The handler will send event data to a channel in a [RocketChat] instance.
    ```shell
      Name    Type   Timeout     Filters     Mutator            Execute            Environment Variables               Assets
     ─────── ────── ───────── ───────────── ───────── ─────────────────────────── ─────────────────────── ─────────────────────────────────
-    rocketchat   pipe     10   is_incident           RUN:  sensu-rocketchat-handler                      sensu/sensu-rocketchat-handler:0.1.0
+    mattermost   pipe     10   is_incident           RUN:  sensu-mattermost-handler                      sensu/sensu-slack-handler:1.3.2
    ```
 
-   Do you see the `rocketchat` handler in the output?
+   Do you see the `mattermost` handler in the output?
    If so, you've successfully created your first handler.
 
 ## Using Handlers to Store Observability Data
@@ -246,8 +239,8 @@ The playbook for responding to this incident is available at https://{{ .Entity.
 
 Another feature of the SDK is the ability to [override handler configuration][sdk_configuration_options_docs] using metadata embedded in the event.
 
-For example, you may want to send certain events to the `#ops` channel in RocketChat.
-The channel can be specifed in an annotation like `sensu.io/plugins/rocketchat/config/channel` on a per-check basis.
+For example, you may want to send certain events to the `#ops` channel in Mattermost.
+The channel can be specifed in an annotation like `sensu.io/plugins/slack/config/channel` on a per-check basis.
 
 **Example: Check Configuration Using Annotations to Override Destination Channel**
 
@@ -258,7 +251,7 @@ api_version: core/v2
 metadata:
   name: nginx-status
   annotations:
-    sensu.io/plugins/rocketchat/config/channel: "#ops"
+    sensu.io/plugins/slack/config/channel: "#ops"
 spec:
   command: check-nginx-status.rb --url http://127.0.0.1:80/nginx_status
   publish: true
@@ -267,10 +260,10 @@ spec:
   interval: 30
   timeout: 10
   handlers:
-    - rocketchat
+    - slack
 ```
 
-For more examples of configuration overrides using annotations, read the handler documentation for some frequently-used handlers (i.e. [RocketChat][rocketchat_handler_annotations], [Slack][slack_handler_annotations], [Pagerduty][pagerduty_handler_annotations], and [ServiceNow][servicenow_handler_annotations]).
+For more examples of configuration overrides using annotations, read the handler documentation for some frequently-used handlers (i.e. [Slack][slack_handler_annotations], [Pagerduty][pagerduty_handler_annotations], and [ServiceNow][servicenow_handler_annotations]).
 
 
 ### Additional Use Cases
@@ -302,7 +295,8 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 <!-- Product Links -->
 [sumologic]: https://sumologic.com
 [slack]: https://slack.com/
-[rocketchat]: https://rocket.chat/
+[mattermost]: https://https://mattermost.com
+[mattermost-api]: https://docs.mattermost.com/developer/integration-faq.html#what-does-slack-compatible-mean
 [bonsai]: https://bonsai.sensu.io/
 [bonsai_handlers]: https://bonsai.sensu.io/assets?q=handler
 [prometheus]: https://prometheus.io/
@@ -313,7 +307,7 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [servicenow]: https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/servicenow/
 [jira]: https://docs.sensu.io/sensu-go/latest/plugins/supported-integrations/jira/
 <!-- GitHub Projects -->
-[sensu_rocketchat_handler]: https://github.com/sensu/sensu-rocketchat-handler
+[sensu-slack-handler]: https://github.com/sensu/sensu-slack-handler
 [sensu_sumologic_handler]: https://github.com/sensu/sensu-sumologic-handler
 [sensu_influxdb_handler]: https://github.com/sensu/sensu-influxdb-handler
 [sensu_plugin_sdk]: https://github.com/sensu/sensu-plugin-sdk
@@ -334,7 +328,6 @@ Read more about handlers in the [handler reference documentation][handlers_docs]
 [handler_stacks_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-stacks
 [handler_sets_docs]: https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#execute-multiple-handlers-handler-set
 [go_template_package]: https://pkg.go.dev/text/template
-[rocketchat_handler_annotations]: https://bonsai.sensu.io/assets/sensu/sensu-rocketchat-handler#annotations
 [slack_handler_annotations]: https://bonsai.sensu.io/assets/sensu/sensu-slack-handler#annotations
 [pagerduty_handler_annotations]: https://bonsai.sensu.io/assets/sensu/sensu-pagerduty-handler#argument-annotations
 [servicenow_handler_annotations]: https://bonsai.sensu.io/assets/sensu/sensu-servicenow-handler#annotations

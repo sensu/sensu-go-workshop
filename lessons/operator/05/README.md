@@ -6,7 +6,7 @@
   - [The Function of Time](#the-function-of-time)
   - [Structured Data](#structured-data)
 - [Working With Events](#working-with-events)
-  - [Event Data Structure](#event-data-structure) 
+  - [Event Data Structure](#event-data-structure)
   - [EXERCISE 1: Create an Event Manually](#exercise-1-create-an-event-manually)
   - [EXERCISE 2: Create an Event that Triggers an Alert](#exercise-2-create-an-event-that-triggers-an-alert)
 - [Discussion](#discussion)
@@ -14,7 +14,7 @@
 - [Next Steps](#next-steps)
 
 ## Goals
-In this lesson we will take a deeper look at events in Sensu, create an event manually using common shell tools, and show how events can trigger alerts. 
+In this lesson we will take a deeper look at events in Sensu, create an event manually using common shell tools, and show how events can trigger alerts.
 This lesson is intended for operators of Sensu, and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## Events are Observations
@@ -28,7 +28,7 @@ The richer that knowledge is, the better you can understand and reason about the
 
 So what is it that we are observing?
 
-### System Transparency 
+### System Transparency
 From our vantage point looking at a dashboard, we can only observe what the system shares with us.
 In traditional software development this involved informational output in the form of logs.
 Later, some systems were instrumented to allow on-demand inspection.
@@ -45,8 +45,8 @@ Modern observability involves two categories of system information; data which i
 Broadly, emitted data is referred to as _logs_ or _events_, and queried or inspected data is known as _metrics_ or _telemetry_.
 These differ primarily in their relationship to time.
 
-Log messages are emitted at irregular and unpredictable times. 
-They are emitted when _something happens_. 
+Log messages are emitted at irregular and unpredictable times.
+They are emitted when _something happens_.
 Metrics however are queried, either by _polling_ on an periodic basis, or _ad hoc_ when someone is inspecting the system.
 
 The unifying property of these two kinds of information is their _timestamp_.
@@ -54,9 +54,9 @@ The unifying property of these two kinds of information is their _timestamp_.
 ### Structured Data
 
 Where these two kinds of information differ though, is in structure.
-Logs are presented as text strings, often in a human language. 
+Logs are presented as text strings, often in a human language.
 They are intended to be human-readable and have little to no structure.
-Metrics are often presented as measurements in numerical form. 
+Metrics are often presented as measurements in numerical form.
 They are intended to be machine-readable and are often structured as key-value pairs.
 
 For a long time these two kinds of information were handled separately.
@@ -108,14 +108,14 @@ Sensu _events_ are structured data which include:
 </details>
 
 This generic container provides a tremendous amount of flexibility in terms of the types of observations that can be collected.
-For all the details on what kind of data events can hold, read the [Events reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/). 
+For all the details on what kind of data events can hold, read the [Events reference documentation](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/).
 
 Let's try making an event manually, using some common command-line tools.
 
 ## EXERCISE 1: Create an Event Manually
 ### Scenario
 
-You want to explore the Events API, or want to generate an event manually using common shell tools. 
+You want to explore the Events API, or want to generate an event manually using common shell tools.
 
 ### Solution
 
@@ -129,8 +129,8 @@ We can manually create an event using common shell tools like `curl` or PowerShe
 
    Any tool that can `POST` to an HTTP endpoint can be used.
    For example, you could instrument your application to emit events directly to Sensu, using standard libraries for HTTP and JSON.
-   
-   For this exercise we will use `curl` on Mac/Linux and PowerShell's `Invoke-RestMethod` cmdlet on Windows. 
+
+   For this exercise we will use `curl` on Mac/Linux and PowerShell's `Invoke-RestMethod` cmdlet on Windows.
 
    **Mac and Linux:**
 
@@ -153,37 +153,37 @@ We can manually create an event using common shell tools like `curl` or PowerShe
      -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database."}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
-    
-   Let's break down what we just did there. 
+
+   Let's break down what we just did there.
 
    We `POST`ed an event payload, in JSON format, to a secure endpoint in the [Events API][events_api_docs].
 
    #### The URL
-   
+
    The destination URL was `http://127.0.0.1:8080/api/core/v2/namespaces/default/events`.
 
    Let's break this URL down into its parts:
    - `http://127.0.0.1:8080`: The address and port of the backend.
-   - `api/core/v2`: The base address of the Sensu API. 
-     
-     Notice the version in the path. 
-     This is how Sensu guarantees to never break backwards compatibility! 
-     
-   - `namespaces/default`: The namespace to `POST` the event to. 
-     
+   - `api/core/v2`: The base address of the Sensu API.
+
+     Notice the version in the path.
+     This is how Sensu guarantees to never break backwards compatibility!
+
+   - `namespaces/default`: The namespace to `POST` the event to.
+
      You are likely using the `default` namespace, but just in case, the command checks to see if the `$SENSU_NAMESPACE` environment variable is set.
 
    - `events`: This is the root of the [Events API][events_api_docs].
 
    #### The Header
 
-   The API key that we generated in [Lesson 3](../03/README.md#readme) was used to authenticate the request. 
+   The API key that we generated in [Lesson 3](../03/README.md#readme) was used to authenticate the request.
    This is stored in the `$SENSU_API_KEY` environment variable.
-   The command included an `Authorization` header, with a value using the format of `Key <api_key>`. 
-   
+   The command included an `Authorization` header, with a value using the format of `Key <api_key>`.
+
    #### The Payload
 
-   The payload included a JSON formatted `event` structure in the `POST` body. 
+   The payload included a JSON formatted `event` structure in the `POST` body.
    This event is mimicing the kind of event that an automated `check` would generate.
 
    <details>
@@ -192,11 +192,11 @@ We can manually create an event using common shell tools like `curl` or PowerShe
    ```json
    {
      "entity": {
-       "metadata":{ 
+       "metadata":{
          "name": "i-424242"
        }
      },
-     "check":{ 
+     "check":{
        "metadata":{
          "name": "my-app"
          },
@@ -209,20 +209,20 @@ We can manually create an event using common shell tools like `curl` or PowerShe
    </details>
 
    This `event` contains an `entity` with a `metadata` property, indicating that  `i-424242` is the name of the node the event came from.
-   There is also a `check` structure describing the _check_ that generated it. 
+   There is also a `check` structure describing the _check_ that generated it.
    The check is named `my-app` and its `interval` says that it runs every 30 seconds.
 
-   The remaining two are the `status` and `output`. 
+   The remaining two are the `status` and `output`.
    Following common UNIX conventions, if a `check` executable exits with a status other than `0`, it is considered an error.
    In such cases, the `output` is captured and included with the event.
-   The output message indicates a database connection failure. 
+   The output message indicates a database connection failure.
 
    #### What Happens When Sensu Processes an Event?
-   
+
    At minimum, the backend will store the most recent event for an entity, so we can inspect it via `sensuctl`.
 
    **View a List of Events**
-   
+
    ```shell
    sensuctl event list
    ```
@@ -257,9 +257,9 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
 
 1. **Create an Event that Alerts in Rocket.Chat.**
 
-   This step is the same as last time, but now includes a `handlers` property in the `check` structure. 
+   This step is the same as last time, but now includes a `handlers` property in the `check` structure.
    The value is a simple list of handler names.
-   The Rocket.Chat handler is named `rocketchat`.
+   The Rocket.Chat handler is named `mattermost`.
 
    <details>
    <summary><strong>Example: </strong>Event with `handlers` Property</summary>
@@ -267,24 +267,24 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
    ```json
    {
      "entity": {
-       "metadata":{ 
+       "metadata":{
          "name": "i-424242"
        }
      },
-     "check":{ 
+     "check":{
        "metadata":{
          "name": "my-app"
          },
        "interval": 30,
        "status": 2,
        "output": "ERROR    : failed to connect to database.",
-       "handlers": ["rocketchat"]
+       "handlers": ["mattermost"]
      }
    }
    ```
    </details>
 
-  
+
    Run the following command to create the event.
 
    **Mac and Linux:**
@@ -293,7 +293,7 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
    curl \
      -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
-     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' \
      "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -304,18 +304,18 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-   
-   This time, because this event defines handlers, the backend will generate an alert in Rocket.Chat. 
+
+   This time, because this event defines handlers, the backend will generate an alert in Rocket.Chat.
    To view the alert, open up [Rocket.Chat](http://127.0.0.1:5000/) and login using the default credentials (username: `sensu`, password: `sensu`)."
 
 1. **Send an Event with a Successful Exit Status.**
 
-   The last event we sent had an error state. 
-   In most scenarios, this would open an incident. 
+   The last event we sent had an error state.
+   In most scenarios, this would open an incident.
    Let's send one more event to indicate that our app is now restored to a functional state.
 
    This time the `status` will be set to 0 and the output message is `200 OK`.
@@ -326,18 +326,18 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
    ```json
    {
      "entity": {
-       "metadata":{ 
+       "metadata":{
          "name": "i-424242"
        }
      },
-     "check":{ 
+     "check":{
        "metadata":{
          "name": "my-app"
          },
        "interval": 30,
        "status": 0,
        "output": "200 OK",
-       "handlers": ["rocketchat"]
+       "handlers": ["mattermost"]
      }
    }
    ```
@@ -351,7 +351,7 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
    curl \
      -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
      -H "Content-Type: application/json" \
-     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
+     -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' \
      "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -362,7 +362,7 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -370,12 +370,12 @@ Let's create an event that will be processed using the Rocket.Chat handler we co
 If so you're ready to move on to the next lesson!
 
 ## Discussion
-<!-- Summary --> 
+<!-- Summary -->
 
 In this lesson you learned about the event data structure, and how it unifies all kinds of information into a single data type.
 We manually created some events with different statuses and learned how to configure events to get sent to the right handlers.
 
-At the moment, our handler will just post every message that comes in directly to the channel. 
+At the moment, our handler will just post every message that comes in directly to the channel.
 In the next lesson, we will use _filters_ to show how the handler can notice this status change and resolve the incident, while also preventing the chat from being spammed with redundant messages.
 
 
@@ -390,7 +390,7 @@ Some common use cases for events:
 
 #### Service Health and Metrics Collection
 
-We showed a simple example of a service health check in this exercise, and touched on metrics in the previous exercise. 
+We showed a simple example of a service health check in this exercise, and touched on metrics in the previous exercise.
 Both topics will be covered in more detail in [Lesson 8: Introduction to Checks](/lessons/operator/08/README.md#readme).
 
 #### Dead Man's Switches

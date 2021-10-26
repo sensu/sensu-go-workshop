@@ -20,7 +20,7 @@ In this lesson we will discuss using _filters_ in the observability pipeline. In
 Sensu filters provide control over which events get processed by downstream handlers.
 The filter applies conditionals to an event stream in realtime using Sensu Query Expressions (SQEs).
 
-By default, a Sensu handler will process all events sent to it. 
+By default, a Sensu handler will process all events sent to it.
 This is rarely desired behavior, so most handlers will have event filters applied to limit which events it processes.
 
 ## Sensu Query Expressions (SQEs)
@@ -31,7 +31,10 @@ SQEs are EMCAScript 5 expressions that return either `true` or `false`.
 SQEs can be as simple as basic comparison operations – "less than" (`<`) or "greater than" (`>`) "equal to" (`==`) or "not equal" (`!=`) – or as complex as small JavaScript programs.
 You can even package filter logic as JavaScript libraries and import them into the sandbox environment using Dynamic Runtime Assets!
 
-_NOTE: Dynamic Runtime Assets are covered in greater detail in [Lesson 10: Introduction to Assets](/lessons/operator/10/README.md#readme)._
+- **Eliminating alert fatigue** by deduplicating incoming events and limiting repeat processing to predefined conditions (e.g. only alert once per hour per incident)
+- **Optimizing metrics processing** by dropping events that do not contain metric data, or sampling metrics to reduce storage costs
+- **Orchestrating event processing** via occurrence filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
+- **Configuring conditional triggers** by evaluating incoming events to determine which event handler to use (e.g. notify developers via Mattermost, but send all incidents assigned to operations via Pagerduty using a handler set and corresponding filters)
 
 ## Built-in Filters and Helper Functions
 
@@ -51,7 +54,7 @@ Sensu includes built-in event filters and helper functions to customize event pi
 ## EXERCISE 1: Use a Built-in Filter to Only Alert on Problems
 ### Scenario
 
-You want to reduce the amount of alerts that are going to your chat-ops channel. 
+You want to reduce the amount of alerts that are going to your chat-ops channel.
 You'd like to only get ones that indicate there's some kind of problem or possible incident.
 
 ### Solution
@@ -66,24 +69,73 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
 
 1. **Modify a handler configuration template to use a built-in filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme) (i.e. `rocketchat.yaml`), and replace the `filters: []` line with the following:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme).
+   Replace the contents of `mattermost.yaml` with the following:
 
    ```yaml
-   filters:
-   - is_incident
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: mattermost
+   spec:
+     type: pipe
+     command: >-
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.3.2
+     timeout: 10
+     filters:
+     - is_incident
+     secrets:
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
 
-1. **Update the handler using `sensuctl create`.**
+   > **Understanding the YAML:**
+   > - We replaced the `filters: []` line with the following:
+   >   ```yaml
+   >   filters:
+   >   - is_incident
+   >   ```
+
+1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f rocketchat.yaml
+   sensuctl create -f mattermost.yaml
    ```
 
    Now verify that the handler configuration was updated by viewing the handler info.
 
    ```shell
-   sensuctl handler info rocketchat --format yaml
+   sensuctl handler info mattermost --format yaml
    ```
+
+1. **Configure environment variables.**
+
+   Setup the necessary environment variables by running one of the following commands:
+
+   **Mac and Linux users (`.envrc`):**
+
+   ```shell
+   source .envrc
+   env | grep SENSU
+   ```
+
+   **Windows users (`.envrc.ps1`):**
+
+   ```powershell
+   . .\.envrc.ps1
+   Get-ChildItem env: | Out-String -Stream | Select-String -Pattern SENSU
+   ```
+
+   The output should include the expected values for `SENSU_API_URL`, `SENSU_NAMESPACE`, and `SENSU_API_KEY`.
+
+   > _NOTE: if you need help creating an API Key, please refer to the [Lesson 3 EXERCISE 6: create an API Key for personal use](/lessons/operator/03/README.md#exercise-6-create-an-api-key-for-personal-use)._
 
 1. **Test the filter.**
 
@@ -97,7 +149,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -108,7 +160,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -119,7 +171,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -130,7 +182,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-app"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -153,7 +205,7 @@ You want to reduce the alert fatigue so that you only get one error messages whe
 
 To accomplish this we will write a custom filter using JavaScript.
 Internally, Sensu maintains a counter on events which tracks how many times the event has been triggered.
-We can use that in our filter to let only the first instance of the event through to the handler. 
+We can use that in our filter to let only the first instance of the event through to the handler.
 
 ### Steps
 
@@ -163,8 +215,8 @@ We can use that in our filter to let only the first instance of the event throug
    These counters include the `occurrences` counter, and the `occurrences_watermark` counter.
    The `occurrences` property is visible in the event detail output from a `sensuctl event info` command:
 
-   **Mac and Linux** 
-   
+   **Mac and Linux**
+
    ```shell
    sensuctl event info learn.sensu.io helloworld --format json | grep occurrences
    ```
@@ -178,7 +230,7 @@ We can use that in our filter to let only the first instance of the event throug
 
    ```json
    "occurrences": 8,
-   "occurrences_watermark": 8,   
+   "occurrences_watermark": 8,
    ```
 
    Let's create a filter that only processes the first occurrence of an incident, and then again only once every hour.
@@ -229,7 +281,7 @@ You just created a custom filter and now you want to update your chat handler to
 
 ### Solution
 
-Handlers can have multiple filters stacked in order. 
+Handlers can have multiple filters stacked in order.
 Combining the built-in `is_incident` filter with the custom `filter-repeated` filter we just made, will result in only the first failure event showing up in chat.
 To add this, we will edit our handler configuration to add `filter-repeated` to the `filters` property.
 
@@ -237,24 +289,47 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
 
 1. **Modify the Rocket.Chat handler configuration to use a custom filter.**
 
-   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme), `rocketchat.yaml`, and add `filter-repeated` to the `filters` field:
+   Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme).
+   Replace the contents of `mattermost.yaml` with the following:
 
    ```yaml
-   filters:
-   - is_incident
-   - filter-repeated
+   ---
+   type: Handler
+   api_version: core/v2
+   metadata:
+     name: mattermost
+   spec:
+     type: pipe
+     command: >-
+       sensu-slack-handler
+       --channel "#alerts"
+       --username SensuGo
+       --description-template "{{ .Check.Output }}\n\n[namespace:{{.Entity.Namespace}}]"
+       --webhook-url ${MATTERMOST_WEBHOOK_URL}
+     runtime_assets:
+     - sensu/sensu-slack-handler:1.3.2
+     timeout: 10
+     filters:
+     - is_incident
+     - filter-repeated
+     secrets:
+     - name: MATTERMOST_WEBHOOK_URL
+       secret: mattermost_webhook_url
    ```
 
-1. **Update the handler using `sensuctl create`.**
+   > **Understanding the YAML:**
+   > - We added `filter-repeated` the `filters:` array.
+
+1. **Update the handler using `sensuctl create -f`.**
 
    ```shell
-   sensuctl create -f rocketchat.yaml
+   sensuctl create -f mattermost.yaml
    ```
 
    Now verify that the handler configuration was updated by viewing the handler configration using `sensuctl handler info`
 
    ```shell
-   sensuctl handler info rocketchat --format yaml
+   sensuctl handler info mattermost --format yaml
    ```
 
 1. **Test the filter.**
@@ -269,7 +344,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -280,7 +355,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -291,7 +366,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -302,7 +377,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":2,"output":"ERROR: failed to connect to database.","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -313,7 +388,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -324,7 +399,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -335,7 +410,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
    ```shell
    curl -i -X POST -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' \
+        -d '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' \
         "${SENSU_API_URL:-http://127.0.0.1:8080}/api/core/v2/namespaces/${SENSU_NAMESPACE:-default}/events"
    ```
 
@@ -346,7 +421,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
      -Method POST `
      -Headers @{"Authorization" = "Key ${Env:SENSU_API_KEY}";} `
      -ContentType "application/json" `
-     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["rocketchat"]}}' `
+     -Body '{"entity":{"metadata":{"name":"i-424242"}},"check":{"metadata":{"name":"my-api"},"interval":30,"status":0,"output":"200 OK","handlers":["mattermost"]}}' `
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
@@ -357,7 +432,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
 
 ## Discussion
 
-In this lesson we learned how to apply filters to control the behavior of handlers. 
+In this lesson we learned how to apply filters to control the behavior of handlers.
 We also learned how to solve complex problems by authoring custom filters using JavaScript expressions.
 
 These examples demonstrate Sensu's flexible filtering system, which allows you to customize how and when events will be processed by the Sensu pipeline.

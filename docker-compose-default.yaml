@@ -8,6 +8,11 @@ services:
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "2048M"
     labels:
     - io.sensu.role=sensu-backend
     ports:
@@ -15,9 +20,10 @@ services:
     - 8080:8080
     - 8081:8081
     environment:
+    - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - SENSU_INTERNAL_ENVIRONMENT
+    - SENSU_BACKEND_CLUSTER_ADMIN_API_KEY
     - SENSU_WORKSHOP_ENV_SECRET
     - SUMOLOGIC_HTTP_SOURCE_URL
     volumes:
@@ -31,8 +37,8 @@ services:
       retries: 6
     command: >-
       sensu-backend start
-      --log-level=debug
-      --debug=true
+      --log-level=warn
+      --debug=false
 
   # Sensu Agent
   #
@@ -41,6 +47,10 @@ services:
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
     - io.sensu.role=sensu-agent
     ports:
@@ -58,6 +68,9 @@ services:
     - SENSU_API_PORT
     - SENSU_STATSD_METRICS_HOST
     - SENSU_STATSD_METRICS_PORT
+    volumes:
+    - type: tmpfs
+      target: /var/lib/sensu
     healthcheck:
       test: wget -q -O- http://127.0.0.1:3031/healthz
       interval: 10s
@@ -65,12 +78,56 @@ services:
       retries: 6
     command: >-
       sensu-agent start
-      --log-level=info
+      --log-level=warn
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
-      --statsd-event-handlers influxdb
+      --statsd-event-handlers sumologic-metrics
       --password ${SENSU_AGENT_PASSWORD}
+
+  # Postgres
+  #
+  # Sensu data store.
+  #
+  # See: https://www.postgresql.org/docs/
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    labels:
+    - io.sensu.role=postgres
+    ports:
+    - 5432
+    environment:
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
+    - PGDATA=/var/lib/postgresql/data
+    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - APP_DB_USERNAME
+    - APP_DB_PASSWORD
+    - APP_DB_NAME
+    - MATTERMOST_DB
+    - MATTERMOST_ADMIN_USER
+    - MATTERMOST_ADMIN_PASSWORD
+    volumes:
+    - type: bind
+      source: ./config/postgres/postgresql.conf
+      target: /etc/postgresql/postgresql.conf
+    - type: bind
+      source: ./config/postgres/scripts/
+      target: /docker-entrypoint-initdb.d/
+    - type: volume
+      source: postgres_data
+      target: /var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # Sensu Asset Server
   #
@@ -78,7 +135,11 @@ services:
   #
   # See: https://nginx.org/en/docs/
   sensu-assets:
-    image: "nginx:latest"
+    image: "nginx:${NGINX_VERSION}"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
     - io.sensu.role=asset-server
     ports:
@@ -88,8 +149,8 @@ services:
     - type: bind
       source: ./config/nginx/nginx.conf
       target: /etc/nginx/nginx.conf
-    - type: volume
-      source: asset_data
+    - type: bind
+      source: ./assets
       target: /usr/share/nginx/html/assets
     - type: volume
       source: user_data
@@ -100,38 +161,6 @@ services:
       timeout: 5s
       retries: 6
 
-  # Sensu Asset SMB Adapter
-  #
-  # Upload assets to the workshop Sensu Assets service via SMB.
-  #
-  # See: https://www.samba.org/samba/docs/
-  sensu-assets-smb:
-    build:
-      context: ./docker/sensu-assets/
-      dockerfile: Dockerfile.debian
-      args:
-      - WORKSHOP_PASSWORD
-    image: sensu-assets:latest
-    labels:
-    - io.sensu.role=asset-server
-    ports:
-    - 139:139
-    - 445:445
-    environment: []
-    volumes:
-    - type: bind
-      source: ./config/samba/smb.conf
-      target: /etc/samba/smb.conf
-    - type: volume
-      source: asset_data
-      target: /home/sensu/assets
-    healthcheck:
-      test: smbstatus --brief
-      interval: 10s
-      timeout: 5s
-      retries: 6
-    command: smbd --foreground --log-stdout --configfile /etc/samba/smb.conf
-
   # Vault
   #
   # Includes a Vault "devmode" server for secrets management.
@@ -139,6 +168,10 @@ services:
   # See: https://www.vaultproject.io/docs
   vault:
     image: vault:${VAULT_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
     - io.sensu.role=secrets-manager
     ports:
@@ -146,7 +179,15 @@ services:
     environment:
     - VAULT_DEV_ROOT_TOKEN_ID
     - VAULT_DEV_LISTEN_ADDRESS
-    volumes: []
+    volumes:
+      - type: volume
+        source: workshop_data
+        target: /vault/logs
+        consistency: consistent
+      - type: volume
+        source: workshop_data
+        target: /vault/file
+        consistency: consistent
     healthcheck:
       test: wget -q -O- http://127.0.0.1:8200/v1/sys/health
       interval: 10s
@@ -155,124 +196,97 @@ services:
     command: >-
       vault server -dev -log-level debug
 
-  # RocketChat
+  # Mattermost
   #
-  # Includes a rocket.chat deployment (an OSS Slack alternative) for chat/alerting.
+  # Includes a Mattermost deployment for workshop alerts and workshop chat.
   #
-  # See: https://rocket.chat
-  rocketchat:
-    image: rocket.chat:${ROCKETCHAT_VERSION}
+  # See: https://mattermost.com
+  mattermost:
+    image: mattermost/mattermost-team-edition:${MATTERMOST_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
     - io.sensu.role=chat
-    depends_on:
-    - mongo
     ports:
-    - 5000:5000
+    - 8065:8065
+    extra_hosts:
+    - "dockerhost:127.0.0.1"
     environment:
-    - PORT=5000
-    - ROOT_URL=http://0.0.0.0:5000
-    - MONGO_URL=mongodb://mongo:27017/rocketchat
-    - MONGO_OPLOG_URL=mongodb://mongo:27017/local
-    - ADMIN_USERNAME=$ROCKETCHAT_ADMIN_USER
-    - ADMIN_PASS=$ROCKETCHAT_ADMIN_PASSWORD
-    - ADMIN_EMAIL=admin@example.com
-    - OVERWRITE_SETTING_Show_Setup_Wizard=completed
-    - CREATE_TOKENS_FOR_USERS=true
+    - MATTERMOST_DB=${MATTERMOST_DB}
+    - MATTERMOST_ADMIN_USER=${MATTERMOST_ADMIN_USER}
+    - MATTERMOST_ADMIN_PASSWORD=${MATTERMOST_ADMIN_PASSWORD}
+    - MM_SQLSETTINGS_DRIVERNAME=postgres
+    - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_ADMIN_USER}:${MATTERMOST_ADMIN_PASSWORD}@postgres/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
+    - MM_TEAMSETTINGS_ENABLEOPENSERVER=false
+    - MM_PASSWORDSETTINGS_MINIMUMLENGTH=8
+    - MM_PASSWORDSETTINGS_LOWERCASE=true
+    - MM_PASSWORDSETTINGS_UPPERCASE=false
+    - MM_PASSWORDSETTINGS_NUMBER=false
+    - MM_PASSWORDSETTINGS_SYMBOL=false
     volumes:
     - type: volume
-      source: rocketchat_data
-      target: /app/uploads
+      source: mattermost_config
+      target: /mattermost/config
       consistency: consistent
-
-  # MongoDB
-  #
-  # Includes MongoDB backend for rocket.chat deployment.
-  #
-  # See: https://www.mongodb.com
-  mongo:
-    image: mongo:${MONGODB_VERSION}
-    labels:
-    - io.sensu.role=chat
-    ports:
-    - 27017:27107
-    # environment:
-    # - MONGO_INITDB_ROOT_USERNAME
-    # - MONGO_INITDB_ROOT_PASSWORD
-    # - MONGO_INITDB_DATABASE
-    volumes:
     - type: volume
-      source: mongo_data
-      target: /data/db
+      source: mattermost_data
+      target: /mattermost/data
       consistency: consistent
     - type: bind
-      source: ./config/mongodb/mongod.conf
-      target: /etc/mongo/mongod.conf
+      source: ./config/mattermost/data.jsonl
+      target: /mattermost/data/data.jsonl
+      consistency: consistent
     - type: bind
-      source: ./config/mongodb/init-scripts
-      target: /docker-entrypoint-initdb.d/
+      source: ./config/mattermost/profile.jpg
+      target: /mattermost/profile.jpg
+      consistency: consistent
+    - type: volume
+      source: mattermost_logs
+      target: /mattermost/logs
+      consistency: consistent
+    - type: volume
+      source: mattermost_plugins
+      target: /mattermost/plugins
+      consistency: consistent
+    - type: volume
+      source: mattermost_plugins_extra
+      target: /mattermost/client/plugins
       consistency: consistent
     healthcheck:
-      test: mongo --eval 'db.runCommand("ping").ok' localhost:27017/test --quiet
+      test: wget -q -O- http://127.0.0.1:8065/api/v4/system/ping
       interval: 10s
       timeout: 5s
       retries: 6
-    command: mongod --smallfiles --oplogSize 128 --replSet rs01
 
-  # Sensu CLI
+  # Demo App
   #
-  # Provide a clean workshop environment based on Alpine Linux w/ sensuctl
-  # pre-installed in case the trainee workstation is missing a required
-  # dependency.
-  #
-  # See: https://alpinelinux.org
-  sensuctl:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      args:
-      - SENSU_CLI_VERSION
-      - VAULT_VERSION
-    image: workshop:${SENSU_CLI_VERSION}
-    depends_on:
-    - sensu-backend
+  # See: https://github.com/portertech/demo-app
+  app:
+    image: portertech/demo-app:latest
     deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: ${WORKSHOP_SETUP_RETRIES}
+      resources:
+        limits:
+          memory: 64M
     labels:
-    - io.sensu.role=sensuctl
-    ports: []
+    - io.sensu.role=sensu-agent
+    ports:
+    - 8080/tcp
     environment:
-    - SENSU_API_URL
-    - SENSU_USERNAME
-    - SENSU_PASSWORD
-    - SENSU_NAMESPACE
-    - VAULT_ADDR
-    - VAULT_TOKEN
-    volumes:
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
-    - type: bind
-      source: ./scripts
-      target: /usr/local/bin/scripts
-    - type: bind
-      source: ./
-      target: /root/workshop
-      consistency: consistent
-    - type: volume
-      source: sensuctl_data
-      target: /root/.config
-      consistency: consistent
-    working_dir: /root
-    entrypoint: wait-for-sensu-backend sensuctl
+    - DB_HOST=${APP_DB_HOST}
+    - DB_PORT=${APP_DB_PORT}
+    - DB_USER=${APP_DB_USERNAME}
+    - DB_PASS=${APP_DB_PASSWORD}
+    - DB_NAME=${APP_DB_NAME}
+    volumes: []
+    healthcheck:
+      test: curl -XGET -I http://127.0.0.1:8080/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
     command: >-
-      configure -n
-      --url ${SENSU_API_URL}
-      --username ${SENSU_USERNAME}
-      --password ${SENSU_PASSWORD}
-      --namespace ${SENSU_NAMESPACE}
-      --format tabular
+      /usr/bin/demo-app
 
   # Configurator
   #
@@ -293,10 +307,15 @@ services:
       args:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
+      - MATTERMOST_VERSION
     image: workshop:${SENSU_CLI_VERSION}
     depends_on:
     - sensu-backend
+    - mattermost
     deploy:
+      resources:
+        limits:
+          memory: 64M
       restart_policy:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
@@ -306,14 +325,16 @@ services:
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
     - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+    - SENSU_BACKEND_CLUSTER_ADMIN_API_KEY
     - VAULT_ADDR
     - VAULT_TOKEN
     - WORKSHOP_HOSTNAME
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
-    - WORKSHOP_PASSWORD
-    - ROCKETCHAT_ADMIN_USER
-    - ROCKETCHAT_ADMIN_PASSWORD
+    - WORKSHOP_DEFAULT_TRAINEE_PASSWORD
+    - MATTERMOST_ADMIN_USER
+    - MATTERMOST_ADMIN_PASSWORD
+    - SENSU_CLUSTER_EXTRAS=config/sensu/store
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -323,7 +344,7 @@ services:
       target: /workshop/.env
     - type: bind
       source: ./${COMPOSE_FILE}
-      target: /workshop/docker-compose.yaml
+      target: /workshop/${COMPOSE_FILE}
     - type: bind
       source: ./docker
       target: /workshop/docker
@@ -342,18 +363,15 @@ services:
       target: /workshop/config/vault
       consistency: consistent
     - type: volume
-      source: sensuctl_data
-      target: /root/.config
-    - type: volume
       source: user_data
       target: /users
     command: |-
       init-workshop
 
 volumes:
-  sensu_data:
+  workshop_data:
     driver: local
-  sensuctl_data:
+  sensu_data:
     driver: local
   etcd_data:
     driver: local
@@ -375,5 +393,13 @@ volumes:
     driver: local
   mongo_data:
     driver: local
-  rocketchat_data:
+  mattermost_config:
+    driver: local
+  mattermost_data:
+    driver: local
+  mattermost_logs:
+    driver: local
+  mattermost_plugins:
+    driver: local
+  mattermost_plugins_extra:
     driver: local

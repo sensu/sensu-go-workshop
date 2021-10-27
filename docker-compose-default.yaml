@@ -140,13 +140,14 @@ services:
     labels:
     - io.sensu.role=ldap-server
     healthcheck:
-      test: curl -s -I -A "Docker health check (curl)" http://127.0.0.1:80/
+      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w password
       interval: 10s
       timeout: 5s
       retries: 6
-
-    container_name: openldap
-    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
 
     environment:
       - ORG_NAME=Sensu

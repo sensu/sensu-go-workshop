@@ -9,7 +9,7 @@ services:
   sensu-backend:
     image: sensu/sensu:${SENSU_BACKEND_VERSION}
     labels:
-    - io.sensu.role=sensu-backend
+    - sensu.io/workshop/role=sensu-backend
     ports:
     - 3000:3000
     - 8080:8080
@@ -41,7 +41,7 @@ services:
   sensu-agent:
     image: sensu/sensu:${SENSU_AGENT_VERSION}
     labels:
-    - io.sensu.role=sensu-agent
+    - sensu.io/workshop/role=sensu-agent
     ports:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
@@ -79,7 +79,7 @@ services:
   sensu-assets:
     image: "nginx:latest"
     labels:
-    - io.sensu.role=asset-server
+    - sensu.io/workshop/role=asset-server
     ports:
     - 8000:80
     environment: []
@@ -112,7 +112,7 @@ services:
       - WORKSHOP_PASSWORD
     image: sensu-assets:latest
     labels:
-    - io.sensu.role=asset-server
+    - sensu.io/workshop/role=asset-server
     ports:
     - 139:139
     - 445:445
@@ -138,7 +138,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
     labels:
-    - io.sensu.role=data-platform
+    - sensu.io/workshop/role=data-platform
     ports:
     - 9200:9200
     - 9300:9300
@@ -163,7 +163,7 @@ services:
     depends_on:
     - elasticsearch
     labels:
-    - io.sensu.role=dashboards
+    - sensu.io/workshop/role=dashboards
     ports:
     - 5601:5601
     environment: []
@@ -186,7 +186,7 @@ services:
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION}
     labels:
-    - io.sensu.role=dashboards
+    - sensu.io/workshop/role=dashboards
     ports:
     - 3001:3000
     environment:
@@ -217,7 +217,7 @@ services:
   vault:
     image: vault:${VAULT_VERSION}
     labels:
-    - io.sensu.role=secrets-manager
+    - sensu.io/workshop/role=secrets-manager
     ports:
     - 8200:8200
     environment:
@@ -240,7 +240,7 @@ services:
   rocketchat:
     image: rocket.chat:${ROCKETCHAT_VERSION}
     labels:
-    - io.sensu.role=chat
+    - sensu.io/workshop/role=chat
     depends_on:
     - mongo
     ports:
@@ -269,7 +269,7 @@ services:
   mongo:
     image: mongo:${MONGODB_VERSION}
     labels:
-    - io.sensu.role=chat
+    - sensu.io/workshop/role=chat
     ports:
     - 27017:27107
     # environment:
@@ -317,7 +317,7 @@ services:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
-    - io.sensu.role=sensuctl
+    - sensu.io/workshop/role=sensuctl
     ports: []
     environment:
     - SENSU_API_URL
@@ -378,7 +378,7 @@ services:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
-    - io.sensu.role=configurator
+    - sensu.io/workshop/role=configurator
     ports: []
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME

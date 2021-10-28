@@ -148,7 +148,6 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
-
     environment:
       - ORG_NAME=Sensu
       - ORG_DNS=example.com

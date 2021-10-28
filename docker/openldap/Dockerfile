@@ -1,10 +1,12 @@
 FROM ubuntu:18.04
 
 # Install OpenLDAP
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y slapd ldap-utils openssl ca-certificates
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y slapd ldap-utils openssl ca-certificates net-tools
 
 # Copy project files
 COPY resources /app
+RUN mkdir -p /etc/ldap
+COPY resources/ldap.conf /etc/ldap/ldap.conf
 
 # Change to /app/
 WORKDIR /app/

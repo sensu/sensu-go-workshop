@@ -140,7 +140,7 @@ services:
     labels:
     - io.sensu.role=ldap-server
     healthcheck:
-      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w password
+      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w $$ROOT_SECRET
       interval: 10s
       timeout: 5s
       retries: 6

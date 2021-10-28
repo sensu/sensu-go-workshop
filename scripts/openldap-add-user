@@ -1,0 +1,25 @@
+#!/bin/sh
+
+echo "Add a user Bob Jones"
+ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF
+dn: cn=Bob Jones,ou=Users,$OPENLDAP_ORG_DN
+cn: Bob Jones
+sn: Jones
+objectClass: inetOrgPerson
+userPassword: p@ssw0rd
+uid: bjones
+EOF
+ret=$?
+echo "Return Value : $ret"
+
+echo  "Add user Bob Jones to engineering group"
+ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF
+dn: cn=engineering,ou=Users,$OPENLDAP_ORG_DN
+changetype: modify
+add: member
+member: cn=Bob Jones,ou=Users,$OPENLDAP_ORG_DN
+EOF
+ret=$?
+echo "Return Value : $ret"
+
+

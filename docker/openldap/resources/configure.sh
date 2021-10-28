@@ -30,11 +30,11 @@ gen_certs(){
   cd -
 }
 
-# Requires ORG_NAME, ORG_DNS, ORG_DN, ROOT_SECRET
+# Requires ORG_NAME, ORG_DNS, ORG_DN, OPENLDAP_ROOT_PASSWORD
 gen_init_schema(){
 
   # Hash password before adding it
-  ROOT_HASH=$(slappasswd -s $ROOT_SECRET) || fatal 'Invalid password input!'
+  ROOT_HASH=$(slappasswd -s $OPENLDAP_ROOT_PASSWORD) || fatal 'Invalid password input!'
 
   # Initialize configuration
   cat << EOF > /tmp/ldap-init.ldif
@@ -100,7 +100,7 @@ EOF
 [[ -z ${ORG_DNS} ]] && fatal "Environment variable ORG_DNS must be set."
 [[ -z ${ORG_DN} ]] && fatal "Environment variable ORG_DN must be set."
 [[ -z ${SERVER_FQDN} ]] && fatal "Environment variable SERVER_FQDN must be set."
-[[ -z ${ROOT_SECRET} ]] && fatal "Environment variable ROOT_SECRET must be set."
+[[ -z ${OPENLDAP_ROOT_PASSWORD} ]] && fatal "Environment variable OPENLDAP_ROOT_PASSWORD must be set."
 CERT_DIR='/config/certs'
 
 # Generate certificates
@@ -126,16 +126,16 @@ info 'Importing LDAP configuration'
 ldapmodify -a -Y EXTERNAL -H ldapi:/// -f /tmp/ldap-init.ldif || fatal 'Could not initialize server configuration!'
 
 info 'Importing LDAP organization'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/org-init.ldif || fatal 'Could not create organization!'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/org-init.ldif || fatal 'Could not create organization!'
 
 info 'Importing LDAP User Organizational Unit'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
 
 info 'Importing LDAP engineering Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
 
 info 'Importing LDAP sales Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
 
 info 'Importing schemas'
 for schema in /app/schema/*.ldif; do

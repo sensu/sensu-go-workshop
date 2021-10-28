@@ -32,7 +32,8 @@ RUN /mattermost/bin/mmctl version
 # - mmctl
 #
 FROM alpine:latest AS workshop
-RUN apk add curl jq gettext docker-cli docker-compose && mkdir /lib64
+RUN apk add curl jq gettext docker-cli docker-compose openldap-clients && mkdir /lib64
+RUN echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/
 COPY --from=vault /bin/vault /usr/local/bin/vault

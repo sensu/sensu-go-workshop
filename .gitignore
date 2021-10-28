@@ -9,6 +9,7 @@ license.json
 # ignore configurator artifacts
 config/sensu/rbac/*
 config/mattermost/data.jsonl
+config/vault/secrets/mattermost.json
 
 # ignore workshop artifacts
 *.zip

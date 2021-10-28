@@ -64,11 +64,30 @@ EOF
   cat << EOF > /tmp/org-init.ldif
 # Organization Initalization
 dn: $ORG_DN
-changetype: add
-objectclass: top
 objectclass: organization
 objectclass: dcObject
 o: $ORG_NAME
+EOF
+
+  cat << EOF > /tmp/users-ou.ldif
+# Users Organizational Unit
+dn: ou=Users,$ORG_DN
+objectClass: organizationalUnit
+ou: Users
+EOF
+
+  cat << EOF > /tmp/engineering-group.ldif
+dn: cn=engineering,ou=Users,$ORG_DN
+cn: engineering
+objectClass: groupOfNames
+member:
+EOF
+
+  cat << EOF > /tmp/sales-group.ldif
+dn: cn=sales,ou=Users,$ORG_DN
+cn: sales
+objectClass: groupOfNames
+member:
 EOF
 }
 
@@ -107,7 +126,16 @@ info 'Importing LDAP configuration'
 ldapmodify -a -Y EXTERNAL -H ldapi:/// -f /tmp/ldap-init.ldif || fatal 'Could not initialize server configuration!'
 
 info 'Importing LDAP organization'
-ldapmodify -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/org-init.ldif || fatal 'Could not create organization!'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/org-init.ldif || fatal 'Could not create organization!'
+
+info 'Importing LDAP User Organizational Unit'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
+
+info 'Importing LDAP engineering Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
+
+info 'Importing LDAP sales Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $ROOT_SECRET -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
 
 info 'Importing schemas'
 for schema in /app/schema/*.ldif; do

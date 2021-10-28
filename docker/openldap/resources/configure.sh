@@ -5,7 +5,7 @@
 # Functions
 #
 
-# Requires ORG_NAME, SERVER_URL, CERT_DIR
+# Requires OPENLDAP_ORG_NAME, CERT_DIR
 gen_certs(){
 
   [[ openssl ]] || fatal "OpenSSL not installed."
@@ -30,11 +30,11 @@ gen_certs(){
   cd -
 }
 
-# Requires ORG_NAME, ORG_DNS, ORG_DN, OPENLDAP_ROOT_PASSWORD
+# Requires OPENLDAP_ORG_NAME, OPENLDAP_ORG_DNS, OPENLDAP_ORG_DN, OPENLDAP_ADMIN_PASSWORD
 gen_init_schema(){
 
   # Hash password before adding it
-  ROOT_HASH=$(slappasswd -s $OPENLDAP_ROOT_PASSWORD) || fatal 'Invalid password input!'
+  ROOT_HASH=$(slappasswd -s $OPENLDAP_ADMIN_PASSWORD) || fatal 'Invalid password input!'
 
   # Initialize configuration
   cat << EOF > /tmp/ldap-init.ldif
@@ -42,10 +42,10 @@ gen_init_schema(){
 dn: olcDatabase={1}mdb,cn=config
 changetype: modify
 replace: olcSuffix
-olcSuffix: $ORG_DN
+olcSuffix: $OPENLDAP_ORG_DN
 -
 replace: olcRootDN
-olcRootDN: cn=admin,$ORG_DN
+olcRootDN: cn=admin,$OPENLDAP_ORG_DN
 -
 replace: olcRootPW
 olcRootPW: $ROOT_HASH
@@ -63,28 +63,28 @@ EOF
   # Initialize DIT
   cat << EOF > /tmp/org-init.ldif
 # Organization Initalization
-dn: $ORG_DN
+dn: $OPENLDAP_ORG_DN
 objectclass: organization
 objectclass: dcObject
-o: $ORG_NAME
+o: $OPENLDAP_ORG_NAME
 EOF
 
   cat << EOF > /tmp/users-ou.ldif
 # Users Organizational Unit
-dn: ou=Users,$ORG_DN
+dn: ou=Users,$OPENLDAP_ORG_DN
 objectClass: organizationalUnit
 ou: Users
 EOF
 
   cat << EOF > /tmp/engineering-group.ldif
-dn: cn=engineering,ou=Users,$ORG_DN
+dn: cn=engineering,ou=Users,$OPENLDAP_ORG_DN
 cn: engineering
 objectClass: groupOfNames
 member:
 EOF
 
   cat << EOF > /tmp/sales-group.ldif
-dn: cn=sales,ou=Users,$ORG_DN
+dn: cn=sales,ou=Users,$OPENLDAP_ORG_DN
 cn: sales
 objectClass: groupOfNames
 member:
@@ -96,11 +96,10 @@ EOF
 #
 
 # Variables
-[[ -z ${ORG_NAME} ]] && fatal "Environment variable ORG_NAME must be set."
-[[ -z ${ORG_DNS} ]] && fatal "Environment variable ORG_DNS must be set."
-[[ -z ${ORG_DN} ]] && fatal "Environment variable ORG_DN must be set."
-[[ -z ${SERVER_FQDN} ]] && fatal "Environment variable SERVER_FQDN must be set."
-[[ -z ${OPENLDAP_ROOT_PASSWORD} ]] && fatal "Environment variable OPENLDAP_ROOT_PASSWORD must be set."
+[[ -z ${OPENLDAP_ORG_NAME} ]] && fatal "Environment variable OPENLDAP_ORG_NAME must be set."
+[[ -z ${OPENLDAP_ORG_DNS} ]] && fatal "Environment variable OPENLDAP_ORG_DNS must be set."
+[[ -z ${OPENLDAP_ORG_DN} ]] && fatal "Environment variable OPENLDAP_ORG_DN must be set."
+[[ -z ${OPENLDAP_ADMIN_PASSWORD} ]] && fatal "Environment variable OPENLDAP_ADMIN_PASSWORD must be set."
 CERT_DIR='/config/certs'
 
 # Generate certificates
@@ -126,16 +125,16 @@ info 'Importing LDAP configuration'
 ldapmodify -a -Y EXTERNAL -H ldapi:/// -f /tmp/ldap-init.ldif || fatal 'Could not initialize server configuration!'
 
 info 'Importing LDAP organization'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/org-init.ldif || fatal 'Could not create organization!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/org-init.ldif || fatal 'Could not create organization!'
 
 info 'Importing LDAP User Organizational Unit'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
 
 info 'Importing LDAP engineering Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
 
 info 'Importing LDAP sales Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$ORG_DN -w $OPENLDAP_ROOT_PASSWORD -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
 
 info 'Importing schemas'
 for schema in /app/schema/*.ldif; do

@@ -140,7 +140,7 @@ services:
     labels:
     - io.sensu.role=ldap-server
     healthcheck:
-      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w $$OPENLDAP_ROOT_PASSWORD
+      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w $$OPENLDAP_ADMIN_PASSWORD
       interval: 10s
       timeout: 5s
       retries: 6
@@ -149,11 +149,10 @@ services:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
     environment:
-      - ORG_NAME=Sensu
-      - ORG_DNS=example.com
-      - ORG_DN=dc=example,dc=com
-      - SERVER_FQDN=ldap.example.com
-      - OPENLDAP_ROOT_PASSWORD
+      - OPENLDAP_ORG_NAME
+      - OPENLDAP_ORG_DNS
+      - OPENLDAP_ORG_DN
+      - OPENLDAP_ADMIN_PASSWORD
     ports:
       - '389:389'
       - '636:636'

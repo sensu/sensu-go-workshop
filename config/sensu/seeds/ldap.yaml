@@ -1,0 +1,26 @@
+---
+type: ldap
+api_version: authentication/v2
+metadata:
+  name: openldap
+spec:
+  groups_prefix: ldap
+  servers:
+  - binding:
+      password: workshop
+      user_dn: cn=admin,dc=example,dc=com
+    group_search:
+      attribute: member
+      base_dn: ou=Users,dc=example,dc=com
+      name_attribute: cn
+      object_class: groupOfNames
+    host: openldap
+    insecure: true
+    port: 636
+    security: tls
+    user_search:
+      attribute: uid
+      base_dn: ou=Users,dc=example,dc=com
+      name_attribute: cn
+      object_class: inetOrgPerson
+  username_prefix: ldap

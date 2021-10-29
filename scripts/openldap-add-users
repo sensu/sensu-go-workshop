@@ -62,6 +62,7 @@ generate_openldap_users() {
     	echo "Error adding LDAP user missing email:    $(echo ${USER} | base64 -d)"
         exit 1
     fi
+    USER_GROUPS=$(echo ${USER} | base64 -d | jq -r .groups)
 
     ldapdelete -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD "cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN"
     ret=$?
@@ -92,20 +93,24 @@ EOF
       exit $ret
     fi
 
-
-
-    echo  "Add user $USER_FULLNAME to engineering group"
-    ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF
-dn: cn=engineering,ou=Users,$OPENLDAP_ORG_DN
+    if [ "${USER_GROUPS}" != "null" ]; then
+    	USER_GROUPS=$(echo ${USER} | base64 -d | jq -r .groups[])
+    	for GROUP in $USER_GROUPS; do
+          echo  "Add user $USER_ID to $GROUP group"
+          ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF
+dn: cn=$GROUP,ou=Users,$OPENLDAP_ORG_DN
 changetype: modify
 add: member
 member: cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN
 EOF
-    ret=$?
-    if [ $ret -ne 0 ] && [ $ret -ne 20 ]; then
-      echo "ldapadd user to group Bad Return Value : $ret"
-      exit $ret
+          ret=$?
+          if [ $ret -ne 0 ] && [ $ret -ne 20 ]; then
+            echo "ldapadd user to group Bad Return Value : $ret"
+            exit $ret
+          fi
+    	done
     fi
+
   done
   echo "Successfully generated Sensu LDAP Users!"
   echo ""

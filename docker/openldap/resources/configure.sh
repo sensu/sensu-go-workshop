@@ -76,16 +76,43 @@ objectClass: organizationalUnit
 ou: Users
 EOF
 
-  cat << EOF > /tmp/engineering-group.ldif
-dn: cn=engineering,ou=Users,$OPENLDAP_ORG_DN
-cn: engineering
+  cat << EOF > /tmp/sensu-workshop-group.ldif
+dn: cn=sensu-workshop,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-workshop
 objectClass: groupOfNames
 member:
 EOF
 
-  cat << EOF > /tmp/sales-group.ldif
-dn: cn=sales,ou=Users,$OPENLDAP_ORG_DN
-cn: sales
+  cat << EOF > /tmp/sensu-engineering-group.ldif
+dn: cn=sensu-engineering,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-engineering
+objectClass: groupOfNames
+member:
+EOF
+
+  cat << EOF > /tmp/sensu-operations-group.ldif
+dn: cn=sensu-operations,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-operations
+objectClass: groupOfNames
+member:
+EOF
+
+  cat << EOF > /tmp/sensu-sales-group.ldif
+dn: cn=sensu-sales,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-sales
+objectClass: groupOfNames
+member:
+EOF
+  cat << EOF > /tmp/sensu-trainees-group.ldif
+dn: cn=sensu-trainees,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-trainees
+objectClass: groupOfNames
+member:
+EOF
+
+  cat << EOF > /tmp/sensu-cluster-admins-group.ldif
+dn: cn=sensu-cluster-admins,ou=Users,$OPENLDAP_ORG_DN
+cn: sensu-cluster-admins
 objectClass: groupOfNames
 member:
 EOF
@@ -131,10 +158,22 @@ info 'Importing LDAP User Organizational Unit'
 ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/users-ou.ldif || fatal 'Could not create users organizational unit!'
 
 info 'Importing LDAP engineering Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/engineering-group.ldif || fatal 'Could not create engineering group!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-engineering-group.ldif || fatal 'Could not create engineering group!'
+
+info 'Importing LDAP workshop Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-workshop-group.ldif || fatal 'Could not create workshop group!'
+
+info 'Importing LDAP operations Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-operations-group.ldif || fatal 'Could not create operations group!'
+
+info 'Importing LDAP trainees Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-trainees-group.ldif || fatal 'Could not create operations group!'
+
+info 'Importing LDAP cluster-admins Group Definition'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-cluster-admins-group.ldif || fatal 'Could not create operations group!'
 
 info 'Importing LDAP sales Group Definition'
-ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sales-group.ldif || fatal 'Could not create sales group!'
+ldapadd -H ldapi:/// -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD -f /tmp/sensu-sales-group.ldif || fatal 'Could not create sales group!'
 
 info 'Importing schemas'
 for schema in /app/schema/*.ldif; do

@@ -40,7 +40,7 @@ See below for the complete list of lesson plans.
 - [Lesson 06: Introduction to Filters](/lessons/operator/06/README.md#readme)
 - [Lesson 07: Introduction to Agents](/lessons/operator/07/README.md#readme)
 - [Lesson 08: Introduction to Checks](/lessons/operator/08/README.md#readme)
-- [Lesson 09: Introduction to Check Hooks](/lessons/operator/09/README.md#readme)
+- [Lesson 09: Introduction to Hooks](/lessons/operator/09/README.md#readme)
 - [Lesson 10: Introduction to Silencing](/lessons/operator/10/README.md#readme)
 - [Lesson 11: Using the Sensu Web App](/lessons/operator/11/README.md#readme)
 - [Lesson 12: Introduction to Sensu Assets](/lessons/operator/12/README.md#readme)

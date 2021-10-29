@@ -59,7 +59,7 @@ You'd like to only get ones that indicate there's some kind of problem or possib
 
 ### Solution
 
-To accomplish this, we'll put a filter in front of the Rocket.Chat handler.
+To accomplish this, we'll put a filter in front of the Mattermost handler.
 We will use the built-in filter `is_incident` on the `mattermost` handler.
 This filter will only let events be processed by the handler if they have a non-zero exit status.
 
@@ -186,7 +186,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-   Try running these commands multiple times in different combinations and observing the behavior in your local [Rocket.Chat instance](https://127.0.0.1:5000).
+   Try running these commands multiple times in different combinations and observing the behavior in your local [Mattermost instance](https://127.0.0.1:8065).
 
    The first occurrence of a `"status": 0` event following an active incident is treated as a "resolution" event, and will be processed; but subsequent occurrences of the `"status": 0` event will be filtered.
 
@@ -287,7 +287,7 @@ To add this, we will edit our handler configuration to add `filter-repeated` to 
 
 ### Steps
 
-1. **Modify the Rocket.Chat handler configuration to use a custom filter.**
+1. **Modify the Mattermost handler configuration to use a custom filter.**
 
    Let's modify the handler template we created in [Lesson 4](/lessons/operator/04/README.md#readme).
    Replace the contents of `mattermost.yaml` with the following:
@@ -446,7 +446,7 @@ Some example use cases include:
 - **Reduce alert fatigue** by deduplicating incoming events and limiting repeat processing (e.g. only alert once per hour per incident)
 - **Optimize metrics processing** by dropping empty events, or sampling metrics to reduce storage costs
 - **Orchestrate remediations** via [_occurrence_](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-events/events/#occurrences-and-occurrences-watermark) filtering (e.g. trigger a lightweight remediation action after 3 occurrences, and a more aggressive remediation action after 10+ occurrences)
-- **Configure conditional triggers** by determining which event handler to use (e.g. notify developers via Rocket.Chat, but send all incidents assigned to operations to Pagerduty)
+- **Configure conditional triggers** by determining which event handler to use (e.g. notify developers via Mattermost, but send all incidents assigned to operations to Pagerduty)
 
 ### Filter Execution Environment
 

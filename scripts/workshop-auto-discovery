@@ -11,7 +11,6 @@ discover_apps() {
         -H "Authorization: Key ${SENSU_API_KEY}" \
         -H "Content-Type: application/json" \
         -d "{
-          \"entity_class\": \"proxy\",
           \"metadata\": {
             \"name\": \"${APP}\",
             \"namespace\": \"default\",
@@ -22,9 +21,13 @@ discover_apps() {
             \"annotations\": {
               \"hostname\": \"${APP}\"
             }
-          }
+          },
+          \"entity_class\": \"proxy\",
+          \"subscriptions\": [
+            \"workshop\"
+          ]
         }" \
-        "${SENSU_API_URL}/api/core/v2/namespaces/default/entities" > /dev/null 2&>1
+        "${SENSU_API_URL}/api/core/v2/namespaces/default/entities" > /dev/null 2>&1
   done
 }
 

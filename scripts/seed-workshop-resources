@@ -213,7 +213,7 @@ initialize_workshop_chat && \
 seed_workshop_chat && \
 seed_secrets
 if [ $? -gt 0 ]; then
-  echo "Failed to create Sensu user accounts."
+  echo "Encountered an error while seeding workshop resources."
   echo ""
   exit 2
 fi

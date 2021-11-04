@@ -122,8 +122,14 @@ initialize_workshop_chat() {
 
 seed_workshop_chat() {
   echo "Seeding Mattermost service..."
-  mmctl auth login http://mattermost:8065 --name sensu-workshop --username sensu --password workshop > /dev/null 2>&1
-  export MATTERMOST_WEBHOOK_URL="http://mattermost:8065/hooks/$(mmctl webhook create-incoming --channel workshop:alerts --user sensu --format json | jq -r .id)"
+  mmctl auth login http://mattermost:8065 --name sensu-workshop --username sensu --password sensu > /dev/null 2>&1
+  WEBHOOK_ID=$(mmctl webhook create-incoming --channel workshop:alerts --user sensu --format json | jq -r .id)
+  if [ -z "$WEBHOOK_ID" ]; then
+      echo "Failed to create a Mattermost webhook."
+      echo ""
+      exit 2
+  fi
+  export MATTERMOST_WEBHOOK_URL="http://mattermost:8065/hooks/$WEBHOOK_ID"
   echo "{\"webhook_url\": \"${MATTERMOST_WEBHOOK_URL}\", \"ttl\": \"30s\"}" | jq . > ${VAULT_WORKSHOP_SEEDS}/mattermost.json
   if [ $? -gt 0 ]; then
     echo "Failed to create a Mattermost incoming webhook."

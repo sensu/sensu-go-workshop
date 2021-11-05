@@ -1,0 +1,29 @@
+---
+type: ServiceComponent
+api_version: bsm/v1
+metadata:
+  name: link-status
+  namespace: default  
+spec:
+  cron: ''
+  handlers:
+  - diagnostic_output
+  interval: 10
+  query:
+  - type: fieldSelector
+    value: event.check.name == "port-status"
+  - type: fieldSelector
+    value: event.check.is_silenced == false
+  rules:
+  - arguments:
+      link_id: "1291507_1226179"
+      namespace: "default"
+    name: link-1291507_1226179
+    template: link-status-template
+  - arguments:
+      link_id: "1291501_1226179"
+      namespace: "default"
+    name: link-1291501_1226179
+    template: link-status-template
+  services:
+  - network-status

@@ -1,0 +1,88 @@
+---
+type: RuleTemplate
+api_version: bsm/v1
+metadata:
+  name: link-status-template
+  namespace: default
+spec:
+  description: Creates an critical event when link is down
+  arguments:
+    required:
+      - link_id
+      - namespace 
+    properties:
+      link_id:
+        type: string
+        description: Name of the link to issue event for
+      namespace:
+        type: string
+        description: Namespace to match 
+  eval: |
+    // ========================================================================
+    // Built-in arguments
+    //
+    // events = Array of matching events from ServiceComponent (watcher) selectors.
+    // event  = Empty Sensu Event that should be populated via the RuleTemplate (watcher function) and returned upon evaluation.
+    // ========================================================================
+    console.log("DEBUG: beginning RuleTemplate evaluation.")
+    try {
+      // Input validation (events matching ServiceComponent selectors)
+      // Event metadata
+      event.annotations["io.sensu.bsm.selected_event_count"] = events.length;
+      if (events && events.length < 2) {
+        console.log("DEBUG: not event matching events!")
+        event.check.output = "WARNING: Fewer than the expected number of events selected for evaluation.\n";
+        event.check.status = 1;
+        return event;
+      } else {
+        console.log("DEBUG: we have sufficient matching events!")
+      }
+      // Do something here...
+      var down_events = []
+      var in_str = ""
+      var out_str = ""
+      events.forEach(function (e) {
+        in_str+="\n"+e.namespace+":"+e.entity.name+":"+e.check.name
+        if (e.check.status != 0 && e.namespace == args.namespace && e.entity.labels.link_id == args.link_id && e.check.is_silenced == false && e.check.output.indexOf("DOWN") !== -1) {
+          out_str+="\n"+e.namespace+":"+e.entity.name+":"+e.check.name
+          down_events.push(e)
+        }
+      })
+      event.check.output += "\nInput events:" + in_str
+      event.check.output += "\nMatching link_id: " + args.link_id
+      event.check.output += "\nMatching namespace: " + args.namespace
+      event.check.output += "\nNon-zero unsilenced down link events:" + out_str
+      var num_matches = down_events.length
+      if (num_matches == 0) {
+         event.check.output += "\nLink appears to be okay"
+         event.check.status = 0
+      }
+      if (num_matches == 1) {
+         event.check.output += "\nOne side of the link may be reporting as DOWN"
+         event.check.status = 0
+      }
+      if (num_matches == 2) {
+         event.check.output += "\nBoth sides of the link are reporting as DOWN"
+         event.check.status = 2
+      }
+      if (num_matches > 2) {
+         event.check.output += "\nToo many matching events found, expecting only 2 matching events per link"
+         event.check.status = 2
+      }
+
+    } catch(error) {
+      console.log("DEBUG: caught an error!")
+      // Log the RuleTemplate error to the sensu-backend log
+      console.error(error)
+      // Set the RuleTemplate event status
+      event.check.status = 127;
+      // Capture the RuleTemplate error in the RuleTemplate event output (for debugging)
+      event.check.output = string(error);
+    } finally {
+      console.log("DEBUG: reached the finally statement.")
+      return event;
+    };
+
+
+
+

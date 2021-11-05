@@ -1,0 +1,43 @@
+#!/bin/sh
+
+SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
+SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
+
+discover_apps() {
+  WORKSHOP_NETWORK=$(docker network ls --filter name=workshop_default --format "{{ .ID }}")
+  WORKSHOP_APPS=$(docker ps -a --filter network=${WORKSHOP_NETWORK} --filter label=io.sensu.role=app --format "{{ .Names }}")
+  for APP in ${WORKSHOP_APPS}; do
+    curl -X POST \
+        -H "Authorization: Key ${SENSU_API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d "{
+          \"metadata\": {
+            \"name\": \"${APP}\",
+            \"namespace\": \"default\",
+            \"labels\": {
+              \"service\": \"demo-app\",
+              \"source\": \"workshop-auto-discovery\"
+            },
+            \"annotations\": {
+              \"hostname\": \"${APP}\"
+            }
+          },
+          \"entity_class\": \"proxy\",
+          \"subscriptions\": [
+            \"workshop\"
+          ]
+        }" \
+        "${SENSU_API_URL}/api/core/v2/namespaces/default/entities" > /dev/null 2>&1
+  done
+}
+
+echo "Auto-discovering workshop entities..."
+discover_apps
+if [ $? -gt 0 ]; then
+  echo "ERROR: failed to auto-discover workshop entities."
+  echo ""
+  exit 2
+fi
+echo "Success!"
+echo ""
+exit 0

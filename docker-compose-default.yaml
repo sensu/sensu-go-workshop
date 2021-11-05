@@ -57,7 +57,7 @@ services:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
     environment:
-    - SENSU_BACKEND_URL
+    - SENSU_BACKEND_URL=ws://sensu-backend:8081
     - SENSU_AGENT_PASSWORD
     - SENSU_NAMESPACE
     - SENSU_SUBSCRIPTIONS
@@ -78,11 +78,11 @@ services:
       retries: 6
     command: >-
       sensu-agent start
-      --log-level=info
+      --log-level=warn
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"
-      --statsd-event-handlers influxdb
+      --statsd-event-handlers sumologic-metrics
       --password ${SENSU_AGENT_PASSWORD}
 
   # Postgres
@@ -111,8 +111,8 @@ services:
     - APP_DB_PASSWORD
     - APP_DB_NAME
     - MATTERMOST_DB
-    - MATTERMOST_ADMIN_USER
-    - MATTERMOST_ADMIN_PASSWORD
+    - MATTERMOST_DB_USER
+    - MATTERMOST_DB_PASSWORD
     volumes:
     - type: bind
       source: ./config/postgres/postgresql.conf
@@ -128,34 +128,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-
-  # Demo App
-  #
-  # See: https://github.com/portertech/demo-app
-  app:
-    image: portertech/demo-app:latest
-    deploy:
-      resources:
-        limits:
-          memory: 64M
-    labels:
-    - io.sensu.role=sensu-agent
-    ports:
-    - 8080/tcp
-    environment:
-    - DB_HOST=${APP_DB_HOST}
-    - DB_PORT=${APP_DB_PORT}
-    - DB_USER=${APP_DB_USERNAME}
-    - DB_PASS=${APP_DB_PASSWORD}
-    - DB_NAME=${APP_DB_NAME}
-    volumes: []
-    healthcheck:
-      test: curl -XGET -I http://127.0.0.1:8080/healthz
-      interval: 10s
-      timeout: 5s
-      retries: 6
-    command: >-
-      /usr/bin/demo-app
 
   # Sensu Asset Server
   #
@@ -243,12 +215,12 @@ services:
     - "dockerhost:127.0.0.1"
     environment:
     - MATTERMOST_DB=${MATTERMOST_DB}
-    - MATTERMOST_ADMIN_USER=${MATTERMOST_ADMIN_USER}
-    - MATTERMOST_ADMIN_PASSWORD=${MATTERMOST_ADMIN_PASSWORD}
+    - MATTERMOST_DB_USER=${MATTERMOST_DB_USER}
+    - MATTERMOST_DB_PASSWORD=${MATTERMOST_DB_PASSWORD}
     - MM_SQLSETTINGS_DRIVERNAME=postgres
-    - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_ADMIN_USER}:${MATTERMOST_ADMIN_PASSWORD}@postgres/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
+    - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_DB_USER}:${MATTERMOST_DB_PASSWORD}@postgres/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
     - MM_TEAMSETTINGS_ENABLEOPENSERVER=false
-    - MM_PASSWORDSETTINGS_MINIMUMLENGTH=8
+    - MM_PASSWORDSETTINGS_MINIMUMLENGTH=5
     - MM_PASSWORDSETTINGS_LOWERCASE=true
     - MM_PASSWORDSETTINGS_UPPERCASE=false
     - MM_PASSWORDSETTINGS_NUMBER=false
@@ -265,6 +237,10 @@ services:
     - type: bind
       source: ./config/mattermost/data.jsonl
       target: /mattermost/data/data.jsonl
+      consistency: consistent
+    - type: bind
+      source: ./config/mattermost/profile.jpg
+      target: /mattermost/profile.jpg
       consistency: consistent
     - type: volume
       source: mattermost_logs
@@ -283,6 +259,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+
+  # Demo App
+  #
+  # See: https://github.com/portertech/demo-app
+  app:
+    image: portertech/demo-app:latest
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    labels:
+    - io.sensu.role=app
+    ports:
+    - 9001-9005:8080/tcp
+    environment:
+    - DB_HOST=${APP_DB_HOST}
+    - DB_PORT=${APP_DB_PORT}
+    - DB_USER=${APP_DB_USERNAME}
+    - DB_PASS=${APP_DB_PASSWORD}
+    - DB_NAME=${APP_DB_NAME}
+    volumes: []
+    healthcheck:
+      test: curl -XGET -I http://127.0.0.1:8080/healthz
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    command: >-
+      /usr/bin/demo-app
 
   # Configurator
   #
@@ -328,8 +332,8 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_DEFAULT_TRAINEE_PASSWORD
-    - MATTERMOST_ADMIN_USER
-    - MATTERMOST_ADMIN_PASSWORD
+    - MATTERMOST_DB_USER
+    - MATTERMOST_DB_PASSWORD
     - SENSU_CLUSTER_EXTRAS=config/sensu/store
     volumes:
     - type: bind

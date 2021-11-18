@@ -218,19 +218,19 @@ We can use that in our filter to let only the first instance of the event throug
    **Mac and Linux**
 
    ```shell
-   sensuctl event info learn.sensu.io helloworld --format json | grep occurrences
+   sensuctl event info i-424242 my-app --format json | grep occurrences
    ```
 
    **Windows (PowerShell)**
    ```powershell
-   sensuctl event info learn.sensu.io helloworld --format json | Select-String "occurrences"
+   sensuctl event info i-424242 my-app --format json | Select-String "occurrences"
    ```
 
    **Example Output:**
 
    ```json
-   "occurrences": 8,
-   "occurrences_watermark": 8,
+   "occurrences": 3,
+   "occurrences_watermark": 3,
    ```
 
    Let's create a filter that only processes the first occurrence of an incident, and then again only once every hour.

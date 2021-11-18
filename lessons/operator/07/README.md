@@ -81,7 +81,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
       **MacOS**
 
       ```shell
-      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz
+      curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_darwin_amd64.tar.gz"
       ```
 
       **Windows (PowerShell)**
@@ -95,7 +95,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
       **Linux**
 
       ```shell
-      curl -LO https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz
+      curl -LO "https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/${SENSU_VERSION}/sensu-go_${SENSU_VERSION}_linux_amd64.tar.gz"
       ```
 
    2. **Install the Package and Cleanup**
@@ -176,7 +176,7 @@ Once it is installed, you can update its configuration and behavior dynamically 
    --password ${SENSU_PASSWORD}
    ```
 
-1. ** Verify that your agent is running.**
+1. **Verify that your agent is running.**
 
    Verify that your agent is running and connected to the backend:
 

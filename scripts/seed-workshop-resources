@@ -158,6 +158,9 @@ seed_workshop_chat() {
     echo "Successfully created a Mattermost incoming webhook!"
     echo ""
   fi
+  # Turn off annoying popup notices
+  mmctl config set AnnouncementSettings.AdminNoticesEnabled false
+  mmctl config set AnnouncementSettings.UserNoticesEnabled false
 }
 
 seed_user_envrc_files() {

@@ -415,7 +415,7 @@ services:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
       - MATTERMOST_VERSION
-    image: workshop:${SENSU_CLI_VERSION}
+    image: workshop:${SENSU_CLI_VERSION}-${WORKSHOP_VERSION}
     depends_on:
     - etcd
     - mattermost

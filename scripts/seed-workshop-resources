@@ -43,11 +43,11 @@ seed_cluster() {
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
   wait-for ${SENSU_API_URL}/health
   wait-for postgres:5432
-  cat ${SENSU_CLUSTER_CONFIG}/*.template | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
   ERRORS=$(expr ${ERRORS} + $?)
-  cat ${SENSU_CLUSTER_CONFIG}/*.yaml | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
   ERRORS=$(expr ${ERRORS} + $?)
-  cat ${SENSU_CLUSTER_CONFIG}/*.json | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
   ERRORS=$(expr ${ERRORS} + $?)
   if [ ${ERRORS} -ne 0 ]; then
     echo "Error encountered while seeding workshop cluster configuration"
@@ -60,11 +60,11 @@ seed_cluster_extras() {
   ERRORS=0
   if [ ! -z ${SENSU_CLUSTER_EXTRAS} ]; then
     echo "Applying extra configuration from ${SENSU_CLUSTER_EXTRAS}..."
-    cat ${SENSU_CLUSTER_EXTRAS}/*.template | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
     ERRORS=$(expr ${ERRORS} + $?)
-    cat ${SENSU_CLUSTER_EXTRAS}/*.yaml | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
     ERRORS=$(expr ${ERRORS} + $?)
-    cat ${SENSU_CLUSTER_EXTRAS}/*.json | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
     ERRORS=$(expr ${ERRORS} + $?)
     if [ ${ERRORS} -ne 0 ]; then
       echo "Error encountered while seeding workshop cluster extras"
@@ -108,9 +108,9 @@ seed_namespaces() {
     echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
     # cat ${SENSU_WORKSHOP_SEEDS}/*.template | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create
     # ERRORS=$(expr ${ERRORS} + $?)
-    cat ${SENSU_WORKSHOP_SEEDS}/*.yaml | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create
+    for resource in ${SENSU_WORKSHOP_SEEDS}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create; done
     ERRORS=$(expr ${ERRORS} + $?)
-    cat ${SENSU_WORKSHOP_SEEDS}/*.json | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create
+    for resource in ${SENSU_WORKSHOP_SEEDS}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create; done
     ERRORS=$(expr ${ERRORS} + $?)
   done
   if [ ${ERRORS} -ne 0 ]; then

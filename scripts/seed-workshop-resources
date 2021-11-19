@@ -1,12 +1,13 @@
 #!/bin/sh
 
 SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
-SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
+SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
 SENSU_CLUSTER_CONFIG=${SENSU_CLUSTER_CONFIG:-"config/sensu/cluster"}
 SENSU_CLUSTER_EXTRAS=${SENSU_CLUSTER_EXTRAS:-""}
 SENSU_WORKSHOP_SEEDS=${SENSU_WORKSHOP_SEEDS:-"config/sensu/seeds"}
 USERS_JSON=${USERS_JSON:-"users/users.json"}
+USER_TEMPLATE=${USER_TEMPLATE:-"users/user.yaml.template"}
 SENSU_WORKSHOP_ENVRC_TEMPLATE=${SENSU_WORKSHOP_ENVRC_TEMPLATE:-"users/user.envrc.template"}
 SENSU_WORKSHOP_PS1_TEMPLATE=${SENSU_WORKSHOP_PS1_TEMPLATE:-"users/user.envrc.ps1.template"}
 SENSU_WORKSHOP_USER_ENV_FILES=${SENSU_WORKSHOP_USER_ENV_FILES:-"/users"}
@@ -16,7 +17,7 @@ VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
 
 check_deps() {
-  for DEP in sensuctl vault
+  for DEP in wait-for sensuctl sensu-backend vault mmctl
   do
     command -v ${DEP} > /dev/null 2>&1
     if [ $? -ne 0 ]; then
@@ -27,88 +28,109 @@ check_deps() {
 }
 
 validate_io() {
-  if [ ! -d ${VAULT_WORKSHOP_SEEDS} ]; then
-    echo "Missing or invalid namespace seeding secrets: \"${VAULT_WORKSHOP_SEEDS}\" (must be a directory)"
-    echo ""
-    exit 2
-  fi
-  if [ ! -d ${SENSU_WORKSHOP_SEEDS} ]; then
-    echo "Missing or invalid namespace seeding resources: \"${SENSU_WORKSHOP_SEEDS}\" (must be a directory)"
-    echo ""
-    exit 2
-  fi
-  if [ ! -d ${SENSU_WORKSHOP_USER_ENV_FILES} ]; then
-    echo "Missing or invalid env file path: \"${SENSU_WORKSHOP_USER_ENV_FILES}\" (must be a directory)"
-    echo ""
-    exit 2
-  fi
-}
-
-validate_api_urls() {
-  curl -XGET ${SENSU_API_URL}/health > /dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    echo "No Sensu API found at ${SENSU_API_URL}"
-    echo ""
-    exit 2
-  fi
-  curl -XGET ${VAULT_ADDR}/v1/sys/health > /dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    echo "No Vault API found at ${VAULT_ADDR}"
-    echo ""
-    exit 2
-  fi
-}
-
-seed_cluster() {
-  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
-  sleep 5
-  /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_CONFIG}
-  if [ $? -ne 0 ]; then
-    echo "Error encountered while seeding workshop cluster configuration"
-    echo ""
-    exit 2
-  fi
-}
-
-seed_extras() {
-  if [ ! -z ${SENSU_CLUSTER_EXTRAS} ]; then
-    if [ ! -d ${SENSU_CLUSTER_EXTRAS} ]; then
-      echo "Missing or invalid cluster extras: \"${SENSU_CLUSTER_EXTRAS}\" (must be a directory)"
-      echo ""
-      exit 2
-    else
-      echo "Applying extra configuration from ${SENSU_CLUSTER_EXTRAS}"
-      /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_CLUSTER_EXTRAS}
-      if [ $? -ne 0 ]; then
-        echo "Error encountered while seeding workshop cluster extras"
-        echo ""
-        exit 2
-      fi
-    fi
-  fi
-}
-
-seed_namespaces() {
-  for NAMESPACE in $(/usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} namespace list --format json | jq -r .[].name)
+  for CONFIG_DIR in ${VAULT_WORKSHOP_SEEDS} ${SENSU_WORKSHOP_SEEDS} ${SENSU_WORKSHOP_USER_ENV_FILES}
   do
-    echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
-    /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create -rf ${SENSU_WORKSHOP_SEEDS} --namespace ${NAMESPACE}
-    if [ $? -ne 0 ]; then
-      echo "Error encountered while seeding workshop user namespaces"
+    if [ ! -d ${CONFIG_DIR} ]; then
+      echo "Missing or invalid path: \"${VAULT_WORKSHOP_SEEDS}\" (must be a directory)"
       echo ""
       exit 2
     fi
   done
 }
 
-initialize_workshop_chat() {
-  echo "Initializing Mattermost service..."
-  docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --validate > /dev/null 2>&1
-  if [ $? -gt 0 ]; then
-    echo "Failed to initialize Mattermost via bulk import."
+seed_cluster() {
+  ERRORS=0
+  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
+  wait-for ${SENSU_API_URL}/health
+  wait-for postgres:5432
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+  ERRORS=$(expr ${ERRORS} + $?)
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+  ERRORS=$(expr ${ERRORS} + $?)
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+  ERRORS=$(expr ${ERRORS} + $?)
+  if [ ${ERRORS} -ne 0 ]; then
+    echo "Error encountered while seeding workshop cluster configuration"
     echo ""
     exit 2
   fi
+}
+
+seed_cluster_extras() {
+  ERRORS=0
+  if [ ! -z ${SENSU_CLUSTER_EXTRAS} ]; then
+    echo "Applying extra configuration from ${SENSU_CLUSTER_EXTRAS}..."
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+    ERRORS=$(expr ${ERRORS} + $?)
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+    ERRORS=$(expr ${ERRORS} + $?)
+    for resource in ${SENSU_CLUSTER_EXTRAS}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+    ERRORS=$(expr ${ERRORS} + $?)
+    if [ ${ERRORS} -ne 0 ]; then
+      echo "Error encountered while seeding workshop cluster extras"
+      echo ""
+      exit 2
+    fi
+  fi
+  sleep 5
+}
+
+seed_users() {
+  echo "Seeding workshop users, namespaces, and RBAC profiles..."
+  wait-for ${SENSU_API_URL}/health
+  for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
+    export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
+    export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
+    export PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
+    if [ ${PASSWORD} == "null" ]; then
+      export PASSWORD="${WORKSHOP_DEFAULT_TRAINEE_PASSWORD}"
+    fi
+    export PASSWORD_HASH=$(echo ${USER} | base64 -d | jq -r .password_hash)
+    if [ ${PASSWORD_HASH} == "null" ]; then
+      export PASSWORD_HASH=$(sensuctl user hash-password ${PASSWORD} 2> /dev/null)
+    fi
+    if [ -z ${PASSWORD_HASH} ]; then
+      echo "Failed to generate password hash for user ${USERNAME}; skipping..."
+    else
+      echo "Generating user profile for user: ${USERNAME}"
+      cat ${USER_TEMPLATE} | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+    fi
+  done
+  echo "Successfully generated Sensu RBAC templates!"
+  echo ""
+}
+
+seed_namespaces() {
+  ERRORS=0
+  echo "Seeding workshop user namespaces..."
+  for NAMESPACE in $(/usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} namespace list --format json | jq -r .[].name)
+  do
+    echo "Seeding namespace '${NAMESPACE}' with resource templates in ${SENSU_WORKSHOP_SEEDS}"
+    # cat ${SENSU_WORKSHOP_SEEDS}/*.template | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create
+    # ERRORS=$(expr ${ERRORS} + $?)
+    for resource in ${SENSU_WORKSHOP_SEEDS}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create; done
+    ERRORS=$(expr ${ERRORS} + $?)
+    for resource in ${SENSU_WORKSHOP_SEEDS}/*.json; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} --namespace ${NAMESPACE} create; done
+    ERRORS=$(expr ${ERRORS} + $?)
+  done
+  if [ ${ERRORS} -ne 0 ]; then
+    echo "Error encountered while seeding workshop user namespaces"
+    echo ""
+    exit 2
+  else
+    echo "Successfully seeded workshop user namespaces!"
+    echo ""
+  fi
+}
+
+initialize_workshop_chat() {
+  echo "Initializing Mattermost service..."
+  wait-for mattermost:8065
+  # Generate the Mattermost bulk import file (JSONL)
+  cat config/mattermost/data.jsonl.template | envsubst | tee config/mattermost/data.jsonl > /dev/null 2>&1
+  # Copy the Mattermost bulk import file to the Mattermost service container
+  docker cp config/mattermost/data.jsonl workshop_mattermost_1:/mattermost/data/data.jsonl
+  # Perform the Mattermost bulk import
   docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --apply > /dev/null 2>&1
   if [ $? -gt 0 ]; then
     echo "Failed to initialize Mattermost via bulk import."
@@ -122,8 +144,11 @@ initialize_workshop_chat() {
 
 seed_workshop_chat() {
   echo "Seeding Mattermost service..."
-  mmctl auth login http://mattermost:8065 --name sensu-workshop --username sensu --password workshop > /dev/null 2>&1
-  export MATTERMOST_WEBHOOK_URL="http://mattermost:8065/hooks/$(mmctl webhook create-incoming --channel workshop:alerts --user sensu --format json | jq -r .id)"
+  # Configure Mattermost CLI (mmctl)
+  mmctl auth login http://mattermost:8065 --name sensu-workshop --username ${MATTERMOST_ADMIN_USER} --password ${MATTERMOST_ADMIN_PASSWORD} > /dev/null 2>&1
+  # Generate a Mattermost webhook URL via mmctl
+  export MATTERMOST_WEBHOOK_URL="http://mattermost:8065/hooks/$(mmctl webhook create-incoming --channel workshop:alerts --user ${MATTERMOST_ADMIN_USER} --format json | jq -r .id)"
+  # Generate a Vault secret JSON file to seed Vault
   echo "{\"webhook_url\": \"${MATTERMOST_WEBHOOK_URL}\", \"ttl\": \"30s\"}" | jq . > ${VAULT_WORKSHOP_SEEDS}/mattermost.json
   if [ $? -gt 0 ]; then
     echo "Failed to create a Mattermost incoming webhook."
@@ -133,10 +158,14 @@ seed_workshop_chat() {
     echo "Successfully created a Mattermost incoming webhook!"
     echo ""
   fi
-  # TODO: add a for-loop to add Mattermost users for instructor-led workshop
+  # Turn off annoying popup notices
+  mmctl config set AnnouncementSettings.AdminNoticesEnabled false
+  mmctl config set AnnouncementSettings.UserNoticesEnabled false
 }
 
 seed_user_envrc_files() {
+  ERRORS=0
+  echo "Generating user environment files..."
   for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
     export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
     export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
@@ -147,13 +176,24 @@ seed_user_envrc_files() {
     export USER_API_KEY=$(/usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} api-key grant ${USERNAME} | awk -F "/" '{print $NF}')
     echo "Generating user .envrc file: ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc"
     cat ${SENSU_WORKSHOP_ENVRC_TEMPLATE} | envsubst | tee ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc > /dev/null 2>&1
+    ERRORS=$(expr ${ERRORS} + $?)
     echo "Generating user .envrc.ps1 file: ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc.ps1"
     cat ${SENSU_WORKSHOP_PS1_TEMPLATE} | envsubst | tee ${SENSU_WORKSHOP_USER_ENV_FILES}/${USERNAME}.envrc.ps1 > /dev/null 2>&1
+    ERRORS=$(expr ${ERRORS} + $?)
   done
-  echo ""
+  if [ ${ERRORS} -ne 0 ]; then
+    echo "Error generating user environment files"
+    echo ""
+    exit 2
+  else
+    echo "Successfully generated user environment files!"
+    echo ""
+  fi
 }
 
 seed_secrets() {
+  echo "Seeding Vault..."
+  wait-for ${VAULT_ADDR}/v1/sys/health
   for SECRET in $(ls ${VAULT_WORKSHOP_SEEDS})
   do
     NAME=$(echo $SECRET | cut -d "." -f 1)
@@ -167,16 +207,16 @@ seed_secrets() {
 echo "Seeding Sensu Go Workshop resources..."
 check_deps && \
 validate_io && \
-validate_api_urls && \
-seed_extras && \
 seed_cluster && \
+seed_cluster_extras && \
+seed_users && \
 seed_namespaces && \
 seed_user_envrc_files && \
 initialize_workshop_chat && \
 seed_workshop_chat && \
 seed_secrets
 if [ $? -gt 0 ]; then
-  echo "Failed to create Sensu user accounts."
+  echo "Encountered an error while seeding workshop resources."
   echo ""
   exit 2
 fi

@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+SENSU_API_URL=${SENSU_API_URL}
+SENSU_BACKEND_CLUSTER_ADMIN_USERNAME=${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME}
+SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD=${SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD}
+SENSU_BACKEND_CLUSTER_ADMIN_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
+SENSU_NAMESPACE=${SENSU_NAMESPACE}
+SENSU_ETCD_CLIENT_URLS=${SENSU_ETCD_CLIENT_URLS}
+SENSU_INIT_TEMP_FILE="/root/.sensu-backend-init"
+INTERVAL=2
+RETRIES=5
+ATTEMPT=0
+SUCCESS=0
+
+sensu_backend_init() {
+  if [ ! -z ${SENSU_ETCD_CLIENT_URLS} ]; then
+    echo "Initializing the Sensu backend..."
+    wait-for ${SENSU_ETCD_CLIENT_URLS}/health
+    sensu-backend init --etcd-client-urls ${SENSU_ETCD_CLIENT_URLS} --cluster-admin-username ${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME} --cluster-admin-password ${SENSU_BACKEND_CLUSTER_ADMIN_USERNAME} --cluster-admin-api-key ${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY} --ignore-already-initialized
+    if [ $? -eq 0 ]; then
+      echo "Successfully initialized the Sensu backend!"
+      echo ""
+      return 0
+    else
+      return 1
+    fi
+  fi
+}
+
+sensu_backend_init
+if [ $? -gt 0 ]; then
+  echo "Failed to initialize the sensu-backend!"
+  echo ""
+  exit 2
+fi
+exit 0

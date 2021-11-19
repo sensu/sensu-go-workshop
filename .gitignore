@@ -1,11 +1,15 @@
+# ignore license files
+license.json
+
 # ignore user env files
 # git update-index --assume-unchanged .envrc .envrc.ps1
 .envrc
 .envrc.ps1
 
-# ignore cluster config files
-license.json
+# ignore configurator artifacts
 config/sensu/rbac/*
+config/mattermost/data.jsonl
+config/vault/secrets/mattermost.json
 
 # ignore workshop artifacts
 *.zip

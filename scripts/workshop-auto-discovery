@@ -5,7 +5,7 @@ SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
 
 discover_apps() {
   WORKSHOP_NETWORK=$(docker network ls --filter name=workshop_default --format "{{ .ID }}")
-  WORKSHOP_APPS=$(docker ps -a --filter network=${WORKSHOP_NETWORK} --filter label=io.sensu.role=app --format "{{ .Names }}")
+  WORKSHOP_APPS=$(docker ps -a --filter network=${WORKSHOP_NETWORK} --filter label="sensu.io/workshop/role=app" --format "{{ .Names }}")
   for APP in ${WORKSHOP_APPS}; do
     curl -X POST \
         -H "Authorization: Key ${SENSU_API_KEY}" \

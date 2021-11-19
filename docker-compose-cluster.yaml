@@ -16,7 +16,7 @@ services:
           cpus: "1.0"
           memory: "2048M"
     labels:
-    - io.sensu.role=sensu-backend
+    - sensu.io/workshop/role=sensu-backend
     ports: []
     environment:
     - SENSU_INTERNAL_ENVIRONMENT
@@ -54,7 +54,7 @@ services:
         limits:
           memory: 256M
     labels:
-    - io.sensu.role=sensu-agent
+    - sensu.io/workshop/role=sensu-agent
     ports:
     - ${SENSU_API_PORT}/tcp
     - ${SENSU_STATSD_METRICS_PORT}/udp
@@ -101,7 +101,7 @@ services:
         limits:
           memory: 64M
     labels:
-    - io.sensu.role=sensu-lb
+    - sensu.io/workshop/role=sensu-lb
     ports:
     - 3000:3000
     - 8080:8080
@@ -129,7 +129,7 @@ services:
         limits:
           memory: 1024M
     labels:
-    - io.sensu.role=sensu-backend-etcd
+    - sensu.io/workshop/role=sensu-backend-etcd
     ports:
     - 2379:2379
     - 2380:2380
@@ -167,7 +167,7 @@ services:
         limits:
           memory: 1024M
     labels:
-    - io.sensu.role=postgres
+    - sensu.io/workshop/role=postgres
     ports:
     - 5432
     environment:
@@ -211,7 +211,7 @@ services:
         limits:
           memory: 64M
     labels:
-    - io.sensu.role=asset-server
+    - sensu.io/workshop/role=asset-server
     ports:
     - 8000:80
     environment: []
@@ -248,7 +248,7 @@ services:
         limits:
           memory: 64M
     labels:
-    - io.sensu.role=asset-server
+    - sensu.io/workshop/role=asset-server
     ports:
     - 139:139
     - 445:445
@@ -279,7 +279,7 @@ services:
         limits:
           memory: 256M
     labels:
-    - io.sensu.role=secrets-manager
+    - sensu.io/workshop/role=secrets-manager
     ports:
     - 8200:8200
     environment:
@@ -319,7 +319,7 @@ services:
         limits:
           memory: 512M
     labels:
-    - io.sensu.role=chat
+    - sensu.io/workshop/role=chat
     ports:
     - 8065:8065
     extra_hosts:
@@ -344,10 +344,6 @@ services:
     - type: volume
       source: mattermost_data
       target: /mattermost/data
-      consistency: consistent
-    - type: bind
-      source: ./config/mattermost/data.jsonl
-      target: /mattermost/data/data.jsonl
       consistency: consistent
     - type: bind
       source: ./config/mattermost/profile.jpg
@@ -381,7 +377,7 @@ services:
         limits:
           memory: 64M
     labels:
-    - io.sensu.role=app
+    - sensu.io/workshop/role=app
     ports:
     - 9001-9005:8080/tcp
     environment:
@@ -419,7 +415,7 @@ services:
       - SENSU_CLI_VERSION
       - VAULT_VERSION
       - MATTERMOST_VERSION
-    image: workshop:${SENSU_CLI_VERSION}
+    image: workshop:${SENSU_CLI_VERSION}-${WORKSHOP_VERSION}
     depends_on:
     - etcd
     - mattermost
@@ -431,7 +427,7 @@ services:
         condition: on-failure
         max_attempts: ${WORKSHOP_SETUP_RETRIES}
     labels:
-    - io.sensu.role=configurator
+    - sensu.io/workshop/role=configurator
     ports: []
     environment:
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
@@ -445,9 +441,11 @@ services:
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
     - WORKSHOP_DEFAULT_TRAINEE_PASSWORD
+    - MATTERMOST_PORT
     - MATTERMOST_DB_USER
     - MATTERMOST_DB_PASSWORD
-    - SENSU_CLUSTER_EXTRAS=config/sensu/store
+    - MATTERMOST_ADMIN_USER
+    - MATTERMOST_ADMIN_PASSWORD
     volumes:
     - type: bind
       source: /var/run/docker.sock
@@ -468,12 +466,8 @@ services:
       source: ./users
       target: /workshop/users
     - type: bind
-      source: ./config/sensu
-      target: /workshop/config/sensu
-      consistency: consistent
-    - type: bind
-      source: ./config/vault
-      target: /workshop/config/vault
+      source: ./config
+      target: /workshop/config
       consistency: consistent
     - type: volume
       source: user_data

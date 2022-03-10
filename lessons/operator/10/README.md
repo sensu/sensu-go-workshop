@@ -297,7 +297,9 @@ events coming from all checks running on the named entitied, instead of just one
    ```
 1. **Trigger an incident**
 
-   Just as in the exercise 1, we'll want to POST to the demo app healthz API endpoint if needed to placed the app into error status status condition.
+   Just as in the exercise 1, if needed, we'll want to POST to the demo app healthz API endpoint to place the app into error status state.
+   Note: this step might not be needed if your check from the previous excerise is still alerting. 
+
    **Mac and Linux:**
 
    ```shell

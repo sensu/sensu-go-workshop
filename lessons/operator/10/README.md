@@ -230,7 +230,7 @@ You can configure these in the following ways:
   check: *
   ```
 
-- Silence a any check on a specific entity:
+- Silence any check on a specific entity:
 
   ```
   subscription: entity:1-424242

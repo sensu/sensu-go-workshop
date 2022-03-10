@@ -241,7 +241,7 @@ You can configure these in the following ways:
 
 #### Scenario
 
-Here’s the situation. You are responding to an incident or managing a maintenance operation that requires taking a server offline for a period of time. 
+You are responding to an incident or managing a maintenance operation that requires taking a server offline for a period of time. 
 You want to silence all the checks running on that host at once instead of having to silence each one individually.
 
 

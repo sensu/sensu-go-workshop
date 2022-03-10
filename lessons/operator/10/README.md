@@ -209,7 +209,7 @@ You can configure these in the following ways:
   check: app-health
   ```
 
-- Silence a specific check on entities participating in a specific subscription:
+- Silence a specific check on entities in a specific subscription:
 
   ```
   subscription: workshop

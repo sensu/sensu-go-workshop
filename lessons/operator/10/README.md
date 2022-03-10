@@ -315,6 +315,7 @@ This will silence events coming from all checks running on the named entity, ins
    ```
 
    You should see output like `HTTP/1.1 500 Internal Server Error`.
+   
    > _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
    > To obtain the current port mapping number run `sudo docker port workshop_app_1`._
 

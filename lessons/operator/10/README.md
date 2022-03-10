@@ -252,7 +252,7 @@ This will silence events coming from all checks running on the named entity, ins
 
 #### Steps
 
-1. **Create a multiple checks for the demo web app.**
+1. **Generate some sample events.**
 
    Let’s create a new check that will produce alerts similar to the check used in the previous exercise, but with different name. 
 

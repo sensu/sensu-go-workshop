@@ -254,7 +254,7 @@ events coming from all checks running on the named entitied, instead of just one
 
 1. **Create a multiple checks for the demo web app.**
 
-1. Let’s create a new check that will produce alerts similar to the check used in the previous exercise, but with different name. 
+   Let’s create a new check that will produce alerts similar to the check used in the previous exercise, but with different name. 
 
    Copy and paste the following contents to a file named `app.yaml`.
    This will enable HTTP endpoint monitoring of a simple demo app in the workshop environment using two different checks.
@@ -296,7 +296,8 @@ events coming from all checks running on the named entitied, instead of just one
      - mattermost
    ```
 1. **Trigger an incident**
-Just as in the exercise 1, we'll want to POST to the demo app healthz API endpoint if needed to placed the app into error status status condition.
+
+   Just as in the exercise 1, we'll want to POST to the demo app healthz API endpoint if needed to placed the app into error status status condition.
    **Mac and Linux:**
 
    ```shell

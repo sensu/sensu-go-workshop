@@ -189,7 +189,7 @@ To accomplish this we will configure a _silence_ which will selectively disable 
    > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
    > - The "Reason" field lets us leave a comment or provide a description for the silence.
    > **Note:**
-   > Sensu entities automatically participate in subscriptions named `entity:<entity-name>`  
+   > Sensu agents automatically add and subscribe to subscriptions named `entity:<entity-name>`.
    
 ## Bulk Silencing
 

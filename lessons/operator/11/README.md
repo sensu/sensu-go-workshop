@@ -24,7 +24,7 @@
 
 ## Goals
 In this lesson we will introduce the Sensu Web Application.
-In the Sensu web app, you will find an overview of the system in the dashboard, learn to navigate and inspect Sesnu resources, and create and delete silences.
+In the Sensu web app, you will find an overview of the system in the dashboard, learn to navigate and inspect Sensu resources, and create and delete silences.
 This lesson is intended for operators of Sensu and assumes you have [set up a local workshop environment][setup_workshop].
 
 ## A Visual Overview of Your System

@@ -247,8 +247,8 @@ You want to silence all the checks running on that host at once instead of havin
 
 #### Solution
 
-To accomplish this we will configure a silence using a wildcard check name, and the entity specific subscription. This wiil silence 
-events coming from all checks running on the named entitied, instead of just one specific check.
+To accomplish this we will configure a silence using a wildcard check name, and the entity subscription. 
+This will silence events coming from all checks running on the named entity, instead of just one specific check.
 
 #### Steps
 

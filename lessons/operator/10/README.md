@@ -188,13 +188,15 @@ To accomplish this we will configure a _silence_ which will selectively disable 
    > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the `app-health` check
    > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
    > - The "Reason" field lets us leave a comment or provide a description for the silence.
-
+   > **Note:**
+   > Sensu agents automatically add and subscribe to subscriptions named `entity:<entity-name>`.
+   
 ## Bulk Silencing
 
 In certain circumstances it can be helpful to silence incidents in bulk.
 Sensu supports silencing specific incidents spanning multiple hosts, and even bulk silencing multiple incidents across multiple hosts.
 
-### Silencing Alerts on Multiple Hosts
+### Silencing Multiple Alerts on a Single Host
 
 Sensu silences are applied to events by matching two event properties: subscription (`event.entity.subscriptions` or `event.check.subscriptions`), and the check name (`event.check.metadata.name`).
 
@@ -204,6 +206,13 @@ You can configure these in the following ways:
 
   ```
   subscription: entity:1-424242
+  check: app-health
+  ```
+
+- Silence a specific check on entities in a specific subscription:
+
+  ```
+  subscription: workshop
   check: app-health
   ```
 
@@ -221,21 +230,115 @@ You can configure these in the following ways:
   check: *
   ```
 
+- Silence any check on a specific entity:
+
+  ```
+  subscription: entity:1-424242
+  check: app-health
+  ```
+
 ### EXERCISE 2: Bulk Silencing
 
 #### Scenario
 
-You are responding to an incident or managing a maintenance operation involving multiple nodes.
-You want to silence all the nodes at once instead of having to silence each one individually.
+You are responding to an incident or managing a maintenance operation that requires taking a server offline for a period of time. 
+You want to silence all the checks running on that host at once instead of having to silence each one individually.
+
 
 #### Solution
 
-To accomplish this we will configure a silence using a wider subscription, which will silence events coming from _all_ subscribed hosts, instead of just one specific host.
+To accomplish this we will configure a silence using a wildcard check name, and the entity subscription. 
+This will silence events coming from all checks running on the named entity, instead of just one specific check.
 
 #### Steps
 
-1. **Create a silence entry.**
+1. **Generate some sample events.**
 
+   Let’s create a new check that will produce alerts similar to the check used in the previous exercise, but with different name. 
+
+   Copy and paste the following contents to a file named `app.yaml`.
+   This will enable HTTP endpoint monitoring of a simple demo app in the workshop environment using two different checks.
+
+   ```yaml
+   ---
+   type: CheckConfig
+   api_version: core/v2
+   metadata:
+     name: app-health
+   spec:
+     command: http-check --url http://workshop_app_1:8080/healthz
+     runtime_assets:
+     - sensu/http-checks:0.4.0
+     publish: true
+     proxy_entity_name: workshop_app_1
+     subscriptions:
+     - workshop
+     interval: 30
+     timeout: 10
+     handlers:
+     - mattermost
+   ---
+   type: CheckConfig
+   api_version: core/v2
+   metadata:
+     name: moar-app-health
+   spec:
+     command: http-check --url http://workshop_app_1:8080/healthz
+     runtime_assets:
+     - sensu/http-checks:0.4.0
+     publish: true
+     proxy_entity_name: workshop_app_1
+     subscriptions:
+     - workshop
+     interval: 30
+     timeout: 10
+     handlers:
+     - mattermost
+   ```
+1. **Trigger an incident**
+
+   Just as in the exercise 1, if needed, we'll want to POST to the demo app healthz API endpoint to place the app into error status state.
+   Note: this step might not be needed if your check from the previous excerise is still alerting. 
+
+   **Mac and Linux:**
+
+   ```shell
+   curl -i -X POST http://127.0.0.1:9001/healthz
+   curl -i -X GET http://127.0.0.1:9001/healthz
+   ```
+
+   **Windows (Powershell):**
+
+   ```shell
+   Invoke-RestMethod -Method POST -Uri "http://127.0.0.1:9001/healthz"
+   Invoke-RestMethod -Method GET -Uri "http://127.0.0.1:9001/healthz"
+   ```
+
+   You should see output like `HTTP/1.1 500 Internal Server Error`.
+   
+   > _NOTE: If you see an error like `curl: (7) Failed to connect to localhost port 9001: Connection refused` it may be that Docker assigned a different port to your demo app container.
+   > To obtain the current port mapping number run `sudo docker port workshop_app_1`._
+
+   Within a few moments, Sensu should begin reporting the failure.
+   Run the `sensuctl event list` command to see the incident:
+
+   ```shell
+   sensuctl event list
+   ```
+   
+   **Example Output**
+   
+   ```
+         Entity         Check                                        Output                                      Status   Silenced             Timestamp
+    ───────────────── ──────────── ───────────────────────────────────────────────────────────────────────────── ──────── ────────── ───────────────────────────────
+     workshop_app_1    app-health   http-check CRITICAL: HTTP Status 500 for http://workshop_app_1:8080/healthz        2   true       2021-10-23 15:34:11 -0700 PDT
+     workshop_app_1    moar-app-health   http-check CRITICAL: HTTP Status 500 for http://workshop_app_1:8080/healthz   2   true       2021-10-23 15:34:11 -0700 PDT
+   ```
+
+   If you are seeing alerts from both checks in Mattermost, you're ready to move on to the next step.
+
+1. **Create a silence entry.**
+    
    Let's use the `sensuctl silenced create` to create a silencing rule to disable alerts for this incident.
 
    ```shell
@@ -245,12 +348,12 @@ To accomplish this we will configure a silence using a wider subscription, which
    **Example Output**
    ```
    ? Namespace: default
-   ? Subscription: workshop
-   ? Check: app-health
+   ? Subscription: entity:workshop_app_1
+   ? Check: *
    ? Begin time: now
    ? Expiry in Seconds: 120
    ? Expire on Resolve: No
-   ? Reason: My first silence!
+   ? Reason: My first bulk silence
    Created
    ```
 
@@ -258,10 +361,11 @@ To accomplish this we will configure a silence using a wider subscription, which
    Wait until the silence expires, and alerts start appearing in Mattermost again, then move on to the next exercise.
    
    > **Understanding the command:**
-   > - Setting `Subscription: workshop` means the silence will apply to events on any host that is a member of the `workshop` subscription.
-   > - Providing a check name (`Check: app-health`) means the silence will only apply to events from the app-health check
+   > - Setting `Check: *` means the silence will apply to events generated from any check.
+   > - Providing the subscription (`Subscription: entity:workshop_app_1`) means the silence will only apply to events from the entity named workshop_app_1
    > - The "Begin time", "Expiry in seconds", and "Expire on Resolve" settings let us control when Sensu will begin supressing alerts, and when Sensu should resume processing of alerts.
    > - The "Reason" field lets us leave a comment or provide a description for the silence.
+
 
 ## Scheduled Maintenance
 

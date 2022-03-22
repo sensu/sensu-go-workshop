@@ -7,5 +7,5 @@ spec:
   signin_message: Welcome to the **Sensu Go Workshop**!
   always_show_local_cluster: true
   catalog:
-    url: "http://homelab:8083"
+    url: "https://catalog.sensu.io"
     release_version: version

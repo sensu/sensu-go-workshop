@@ -7,7 +7,7 @@ services:
   #
   # See: https://docs.sensu.io/sensu-go/latest/reference/backend/
   sensu-backend:
-    image: sensu/sensu:${SENSU_BACKEND_VERSION}
+    image: ${WORKSHOP_DOCKER_IMAGE}:${WORKSHOP_DOCKER_TAG}
     deploy:
       resources:
         limits:
@@ -46,7 +46,7 @@ services:
   #
   # See: https://docs.sensu.io/sensu-go/latest/reference/agent/
   sensu-agent:
-    image: sensu/sensu:${SENSU_AGENT_VERSION}
+    image: ${WORKSHOP_DOCKER_IMAGE}:${WORKSHOP_DOCKER_TAG}
     deploy:
       resources:
         limits:
@@ -301,6 +301,8 @@ services:
       context: ./
       dockerfile: Dockerfile
       args:
+      - WORKSHOP_DOCKER_IMAGE
+      - WORKSHOP_DOCKER_TAG
       - SENSU_CLI_VERSION
       - VAULT_VERSION
       - MATTERMOST_VERSION

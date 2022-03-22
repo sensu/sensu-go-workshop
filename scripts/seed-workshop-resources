@@ -149,7 +149,7 @@ seed_workshop_chat() {
   # Generate a Mattermost webhook URL via mmctl
   export MATTERMOST_WEBHOOK_URL="http://mattermost:8065/hooks/$(mmctl webhook create-incoming --channel workshop:alerts --user ${MATTERMOST_ADMIN_USER} --format json | jq -r .id)"
   # Generate a Vault secret JSON file to seed Vault
-  echo "{\"webhook_url\": \"${MATTERMOST_WEBHOOK_URL}\", \"ttl\": \"30s\"}" | jq . > ${VAULT_WORKSHOP_SEEDS}/mattermost.json
+  echo "{\"webhook_url\": \"${MATTERMOST_WEBHOOK_URL}\", \"channel\": \"#alerts\", \"ttl\": \"30s\"}" | jq . > ${VAULT_WORKSHOP_SEEDS}/mattermost.json
   if [ $? -gt 0 ]; then
     echo "Failed to create a Mattermost incoming webhook."
     echo ""

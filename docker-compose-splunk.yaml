@@ -213,8 +213,15 @@ services:
     - 8089:8089
     environment:
     - SPLUNK_START_ARGS=--accept-license
+    - SPLUNK_HOME=${SPLUNK_HOME}
     - SPLUNK_PASSWORD=${SPLUNK_PASSWORD}
-    volumes: []
+    volumes:
+    - type: volume
+      source: splunk_data
+      target: ${SPLUNK_HOME}/var
+    - type: bind
+      source: ./config/splunk/system/inputs.conf
+      target: ${SPLUNK_HOME}/etc/system/local/inputs.conf
     healthcheck:
       test: /sbin/checkstate.sh || exit 1
       interval: 10s

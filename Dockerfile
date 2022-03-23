@@ -1,9 +1,11 @@
+ARG WORKSHOP_DOCKER_IMAGE
+ARG WORKSHOP_DOCKER_TAG
 ARG SENSU_CLI_VERSION
 ARG VAULT_VERSION
 ARG MATTERMOST_VERSION
 
 # Use multi-stage Dockerfile to fetch desired sensuctl version
-FROM sensu/sensu:${SENSU_CLI_VERSION} AS sensu
+FROM ${WORKSHOP_DOCKER_IMAGE}:${WORKSHOP_DOCKER_TAG} as sensu
 LABEL stage=builder
 RUN sensuctl version
 

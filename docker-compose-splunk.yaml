@@ -37,8 +37,8 @@ services:
       retries: 6
     command: >-
       sensu-backend start
-      --log-level=debug
-      --debug=true
+      --log-level=warning
+      --debug=false
 
   # Sensu Agent
   #
@@ -195,64 +195,6 @@ services:
       retries: 6
     command: >-
       vault server -dev -log-level debug
-
-  # Splunk
-  #
-  # Includes Splunk data platform for storage of event and
-  # metric data.
-  splunk:
-    image: splunk/splunk:${SPLUNK_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 2048M
-    labels:
-    - sensu.io/workshop/role=data-platform
-    ports:
-    - 8060:8000
-    - 8089:8089
-    environment:
-    - SPLUNK_START_ARGS=--accept-license
-    - SPLUNK_HOME=${SPLUNK_HOME}
-    - SPLUNK_PASSWORD=${SPLUNK_PASSWORD}
-    volumes:
-    - type: volume
-      source: splunk_data
-      target: ${SPLUNK_HOME}/var
-    - type: bind
-      source: ./config/splunk/system/inputs.conf
-      target: ${SPLUNK_HOME}/etc/system/local/inputs.conf
-    healthcheck:
-      test: /sbin/checkstate.sh || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
-  # Splunk Universal Forwarder
-  #
-  # Includes the Splunk Universal Forwarder for data collection
-  splunk-universalforwarder:
-    image: splunk/universalforwarder:${SPLUNK_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 2048M
-    depends_on:
-    - splunk
-    labels:
-    - sensu.io/workshop/role=data-platform
-    ports:
-    - 9997:9997
-    environment:
-    - SPLUNK_START_ARGS=--accept-license
-    - SPLUNK_PASSWORD=${SPLUNK_PASSWORD}
-    volumes: []
-    healthcheck:
-      test: /sbin/checkstate.sh || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
   # Mattermost
   #
   # Includes a Mattermost deployment for workshop alerts and workshop chat.
@@ -418,6 +360,76 @@ services:
     command: |-
       init-workshop
 
+
+  # Splunk
+  #
+  # Includes Splunk data platform for storage of event and
+  # metric data.
+  splunk:
+    image: splunk/splunk:${SPLUNK_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    labels:
+    - sensu.io/workshop/role=data-platform
+    ports:
+    - 8060:8000
+    - 8089:8089
+    - 9997
+    environment:
+    - SPLUNK_START_ARGS=--accept-license
+    - SPLUNK_PASSWORD=${SPLUNK_PASSWORD}
+    volumes:
+    - type: volume
+      source: splunk_data
+      target: /opt/splunk/var
+    - type: volume
+      source: splunk_config
+      target: /opt/splunk/etc
+    healthcheck:
+      test: /sbin/checkstate.sh || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  # Splunk Universal Forwarder
+  #
+  # Includes the Splunk Universal Forwarder for data collection
+  splunkforwarder:
+    image: splunk/universalforwarder:${SPLUNK_VERSION}
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    depends_on:
+    - splunk
+    labels:
+    - sensu.io/workshop/role=data-platform
+    ports:
+    - 9997-9998:9997-9998
+    environment:
+    - SPLUNK_START_ARGS=--accept-license
+    - SPLUNK_PASSWORD=${SPLUNK_PASSWORD}
+    volumes:
+    - type: volume
+      source: splunkforwarder_data
+      target: /opt/splunkforwarder/var
+    - type: volume
+      source: splunkforwarder_config
+      target: /opt/splunkforwarder/etc
+    - type: bind
+      source: ./config/splunk/system/inputs.conf
+      target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/inputs.conf
+    - type: bind
+      source: ./config/splunk/system/outputs.conf
+      target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/outputs.conf
+    healthcheck:
+      test: /sbin/checkstate.sh || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
 volumes:
   workshop_data:
     driver: local
@@ -430,6 +442,12 @@ volumes:
   user_data:
     driver: local
   splunk_data:
+    driver: local
+  splunk_config:
+    driver: local
+  splunkforwarder_data:
+    driver: local
+  splunkforwarder_config:
     driver: local
   mongo_data:
     driver: local

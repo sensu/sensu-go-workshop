@@ -1,7 +1,5 @@
 #!/bin/sh
-wait-for-sensu-backend && \
-generate-user-rbac-templates && \
-create-user-accounts && \
+sensu-backend-init && \
 seed-workshop-resources && \
 openldap-add-users && \
 workshop-auto-discovery

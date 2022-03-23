@@ -310,7 +310,7 @@ Let's create an event that will be processed using the Mattermost handler we con
 
 
    This time, because this event defines handlers, the backend will generate an alert in Mattermost.
-   To view the alert, open up [Mattermost](http://127.0.0.1:8065/) and login using the default credentials (username: `sensu`, password: `sensu`).
+   To view the alert, open up [Mattermost](http://127.0.0.1:5000/) and login using the default credentials (username: `sensu`, password: `sensu`).
 
 1. **Send an Event with a Successful Exit Status.**
 
@@ -366,7 +366,7 @@ Let's create an event that will be processed using the Mattermost handler we con
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-**NEXT:** Did the handler send messages to [Mattermost](http://127.0.0.1:8065)?
+**NEXT:** Did the handler send messages to [Mattermost](http://127.0.0.1:5000)?
 If so you're ready to move on to the next lesson!
 
 ## Discussion

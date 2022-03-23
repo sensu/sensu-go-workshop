@@ -186,7 +186,7 @@ Let's use a built-in filter with a handler we configured in [Lesson 4](/lessons/
      -Uri "${Env:SENSU_API_URL}/api/core/v2/namespaces/${Env:SENSU_NAMESPACE}/events"
    ```
 
-   Try running these commands multiple times in different combinations and observing the behavior in your local [Mattermost instance](https://127.0.0.1:8065).
+   Try running these commands multiple times in different combinations and observing the behavior in your local [Mattermost instance](https://127.0.0.1:5000).
 
    The first occurrence of a `"status": 0` event following an active incident is treated as a "resolution" event, and will be processed; but subsequent occurrences of the `"status": 0` event will be filtered.
 
@@ -218,19 +218,19 @@ We can use that in our filter to let only the first instance of the event throug
    **Mac and Linux**
 
    ```shell
-   sensuctl event info learn.sensu.io helloworld --format json | grep occurrences
+   sensuctl event info i-424242 my-app --format json | grep occurrences
    ```
 
    **Windows (PowerShell)**
    ```powershell
-   sensuctl event info learn.sensu.io helloworld --format json | Select-String "occurrences"
+   sensuctl event info i-424242 my-app --format json | Select-String "occurrences"
    ```
 
    **Example Output:**
 
    ```json
-   "occurrences": 8,
-   "occurrences_watermark": 8,
+   "occurrences": 3,
+   "occurrences_watermark": 3,
    ```
 
    Let's create a filter that only processes the first occurrence of an incident, and then again only once every hour.

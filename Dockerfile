@@ -1,9 +1,11 @@
+ARG WORKSHOP_DOCKER_IMAGE
+ARG WORKSHOP_DOCKER_TAG
 ARG SENSU_CLI_VERSION
 ARG VAULT_VERSION
 ARG MATTERMOST_VERSION
 
 # Use multi-stage Dockerfile to fetch desired sensuctl version
-FROM sensu/sensu:${SENSU_CLI_VERSION} AS sensu
+FROM ${WORKSHOP_DOCKER_IMAGE}:${WORKSHOP_DOCKER_TAG} as sensu
 LABEL stage=builder
 RUN sensuctl version
 
@@ -32,8 +34,12 @@ RUN /mattermost/bin/mmctl version
 # - mmctl
 #
 FROM alpine:latest AS workshop
-RUN apk add curl jq gettext docker-cli docker-compose openldap-clients && mkdir /lib64
+
+RUN apk add curl jq gettext docker-cli docker-compose openldap-clients
+RUN curl -L https://raw.githubusercontent.com/eficode/wait-for/v2.1.3/wait-for -o /usr/bin/wait-for && chmod +x /usr/bin/wait-for
+RUN mkdir /lib64
 RUN echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
+
 COPY --from=sensu /usr/local/bin/sensuctl /usr/local/bin/
 COPY --from=sensu /opt/sensu/bin/sensu-backend /usr/local/bin/
 COPY --from=vault /bin/vault /usr/local/bin/vault

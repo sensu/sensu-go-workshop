@@ -207,7 +207,7 @@ The installation and configuration is automated for you, so you can start using 
 
    1. **Check that Mattermost is Running**
 
-      The Mattermost app should be available at [http://127.0.0.1:8065](http://127.0.0.1:8065).
+      The Mattermost app should be available at [http://127.0.0.1:5000](http://127.0.0.1:5000/).
       Login with the user `sensu` and password `sensu`.
 
 1. **Configure Environment Variables.** <a name="configure-environment-variables"></a>
@@ -261,7 +261,7 @@ The installation and configuration is automated for you, so you can start using 
    ```
 
 
-**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Mattermost](http://127.0.0.1:8065) apps, and your environment variables are all set, then you're ready to start the workshop!
+**NEXT:** If all the containers show as `Up (healthy)` or `Exit 0` state, and you can reach the [Sensu Web UI](http://127.0.0.1:3000) and [Mattermost](http://127.0.0.1:5000) apps, and your environment variables are all set, then you're ready to start the workshop!
 
 ## Discussion
 

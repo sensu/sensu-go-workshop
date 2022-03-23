@@ -6,11 +6,11 @@
   - [EXERCISE 1: Configure a Check](#exercise-1-configure-a-check)
 - [Check Templates](#check-templates)
   - [EXERCISE 2: Modify a Check Using Tokens](#exercise-2-modify-a-check-using-tokens)
-- [Metrics Collection and Extractions](#metrics-collection-and-extractions)
+- [Metrics Collection and Processing](#metrics-collection-and-processing)
   - [Output Metric Extraction](#output-metric-extraction)
   - [Output Metric Tags](#output-metric-tags)
   - [Output Metric Handlers](#output-metric-handlers)
-  - [EXERCISE 3: Tagging and Handling Metrics Using Checks](#exercise-3-tagging-and-handling-metrics-using-checks)
+  - [EXERCISE 3: Tagging and Processing Metrics Using Checks](#exercise-3-tagging-and-processing-metrics-using-checks)
 - [Discussion](#discussion)
   - [Subscriptions, Loose Coupling, and Elastic Infrastructure](#subscriptions-loose-coupling-and-elastic-infrastructure)
   - [Dead Man Switches (TTLs)](#dead-man-switches-ttls)
@@ -67,9 +67,17 @@ A service check can be any program that satisfies the following requirements:
 1. Communicate status via exit status codes
 2. Emit service status information and telemetry data via `STDOUT`
 
+The exit status code is expected to follow these conventions:
+- `0` indicates `OK`.
+- `1` indicates `WARNING`.
+- `2` indicates `CRITICAL`.
+- Exit status codes other than `0`, `1`, and `2` indicate an `UNKNOWN` or custom status
+
 That's the entire specification (more or less)!
 Service checks remain very useful because their simple specification makes it easy to extend monitoring to any area.
 Service checks can be written in any programming or scripting language, including Bash, PowerShell, and MS-DOS scripts.
+
+
 
 ### Subscriptions and Check Scheduling
 

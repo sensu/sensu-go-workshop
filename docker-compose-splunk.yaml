@@ -12,7 +12,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: "2048M"
+          memory: "1024M"
     labels:
     - sensu.io/workshop/role=sensu-backend
     ports:
@@ -370,7 +370,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2048M
+          memory: 1024M
     labels:
     - sensu.io/workshop/role=data-platform
     ports:
@@ -401,7 +401,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2048M
+          memory: 512M
     depends_on:
     - splunk
     labels:
@@ -419,10 +419,10 @@ services:
       source: splunkforwarder_config
       target: /opt/splunkforwarder/etc
     - type: bind
-      source: ./config/splunk/system/inputs.conf
+      source: ./config/splunk/inputs.conf
       target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/inputs.conf
     - type: bind
-      source: ./config/splunk/system/outputs.conf
+      source: ./config/splunk/outputs.conf
       target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/outputs.conf
     healthcheck:
       test: /sbin/checkstate.sh || exit 1

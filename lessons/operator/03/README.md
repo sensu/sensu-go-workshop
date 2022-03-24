@@ -504,7 +504,7 @@ In automated scenarios, adding the `--format json` option will output the inform
    ```
 
    > **PROTIP:** The ability to output JSON is especially powerful when combined with tools like [`jq`](https://stedolan.github.io/jq/).
-   > For example, let's try extracting the Sensu version that is running on the system that this event came from:
+   > For example, let's try extracting the system platform version that is running on the system that this event came from:
    >
    > ```shell
    > sensuctl entity info learn.sensu.io --format json | jq .system.platform_version

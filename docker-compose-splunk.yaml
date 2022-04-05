@@ -387,6 +387,15 @@ services:
     - type: volume
       source: splunk_config
       target: /opt/splunk/etc
+    - type: bind
+      source: ./config/splunk/props.conf
+      target: /opt/splunk/etc/system/local/props.conf
+    - type: bind
+      source: ./config/splunk/props.conf
+      target: /opt/splunk/etc/apps/SplunkForwarder/local/props.conf
+    - type: bind
+      source: ./config/splunk/props.conf
+      target: /opt/splunk/etc/apps/SplunkLightForwarder/props.conf
     healthcheck:
       test: /sbin/checkstate.sh || exit 1
       interval: 10s
@@ -424,6 +433,9 @@ services:
     - type: bind
       source: ./config/splunk/outputs.conf
       target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/outputs.conf
+    - type: bind
+      source: ./config/splunk/props.conf
+      target: /opt/splunkforwarder/etc/apps/splunk_forwarder_on_docker/local/props.conf
     healthcheck:
       test: /sbin/checkstate.sh || exit 1
       interval: 10s

@@ -78,7 +78,7 @@ services:
       retries: 6
     command: >-
       sensu-agent start
-      --log-level=debug
+      --log-level=warn
       --deregister=true
       --detect-cloud-provider
       --labels="environment=training,workshop_version=${WORKSHOP_SENSU_VERSION}"

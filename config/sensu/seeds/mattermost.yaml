@@ -1,8 +1,0 @@
----
-type: Secret
-api_version: secrets/v1
-metadata:
-  name: mattermost_webhook_url
-spec:
-  provider: vault
-  id: secret/sensu/mattermost#webhook_url

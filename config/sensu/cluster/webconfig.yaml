@@ -7,5 +7,6 @@ spec:
   signin_message: Welcome to the **Sensu Go Workshop**!
   always_show_local_cluster: true
   catalog:
-    url: "https://catalog.sensu.io"
+    # url: "https://catalog.sensu.io"
+    url: "http://localhost:8083"
     release_version: version

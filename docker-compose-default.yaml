@@ -372,8 +372,6 @@ volumes:
     driver: local
   user_data:
     driver: local
-  elasticsearch_data:
-    driver: local
   mattermost_config:
     driver: local
   mattermost_data:

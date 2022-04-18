@@ -491,16 +491,6 @@ volumes:
     driver: local
   user_data:
     driver: local
-  grafana_data:
-    driver: local
-  influxdb_data:
-    driver: local
-  timescaledb_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  elasticsearch_data:
-    driver: local
   mattermost_config:
     driver: local
   mattermost_data:

@@ -103,7 +103,7 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
    spec:
      command: http-check --url http://sensu-assets:80
      runtime_assets:
-     - sensu/http-checks
+     - workshop/http-checks
      publish: true
      proxy_entity_name: sensu-assets
      subscriptions:
@@ -112,6 +112,13 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
      timeout: 10
      handlers:
      - mattermost
+   ```
+1. **Register the check in Sensu.**
+
+   Register this new check in Sensu using the `sensuctl create -f` command.
+
+   ```shell
+   sensuctl create -f sensu-assets.yaml
    ```
 
 1. **Observe the service health check failure.**
@@ -126,22 +133,21 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
 
 1. **Add the missing asset.**
 
-   Use the `sensuctl asset add` command to add the missing asset.
+   Use the `sensuctl asset add` command with the rename option to add the missing asset.
 
    ```
-   sensuctl asset add sensu/http-checks
+   sensuctl asset add sensu/http-checks:0.7.0 --rename workshop/http-checks
    ```
 
    The output should look like the following:
 
    ```
-   no version specified, using latest: 0.4.0
-   fetching bonsai asset: sensu/http-checks:0.4.0
-   added asset: sensu/http-checks:0.4.0
+   fetching bonsai asset: sensu/http-checks:0.7.0
+   added asset: sensu/http-checks:0.7.0
 
    You have successfully added the Sensu asset resource, but the asset will not get downloaded until
    it's invoked by another Sensu resource (ex. check). To add this runtime asset to the appropriate
-   resource, populate the "runtime_assets" field with ["sensu/http-checks"].
+   resource, populate the "runtime_assets" field with ["workshop/http-checks"].
    ```
 
    The `sensuctl asset add` command is a direct integration between `sensuctl` and Bonsai that automates the process of downloading and registering Sensu Asset definitions.
@@ -158,9 +164,11 @@ We'll register a new Sensu Asset, and configure a check to use the asset.
      sensuctl create -f asset.yaml
      ```
 
+     We used the `--rename` option to install the asset under a asset naming scheme we are using in the check defintion.  This way if you ever in a situation where you need to fork a Sensu plugin and build your own asset, you'll be able to install the custom version as a drop-in replacement without having to edit your existing check configurations.
+
 1. **Observe the service health check result.**
 
-   Check the Sensu event list again to see the check result.
+   Wait a minute, and check the Sensu event list again to see the check result.
 
    ```
    sensuctl event list
@@ -211,6 +219,7 @@ We will mirror a Sensu Asset downloaded from Bonsai and host it via a simple HTT
    curl -LO https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_linux_amd64.tar.gz
    curl -LO https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_windows_amd64.tar.gz
    curl -LO https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_darwin_amd64.tar.gz
+   cd ..
    ```
 
    **Windows (Powershell):**
@@ -226,6 +235,7 @@ We will mirror a Sensu Asset downloaded from Bonsai and host it via a simple HTT
    Invoke-WebRequest `
      -Uri "https://assets.bonsai.sensu.io/c06ba5a541026092d685e4d54b76c490801b9919/check-disk-usage_0.6.0_darwin_amd64.tar.gz" `
      -OutFile "check-disk-usage_0.6.0_darwin_amd64.tar.gz"
+   cd ..
    ```
 
 1. **Create a YAML File Containing the Asset Configuration.**
@@ -322,30 +332,30 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
    New-Item -Path . -Name plugin\ps\bin -ItemType "directory"
    ```
 
-1. **Create a custom `helloworld` script.**
+1. **Create a custom `helloworkshop` script.**
 
-   Copy the following shell script to a file named `plugin/sh/bin/helloworld`:
+   Copy the following shell script to a file named `plugin/sh/bin/helloworkshop`:
 
    ```shell
    #!/bin/sh
-   if [ $# -eq 0 ]; then
-     echo "Hello, computer world!"
+   if [ $# -lt 1 ]; then
+     echo "Hello unspecified user! Welcome to the Sensu workshop!"
      exit 1
    else
-     echo "Hello, ${0} world!"
+     echo "Hello ${1}! Welcomne to the Sensu workshop!"
      exit 0
    fi
    ```
 
-   Copy the following Powershell script to a file named `plugin/ps/bin/helloworld.ps1`:
+   Copy the following Powershell script to a file named `plugin/ps/bin/helloworkshop.ps1`:
 
    ```powershell
    # Powershell
    if ( $args.Count -eq 0 ) {
-     echo "Hello, computer world!"
+     echo "Hello unspecified user! Welcome to the Sensu workshop!"
      exit 1
    } else {
-     echo "Hello, $args world!"
+     echo "Hello $args! Welcome to the Sensu workshop!"
      exit 0
    }
    ```
@@ -357,31 +367,31 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
    **MacOS or Linux:**
 
    ```
-   chmod +x plugin/sh/bin/helloworld
-   tar -czf helloworld_shell_0.1.0.tar.gz -C plugin/sh/ .
-   tar --list -f helloworld_shell_0.1.0.tar.gz
-   tar -czf helloworld_powershell_0.1.0.tar.gz -C plugin/ps/ .
-   tar --list -f helloworld_powershell_0.1.0.tar.gz
-   mv helloworld_*.tar.gz assets/
+   chmod +x plugin/sh/bin/helloworkshop
+   tar -czf helloworkshop_shell_0.1.0.tar.gz -C plugin/sh/ .
+   tar --list -f helloworkshop_shell_0.1.0.tar.gz
+   tar -czf helloworkshop_powershell_0.1.0.tar.gz -C plugin/ps/ .
+   tar --list -f helloworkshop_powershell_0.1.0.tar.gz
+   mv helloworkshop_*.tar.gz assets/
    ```
 
    **Windows (Powershell):**
 
    ```
-   ICACLS .\plugin\sh\bin\helloworld /grant:r "users:(RX)" /C
-   tar -czf helloworld_shell_0.1.0.tar.gz -C plugin/sh/ .
-   tar --list -f helloworld_shell_0.1.0.tar.gz
-   tar -czf helloworld_powershell_0.1.0.tar.gz -C plugin/ps/ .
-   tar --list -f helloworld_powershell_0.1.0.tar.gz
-   mv helloworld_*.tar.gz .\assets\
+   ICACLS .\plugin\sh\bin\hellowokshop /grant:r "users:(RX)" /C
+   tar -czf helloworkshop_shell_0.1.0.tar.gz -C plugin/sh/ .
+   tar --list -f helloworkshop_shell_0.1.0.tar.gz
+   tar -czf helloworkshop_powershell_0.1.0.tar.gz -C plugin/ps/ .
+   tar --list -f helloworkshop_powershell_0.1.0.tar.gz
+   mv helloworkshop_*.tar.gz .\assets\
    ```
 
-   You should see output from the two `tar --list` commands indicating that the `helloworld` and `helloworld.ps1` scripts are in a `bin` subdirectory; it should look something like this:
+   You should see output from the two `tar --list` commands indicating that the `helloworkshop` and `helloworkshop.ps1` scripts are in a `bin` subdirectory; it should look something like this:
 
    ```
    ./
    ./bin/
-   ./bin/helloworld
+   ./bin/helloworkshop
    ```
 
    _NOTE: if the tarballs were created without the `bin` subdirectory, please delete the `.tar.gz` files and repeat this step from the beginning._
@@ -391,51 +401,58 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
    **Mac or Linux:**
 
    ```
-   shasum -a 512 assets/helloworld_*.tar.gz
+   shasum -a 512 assets/helloworkshop_*.tar.gz
    ```
+   or
 
-   The output should look like this:
+   ```
+   sha512sum assets/helloworkshop_*.tar.gz
+   ``` 
+
+   The output should look similar to this:
 
    ```
-   b999482ec1c11b930d07545ea3c83d48b31c0d64a6576e41634f5c89abaa81dcca271fc6f3c359a31f0f67b1cb07ae6a07af173bc915ea9ba417adbccc57f170  assets/helloworld_powershell_0.1.0.tar.gz
-   3c5675a3bdbad6f0a51adb2186001ef3073057ce665f7015ee9583260fe2ca056df120b2b91c3f60a0abbad7420c27f236eda9aca180a6d674e5bd37133f7cac  assets/helloworld_shell_0.1.0.tar.gz
+   b999482ec1c11b930d07545ea3c83d48b31c0d64a6576e41634f5c89abaa81dcca271fc6f3c359a31f0f67b1cb07ae6a07af173bc915ea9ba417adbccc57f170  assets/hellowokshop_powershell_0.1.0.tar.gz
+   3c5675a3bdbad6f0a51adb2186001ef3073057ce665f7015ee9583260fe2ca056df120b2b91c3f60a0abbad7420c27f236eda9aca180a6d674e5bd37133f7cac  assets/helloworkshop_shell_0.1.0.tar.gz
    ```
+   The actual checksum hash string may be different, what matters is you see a hash listed for the two expected asset tarballs.
 
    **Windows (Powershell):**
 
    ```
-   Get-FileHash -Path .\assets\helloworld_*.tar.gz -Algorithm SHA512 | Format-List
+   Get-FileHash -Path .\assets\helloworkshop_*.tar.gz -Algorithm SHA512 | Format-List
    ```
 
-   The output should like like this:
+   The output should look similar to this:
 
    ```
    Algorithm : SHA512
    Hash      : b999482ec1c11b930d07545ea3c83d48b31c0d64a6576e41634f5c89abaa81dcca271fc6f3c359a31f0f67b1cb07ae6a07af173bc915ea9ba417adbccc57f170
-   Path      : C:\Users\calebhailey\workshop\assets\helloworld_powershell_0.1.0.tar.gz
+   Path      : C:\Users\calebhailey\workshop\assets\helloworkshop_powershell_0.1.0.tar.gz
 
    Algorithm : SHA512
    Hash      : 3c5675a3bdbad6f0a51adb2186001ef3073057ce665f7015ee9583260fe2ca056df120b2b91c3f60a0abbad7420c27f236eda9aca180a6d674e5bd37133f7cac
-   Path      : C:\Users\calebhailey\workshop\assets\helloworld_shell_0.1.0.tar.gz
+   Path      : C:\Users\calebhailey\workshop\assets\helloworkshop_shell_0.1.0.tar.gz
    ```
+   The actual hash string may be different, what matters is you see a hash listed for the two expected asset tarballs.
 
 1. **Create a YAML File Containing the Asset + Example Check Configuration.**
 
-   Copy the following contents to a file named `helloworld.yaml`:
+   Copy the following contents to a file named `helloworkshop.yaml`:
 
    _NOTE: you will need to replace **all three** `sha512` values in this example with the digests from step 4 (above).
-   Take care to use the correct value for the corresponding asset tarball (i.e. `helloworld_shell_0.1.0.tar.gz` and `helloworld_powershell_0.1.0.tar.gz`)._
+   Take care to use the correct value for the corresponding asset tarball (i.e. `helloworkshop_shell_0.1.0.tar.gz` and `helloworkshop_powershell_0.1.0.tar.gz`)._
 
    ```yaml
    ---
    type: CheckConfig
    api_version: core/v2
    metadata:
-     name: helloworld
+     name: helloworkshop
    spec:
-     command: helloworld {{ .system.os | default "workshop" }}
+     command: helloworkshop {{ .system.os | default "workshop" }}
      runtime_assets:
-     - workshop/helloworld:0.1.0
+     - workshop/helloworkshop:0.1.0
      interval: 30
      timeout: 10
      publish: true
@@ -448,18 +465,18 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
    type: Asset
    api_version: core/v2
    metadata:
-     name: workshop/helloworld:0.1.0
+     name: workshop/helloworkshop:0.1.0
    spec:
      builds:
-     - url: http://sensu-assets/assets/helloworld_shell_0.1.0.tar.gz
+     - url: http://sensu-assets/assets/helloworkshop_shell_0.1.0.tar.gz
        sha512: 3c5675a3bdbad6f0a51adb2186001ef3073057ce665f7015ee9583260fe2ca056df120b2b91c3f60a0abbad7420c27f236eda9aca180a6d674e5bd37133f7cac
        filters:
        - entity.system.os == 'linux'
-     - url: http://sensu-assets/assets/helloworld_shell_0.1.0.tar.gz
+     - url: http://sensu-assets/assets/helloworkshop_shell_0.1.0.tar.gz
        sha512: 3c5675a3bdbad6f0a51adb2186001ef3073057ce665f7015ee9583260fe2ca056df120b2b91c3f60a0abbad7420c27f236eda9aca180a6d674e5bd37133f7cac
        filters:
        - entity.system.os == 'darwin'
-     - url: http://sensu-assets/assets/helloworld_powershell_0.1.0.tar.gz
+     - url: http://sensu-assets/assets/helloworkshop_powershell_0.1.0.tar.gz
        sha512: b999482ec1c11b930d07545ea3c83d48b31c0d64a6576e41634f5c89abaa81dcca271fc6f3c359a31f0f67b1cb07ae6a07af173bc915ea9ba417adbccc57f170
        filters:
        - entity.system.os == 'windows'
@@ -467,16 +484,22 @@ You can package the script as a Sensu Asset using built-in tooling (`tar` and `s
 
    > **Understanding the YAML:**
    > - This template contains two Sensu resources in a single file: a Sensu Asset, and a Sensu Check which references this asset.
-   > - This template references the `helloworld_shell_0.1.0.tar.gz` asset build twice – once for Linux and once for Mac (`darwin`).
+   > - This template references the `helloworkshop_shell_0.1.0.tar.gz` asset build twice – once for Linux and once for Mac (`darwin`).
    > - The `sensu-assets` hostname defined in this asset (i.e. `http://sensu-assets`) is resolvable inside of the Sensu workshop Docker network _only_; the agent you installed in [Lesson 7] may be able to resolve this hostname with additional configuation (e.g. by editing `/etc/hosts` or equivalent), but such DNS configuration is out of scope for this workshop.
 
-1. **Register the `helloworld` asset and an example check using the `sensuctl create -f` command**
+1. **Register the `helloworkshop` asset and an example check using the `sensuctl create -f` command**
 
    ```
-   sensuctl create -f helloworld.yaml
+   sensuctl create -f helloworkshop.yaml
    ```
 
-   If you see one or more `helloworld` events in Sensu then you're ready to move on to the next lesson!
+1. **Check for `helloworkshop` event**
+
+   ```
+   sensuctl event list
+   ```
+
+   If you see one or more `helloworkshop` events in Sensu then you're ready to move on to the next lesson!
 
 
 ## Discussion

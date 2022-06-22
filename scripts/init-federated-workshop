@@ -1,0 +1,8 @@
+#!/bin/sh
+SENSU_API_URL="http://sensu-gateway-backend:8080" sensu-backend-init && \
+SENSU_API_URL="http://sensu-alpha-backend:8080" sensu-backend-init && \
+SENSU_API_URL="http://sensu-beta-backend:8080" sensu-backend-init && \
+POSTGRES_SERVER="postgres-gateway" SENSU_API_URL="http://sensu-gateway-backend:8080" SENSU_CLUSTER_CONFIG="config/sensu/gateway-cluster" SENSU_CLUSTER_EXTRAS="config/sensu/federation-cluster" seed-workshop-resources && \
+POSTGRES_SERVER="postgres-alpha"   SENSU_API_URL="http://sensu-alpha-backend:8080"   SENSU_CLUSTER_CONFIG="config/sensu/alpha-cluster"   seed-workshop-resources && \
+POSTGRES_SERVER="postgres-beta"    SENSU_API_URL="http://sensu-beta-backend:8080"    SENSU_CLUSTER_CONFIG="config/sensu/beta-cluster"    seed-workshop-resources && \
+SENSU_API_URL="http://sensu-alpha-backend:8080" workshop-auto-discovery

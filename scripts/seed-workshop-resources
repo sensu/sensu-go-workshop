@@ -15,6 +15,7 @@ VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
 VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
+POSTGRES_SERVER=${POSTGRES_SERVER:-"postgres"}
 
 check_deps() {
   for DEP in wait-for sensuctl sensu-backend vault mmctl
@@ -42,7 +43,7 @@ seed_cluster() {
   ERRORS=0
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
   wait-for ${SENSU_API_URL}/health
-  wait-for postgres:5432
+  wait-for ${POSTGRES_SERVER}:5432
   for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
   ERRORS=$(expr ${ERRORS} + $?)
   for resource in ${SENSU_CLUSTER_CONFIG}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
@@ -204,7 +205,7 @@ seed_secrets() {
   echo ""
 }
 
-echo "Seeding Sensu Go Workshop resources..."
+echo "Seeding Sensu Go Workshop resources for ${SENSU_API_URL}  ..."
 check_deps && \
 validate_io && \
 seed_cluster && \

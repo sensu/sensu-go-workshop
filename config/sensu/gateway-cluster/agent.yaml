@@ -1,0 +1,15 @@
+---
+# This template modifies the built-in "agent" user's password to "topsecret".
+# To modify this password, generate a new password_hash and update this template prior to deploying the workshop.
+#
+# $ sensuctl user hash-password <your_password_here>
+type: User
+api_version: core/v2
+metadata:
+  name: agent
+spec:
+  disabled: false
+  password_hash: "$2a$10$tKM3PsULYeTsFjm0Wwhax.wKsehk9L.EOG/PPFiF8Vvy515HA9kiy"
+  groups:
+  - system:agents
+  username: agent

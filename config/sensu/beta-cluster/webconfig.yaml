@@ -1,0 +1,12 @@
+---
+type: GlobalConfig
+api_version: web/v1
+metadata:
+  name: workshop
+spec:
+  signin_message: Welcome to the **Sensu Go Workshop**!
+  always_show_local_cluster: true
+  catalog:
+    #url: "https://catalog.sensu.io"
+    url: "http://192.168.1.11:3003"
+    release_version: version

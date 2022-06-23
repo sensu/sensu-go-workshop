@@ -20,3 +20,26 @@ spec:
   subjects:
   - name: federation-viewer
     type: User
+---
+api_version: federation/v1
+type: EtcdReplicator
+metadata:
+  name: AlphaClusterRoleBindings
+spec:
+  insecure: true
+  url: http://sensu-alpha-backend:2379
+  api_version: core/v2
+  resource: ClusterRoleBinding
+  replication_interval_seconds: 30
+---
+api_version: federation/v1
+type: EtcdReplicator
+metadata:
+  name: BetaClusterRoleBindings
+spec:
+  insecure: true
+  url: http://sensu-beta-backend:2379
+  api_version: core/v2
+  resource: ClusterRoleBinding
+  replication_interval_seconds: 30
+    

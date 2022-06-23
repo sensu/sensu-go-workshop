@@ -62,9 +62,9 @@ services:
     labels:
     - sensu.io/workshop/role=sensu-backend
     ports:
-    - 3010:3000
-    - 8090:8080
-    - 8091:8081
+    - 3100:3000
+    - 8180:8080
+    - 8181:8081
     environment:
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
@@ -108,9 +108,9 @@ services:
     labels:
     - sensu.io/workshop/role=sensu-backend
     ports:
-    - 3020:3000
-    - 8070:8080
-    - 8071:8081
+    - 3200:3000
+    - 8280:8080
+    - 8281:8081
     environment:
     - SENSU_INTERNAL_ENVIRONMENT
     - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME

@@ -3,9 +3,9 @@
 SENSU_API_URL=${SENSU_API_URL:-"http://sensu-backend:8080"}
 SENSU_NAMESPACE=${SENSU_NAMESPACE:-"default"}
 SENSU_API_KEY=${SENSU_BACKEND_CLUSTER_ADMIN_API_KEY}
-SENSU_CLUSTER_CONFIG=${SENSU_CLUSTER_CONFIG:-"config/sensu/cluster"}
+SENSU_CLUSTER_CONFIG=${SENSU_CLUSTER_CONFIG:-"config/sensu/cluster/common"}
 SENSU_CLUSTER_EXTRAS=${SENSU_CLUSTER_EXTRAS:-""}
-SENSU_WORKSHOP_SEEDS=${SENSU_WORKSHOP_SEEDS:-"config/sensu/seeds"}
+SENSU_WORKSHOP_SEEDS=${SENSU_WORKSHOP_SEEDS:-"config/sensu/seeds/common"}
 USERS_JSON=${USERS_JSON:-"users/users.json"}
 USER_TEMPLATE=${USER_TEMPLATE:-"users/user.yaml.template"}
 SENSU_WORKSHOP_ENVRC_TEMPLATE=${SENSU_WORKSHOP_ENVRC_TEMPLATE:-"users/user.envrc.template"}
@@ -15,7 +15,7 @@ VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
 VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
-POSTGRES_SERVER=${POSTGRES_SERVER:-"postgres"}
+export POSTGRES_SERVER=${POSTGRES_SERVER:-"postgres"}
 
 check_deps() {
   for DEP in wait-for sensuctl sensu-backend vault mmctl
@@ -41,10 +41,12 @@ validate_io() {
 
 seed_cluster() {
   ERRORS=0
-  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
+  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG} and ${SENSU_CLUSTER_EXTRAS}"
   wait-for ${SENSU_API_URL}/health
   wait-for ${POSTGRES_SERVER}:5432
-  for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
+  for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do 
+	  cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
+  done
   ERRORS=$(expr ${ERRORS} + $?)
   for resource in ${SENSU_CLUSTER_CONFIG}/*.yaml; do cat "$resource" | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create; done
   ERRORS=$(expr ${ERRORS} + $?)

@@ -30,10 +30,10 @@ services:
     - SENSU_BACKEND_JWT_PUBLIC_KEY_FILE=/etc/sensu/certs/jwt_public.pem
     volumes:
     - type: bind
-      source: ./config/federation/jwt_private.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_private.pem
       target: /etc/sensu/certs/jwt_private.pem
     - type: bind
-      source: ./config/federation/jwt_public.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_public.pem
       target: /etc/sensu/certs/jwt_public.pem
     - type: volume
       source: sensu_gateway_data
@@ -76,10 +76,10 @@ services:
     - SENSU_BACKEND_JWT_PUBLIC_KEY_FILE=/etc/sensu/certs/jwt_public.pem
     volumes:
     - type: bind
-      source: ./config/federation/jwt_private.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_private.pem
       target: /etc/sensu/certs/jwt_private.pem
     - type: bind
-      source: ./config/federation/jwt_public.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_public.pem
       target: /etc/sensu/certs/jwt_public.pem
     - type: volume
       source: sensu_alpha_data
@@ -122,10 +122,10 @@ services:
     - SENSU_BACKEND_JWT_PUBLIC_KEY_FILE=/etc/sensu/certs/jwt_public.pem
     volumes:
     - type: bind
-      source: ./config/federation/jwt_private.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_private.pem
       target: /etc/sensu/certs/jwt_private.pem
     - type: bind
-      source: ./config/federation/jwt_public.pem
+      source: ./config/sensu/cluster/federated/certs/jwt_public.pem
       target: /etc/sensu/certs/jwt_public.pem
     - type: volume
       source: sensu_beta_data

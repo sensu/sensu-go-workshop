@@ -3,6 +3,6 @@ SENSU_API_URL="http://sensu-gateway-backend:8080" sensu-backend-init && \
 SENSU_API_URL="http://sensu-alpha-backend:8080" sensu-backend-init && \
 SENSU_API_URL="http://sensu-beta-backend:8080" sensu-backend-init && \
 SENSU_WORKSHOP_SEEDS="config/sensu/seeds/common/" POSTGRES_SERVER="postgres" POSTGRES_EVENTS_DB="sensu_gateway_events" SENSU_API_URL="http://sensu-gateway-backend:8080" SENSU_CLUSTER_CONFIG="config/sensu/cluster/common" SENSU_CLUSTER_EXTRAS="config/sensu/cluster/federated/gateway" seed-workshop-resources && \
-SKIP_FEDERATION_CLUSTER=1 POSTGRES_SERVER="postgres" POSTGRES_EVENTS_DB="sensu_alpha_events"   SENSU_API_URL="http://sensu-alpha-backend:8080"   SENSU_CLUSTER_CONFIG="config/sensu/cluster/federated/alpha"   seed-workshop-resources && \
-SKIP_FEDERATION_CLUSTER=1 POSTGRES_SERVER="postgres" POSTGRES_EVENTS_DB="sensu_beta_events"    SENSU_API_URL="http://sensu-beta-backend:8080"    SENSU_CLUSTER_CONFIG="config/sensu/cluster/federated/beta"    seed-workshop-resources && \
+SKIP_FEDERATION_CLUSTER=1 POSTGRES_SERVER="postgres" POSTGRES_EVENTS_DB="sensu_alpha_events"   SENSU_API_URL="http://sensu-alpha-backend:8080" SENSU_CLUSTER_CONFIG="config/sensu/cluster/common" SENSU_CLUSTER_EXTRAS="config/sensu/cluster/federated/alpha"   seed-workshop-resources && \
+SKIP_FEDERATION_CLUSTER=1 POSTGRES_SERVER="postgres" POSTGRES_EVENTS_DB="sensu_beta_events"    SENSU_API_URL="http://sensu-beta-backend:8080" SENSU_CLUSTER_CONFIG="config/sensu/cluster/common" SENSU_CLUSTER_EXTRAS="config/sensu/cluster/federated/beta"    seed-workshop-resources && \
 SENSU_API_URL="http://sensu-alpha-backend:8080" workshop-auto-discovery

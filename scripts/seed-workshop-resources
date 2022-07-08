@@ -16,6 +16,7 @@ VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
 export POSTGRES_SERVER=${POSTGRES_SERVER:-"postgres"}
+export POSTGRES_EVENTS_DB=${POSTGRES_EVENTS_DB:-"sensu_events"}
 
 check_deps() {
   for DEP in wait-for sensuctl sensu-backend vault mmctl
@@ -41,7 +42,8 @@ validate_io() {
 
 seed_cluster() {
   ERRORS=0
-  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG} and ${SENSU_CLUSTER_EXTRAS}"
+  echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
+  echo "POSTGRES_SERVER: ${POSTGRES_SERVER}  POSTGRES_EVENTS_DB: ${POSTGRES_EVENTS_DB}"
   wait-for ${SENSU_API_URL}/health
   wait-for ${POSTGRES_SERVER}:5432
   for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do 

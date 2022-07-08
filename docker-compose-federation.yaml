@@ -235,10 +235,10 @@ services:
 
   # Postgres Gateway
   #
-  # Sensu Gateway data store.
+  # Sensu Postgres data store.
   #
   # See: https://www.postgresql.org/docs/
-  postgres-gateway:
+  postgres:
     image: postgres:${POSTGRES_VERSION}
     deploy:
       resources:
@@ -269,101 +269,13 @@ services:
       source: ./config/postgres/scripts/
       target: /docker-entrypoint-initdb.d/
     - type: volume
-      source: postgres_gateway_data
+      source: postgres_data
       target: /var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
       interval: 10s
       timeout: 5s
       retries: 6
-
-  # Postgres Alpha
-  #
-  # Sensu Alpha data store.
-  #
-  # See: https://www.postgresql.org/docs/
-  postgres-alpha:
-    image: postgres:${POSTGRES_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-    labels:
-    - sensu.io/workshop/role=postgres
-    ports:
-    - 5432
-    environment:
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB
-    - PGDATA=/var/lib/postgresql/data
-    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
-    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - APP_DB_USERNAME
-    - APP_DB_PASSWORD
-    - APP_DB_NAME
-    - MATTERMOST_DB
-    - MATTERMOST_DB_USER
-    - MATTERMOST_DB_PASSWORD
-    volumes:
-    - type: bind
-      source: ./config/postgres/postgresql.conf
-      target: /etc/postgresql/postgresql.conf
-    - type: bind
-      source: ./config/postgres/scripts/
-      target: /docker-entrypoint-initdb.d/
-    - type: volume
-      source: postgres_alpha_data
-      target: /var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-      interval: 10s
-      timeout: 5s
-      retries: 6
-  # Postgres Beta
-  #
-  # Sensu Beta data store.
-  #
-  # See: https://www.postgresql.org/docs/
-  postgres-beta:
-    image: postgres:${POSTGRES_VERSION}
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-    labels:
-    - sensu.io/workshop/role=postgres
-    ports:
-    - 5432
-    environment:
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB
-    - PGDATA=/var/lib/postgresql/data
-    - SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
-    - SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
-    - APP_DB_USERNAME
-    - APP_DB_PASSWORD
-    - APP_DB_NAME
-    - MATTERMOST_DB
-    - MATTERMOST_DB_USER
-    - MATTERMOST_DB_PASSWORD
-    volumes:
-    - type: bind
-      source: ./config/postgres/postgresql.conf
-      target: /etc/postgresql/postgresql.conf
-    - type: bind
-      source: ./config/postgres/scripts/
-      target: /docker-entrypoint-initdb.d/
-    - type: volume
-      source: postgres_beta_data
-      target: /var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
 
   # Sensu Asset Server
   #
@@ -454,7 +366,7 @@ services:
     - MATTERMOST_DB_USER
     - MATTERMOST_DB_PASSWORD
     - MM_SQLSETTINGS_DRIVERNAME=postgres
-    - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_DB_USER}:${MATTERMOST_DB_PASSWORD}@postgres-gateway/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
+    - MM_SQLSETTINGS_DATASOURCE=postgres://${MATTERMOST_DB_USER}:${MATTERMOST_DB_PASSWORD}@postgres/${MATTERMOST_DB}?sslmode=disable&connect_timeout=10
     - MM_TEAMSETTINGS_ENABLEOPENSERVER=false
     - MM_PASSWORDSETTINGS_MINIMUMLENGTH=5
     - MM_PASSWORDSETTINGS_LOWERCASE=true
@@ -506,7 +418,7 @@ services:
     ports:
     - 9001-9005:8080/tcp
     environment:
-    - DB_HOST=postgres-gateway
+    - DB_HOST=postgres
     - DB_PORT=${APP_DB_PORT}
     - DB_USER=${APP_DB_USERNAME}
     - DB_PASS=${APP_DB_PASSWORD}
@@ -608,11 +520,7 @@ volumes:
     driver: local
   etcd_data:
     driver: local
-  postgres_gateway_data:
-    driver: local
-  postgres_alpha_data:
-    driver: local
-  postgres_beta_data:
+  postgres_data:
     driver: local
   user_data:
     driver: local

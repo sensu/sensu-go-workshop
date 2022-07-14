@@ -1,0 +1,45 @@
+---
+type: User
+api_version: core/v2
+metadata:
+  name: federation-viewer
+spec:
+  disabled: false
+  username: federation-viewer
+  password_hash: $2a$10$CmiofbRmKtkPY83x.urqiOU1dI4NMuf8UUgtDmgCHw7mdr6YlEYbC 
+---
+type: ClusterRoleBinding
+api_version: core/v2
+metadata:
+  created_by: admin
+  name: federation-viewer-readonly
+spec:
+  role_ref:
+    name: view
+    type: ClusterRole
+  subjects:
+  - name: federation-viewer
+    type: User
+---
+api_version: federation/v1
+type: EtcdReplicator
+metadata:
+  name: AlphaClusterRoleBindings
+spec:
+  insecure: true
+  url: http://sensu-alpha-backend:2379
+  api_version: core/v2
+  resource: ClusterRoleBinding
+  replication_interval_seconds: 30
+---
+api_version: federation/v1
+type: EtcdReplicator
+metadata:
+  name: BetaClusterRoleBindings
+spec:
+  insecure: true
+  url: http://sensu-beta-backend:2379
+  api_version: core/v2
+  resource: ClusterRoleBinding
+  replication_interval_seconds: 30
+    

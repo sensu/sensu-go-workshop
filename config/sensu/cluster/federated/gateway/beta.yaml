@@ -1,0 +1,8 @@
+---
+api_version: federation/v1
+type: Cluster
+metadata:
+  name: beta
+spec:
+  api_urls:
+  - http://sensu-beta-backend:8080

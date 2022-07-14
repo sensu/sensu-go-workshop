@@ -24,6 +24,8 @@ sensu_backend_init() {
     else
       return 1
     fi
+  else
+    echo "SENSU_ETCD_CLIENT_URLS empty, skipping backend init for ${SENSU_API_URL}"	  
   fi
 }
 

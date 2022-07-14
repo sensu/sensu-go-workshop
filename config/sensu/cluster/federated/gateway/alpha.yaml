@@ -1,0 +1,8 @@
+---
+api_version: federation/v1
+type: Cluster
+metadata:
+  name: alpha
+spec:
+  api_urls:
+  - http://sensu-alpha-backend:8080

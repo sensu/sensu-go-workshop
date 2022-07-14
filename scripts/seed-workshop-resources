@@ -15,6 +15,7 @@ VAULT_ADDR=${VAULT_ADDR:-"http://vault:8200"}
 VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID:-"secretsmanager"}
 VAULT_SECRET_PATH_PREFIX=${VAULT_SECRET_PATH_PREFIX:-"secret/sensu"}
 VAULT_WORKSHOP_SEEDS=${VAULT_WORKSHOP_SEEDS:-"config/vault/secrets"}
+WAIT_FOR_TIMEOUT=${WAIT_FOR_TIMEOUT:-"59"}
 export POSTGRES_SERVER=${POSTGRES_SERVER:-"postgres"}
 export POSTGRES_EVENTS_DB=${POSTGRES_EVENTS_DB:-"sensu_events"}
 
@@ -44,8 +45,8 @@ seed_cluster() {
   ERRORS=0
   echo "Applying cluster configuration from ${SENSU_CLUSTER_CONFIG}"
   echo "POSTGRES_SERVER: ${POSTGRES_SERVER}  POSTGRES_EVENTS_DB: ${POSTGRES_EVENTS_DB}"
-  wait-for ${SENSU_API_URL}/health
-  wait-for ${POSTGRES_SERVER}:5432
+  wait-for -t ${WAIT_FOR_TIMEOUT} ${SENSU_API_URL}/health
+  wait-for -t ${WAIT_FOR_TIMEOUT} ${POSTGRES_SERVER}:5432
   for resource in ${SENSU_CLUSTER_CONFIG}/*.template; do 
 	  cat "$resource" | envsubst | /usr/local/bin/sensuctl --api-url ${SENSU_API_URL} --api-key ${SENSU_API_KEY} create
   done
@@ -83,7 +84,7 @@ seed_cluster_extras() {
 seed_users() {
   if [ -z ${SKIP_SEED_USERS} ]; then
     echo "Seeding workshop users, namespaces, and RBAC profiles..."
-    wait-for ${SENSU_API_URL}/health
+    wait-for -t ${WAIT_FOR_TIMEOUT} ${SENSU_API_URL}/health
     for USER in $( cat "${USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
       export USERNAME_ORIGINAL=$(echo ${USER} | base64 -d | jq -r .username)
       export USERNAME=$(echo ${USERNAME_ORIGINAL} | awk -F "@" '{print $1}')
@@ -133,7 +134,7 @@ seed_namespaces() {
 initialize_workshop_chat() {
   if [ -z ${SKIP_SEED_CHAT} ]; then
     echo "Initializing Mattermost service..."
-    wait-for mattermost:8065
+    wait-for -t ${WAIT_FOR_TIMEOUT} mattermost:8065
     # Generate the Mattermost bulk import file (JSONL)
     cat config/mattermost/data.jsonl.template | envsubst | tee config/mattermost/data.jsonl > /dev/null 2>&1
     # Copy the Mattermost bulk import file to the Mattermost service container
@@ -208,7 +209,7 @@ seed_user_envrc_files() {
 seed_secrets() {
   if [ -z ${SKIP_SEED_SECRETS} ]; then
     echo "Seeding Vault..."
-    wait-for ${VAULT_ADDR}/v1/sys/health
+    wait-for -t ${WAIT_FOR_TIMEOUT} ${VAULT_ADDR}/v1/sys/health
     for SECRET in $(ls ${VAULT_WORKSHOP_SEEDS})
     do
       NAME=$(echo $SECRET | cut -d "." -f 1)
@@ -221,6 +222,7 @@ seed_secrets() {
 }
 
 echo "Seeding Sensu Go Workshop resources for ${SENSU_API_URL}  ..."
+
 check_deps && \
 validate_io && \
 seed_cluster && \

@@ -11,14 +11,14 @@
 - [Learn More](#learn-more)
 - [Next Steps](#next-steps)
 
-## Watch Lesson 1 on YouTube
-
-[![Sensu Go Workshop Lesson 1 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 1 Video")](https://www.youtube.com/watch?v=uyj3qFjq58g&amp;t=540s)
-
 ## Goals
 In this lesson we will introduce the Sensu observability pipeline. You will learn about Sensu's architecture, its underlying data model, and how its unique set of features can be used to implement a monitoring-as-code workflow within your organization.
 
 This lesson is intended for operators of Sensu, or anyone who would like a short semi-technical introduction to Sensu.
+
+## Watch Lesson 1 on YouTube
+
+[![Sensu Go Workshop Lesson 1 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 1 Video")](https://www.youtube.com/watch?v=uyj3qFjq58g&amp;t=540s)
 
 ## Observability Pipeline
 

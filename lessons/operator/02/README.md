@@ -16,7 +16,7 @@ This lesson is intended for operators of Sensu or anyone who would like to explo
 
 ## Watch Lesson 2 on YouTube
 
-[![Sensu Go Workshop Lesson 2 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 2 Video")](https://www.youtube.com/watch?v=X6RFqOhfMQ8)
+[![Sensu Go Workshop Lesson 2 Video](img/SensuGoWorkshopYouTubeLesson2.png "Sensu Go Workshop Lesson 2 Video")](https://www.youtube.com/watch?v=X6RFqOhfMQ8)
 
 ## Prerequisites
 

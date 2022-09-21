@@ -18,7 +18,7 @@ This lesson is intended for operators of Sensu, or anyone who would like a short
 
 ## Watch Lesson 1 on YouTube
 
-[![Sensu Go Workshop Lesson 1 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 1 Video")](https://www.youtube.com/watch?v=uyj3qFjq58g&amp;t=540s)
+[![Sensu Go Workshop Lesson 1 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 1 Video")](https://www.youtube.com/watch?v=uyj3qFjq58g)
 
 ## Observability Pipeline
 

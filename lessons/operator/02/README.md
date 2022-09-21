@@ -14,6 +14,10 @@
 In this lesson we will setup a local Sensu development environment for use during the workshop.
 This lesson is intended for operators of Sensu or anyone who would like to explore Sensu from a technical perspective.
 
+## Watch Lesson 2 on YouTube
+
+[![Sensu Go Workshop Lesson 2 Video](img/SensuGoWorkshopYouTubeLesson1.png "Sensu Go Workshop Lesson 2 Video")](https://www.youtube.com/watch?v=X6RFqOhfMQ8)
+
 ## Prerequisites
 
 This workshop was designed with common IT/DevOps/SRE tooling in mind, so we expect most users will already have everything they need installed.

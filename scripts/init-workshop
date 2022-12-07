@@ -1,4 +1,5 @@
 #!/bin/sh
 sensu-backend-init && \
 seed-workshop-resources && \
+openldap-add-users && \
 workshop-auto-discovery

@@ -244,7 +244,7 @@ Stop the agent, modify the configuration, then restart the agent.
 
    ```yaml
    ---
-   backend_url: ws://127.0.0.1:8080
+   backend-url: ws://127.0.0.1:8080
    name: workshop
    labels:
      foo: bar

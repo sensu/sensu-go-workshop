@@ -138,7 +138,7 @@ initialize_workshop_chat() {
     # Generate the Mattermost bulk import file (JSONL)
     cat config/mattermost/data.jsonl.template | envsubst | tee config/mattermost/data.jsonl > /dev/null 2>&1
     # Copy the Mattermost bulk import file to the Mattermost service container
-    docker cp config/mattermost/data.jsonl workshop_mattermost_1:/mattermost/data/data.jsonl
+    docker cp config/mattermost/data.jsonl workshop-mattermost-1:/mattermost/data/data.jsonl
     # Perform the Mattermost bulk import
     docker-compose exec -T mattermost /mattermost/bin/mattermost import bulk /mattermost/data/data.jsonl --apply > /dev/null 2>&1
     if [ $? -gt 0 ]; then

@@ -1,0 +1,131 @@
+#!/bin/sh
+
+#
+# inetOrgPerson Attribute Ref: https://ldapwiki.com/wiki/InetOrgPerson
+#
+# > /dev/null 2>&1
+# displayName: $USER_FULLNAME
+# userPassword: $USER_PASSWORD
+
+LDAP_USERS_JSON=${1:-"users/ldap_users.json"}
+
+validate_json() {
+  cat ${LDAP_USERS_JSON} | jq . > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Invalid LDAP users JSON file: \"${LDAP_USERS_JSON}\""
+    echo ""
+    exit 2
+  fi
+}
+
+validate_io() {
+  if [ ! -f ${LDAP_USERS_JSON} ]; then
+    echo "Missing user JSON file: \"${LDAP_USERS_JSON}\""
+    echo ""
+    exit 2
+  fi
+  if [ ! ${OPENLDAP_ORG_DN} ]; then
+    echo "Missing OPENLDAP_ORG_DN envvar"
+    echo ""
+    exit 2
+  fi
+  if [ ! ${OPENLDAP_ADMIN_PASSWORD} ]; then
+    echo "Missing OPENLDAP_ADMIN_PASSWORD envvar"
+    echo ""
+    exit 2
+  fi
+
+}
+
+
+
+generate_openldap_users() {
+  for USER in $( cat "${LDAP_USERS_JSON}" | jq -r '.[] | @base64' | sort -u); do
+    USER_ID=$(echo ${USER} | base64 -d | jq -r .id)
+    if [[ "$USER_ID" == "null" ]]; then
+    	echo "Error adding LDAP user missing id:  $USER"
+        exit 1
+    fi
+    echo "Adding LDAP user $USER_ID"
+    USER_PASSWORD=$(echo ${USER} | base64 -d | jq -r .password)
+    if [ "${USER_PASSWORD}" == "null" ]; then
+	echo "Error adding LDAP user missing password: $(echo ${USER} | base64 -d)"
+        exit 1
+    fi
+    USER_FULLNAME=$(echo ${USER} | base64 -d | jq -r .fullname)
+    if [ "${USER_FULLNAME}" == "null" ]; then
+    	echo "Error adding LDAP user missing fullname: $(echo ${USER} | base64 -d)"
+        exit 1
+    fi
+    USER_EMAIL=$(echo ${USER} | base64 -d | jq -r .email)
+    if [ "${USER_EMAIL}" == "null" ]; then
+    	echo "Error adding LDAP user missing email:    $(echo ${USER} | base64 -d)"
+        exit 1
+    fi
+    USER_GROUPS=$(echo ${USER} | base64 -d | jq -r .groups)
+
+    ldapdelete -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD "cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN"
+    ret=$?
+    if [ $ret -ne 0 ] && [ $ret -ne 32 ]; then
+      echo "ldapdelete user Bad Return Value : $ret"
+      exit $ret
+    fi
+    ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF 
+dn: cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN
+cn: $USER_ID
+sn: $USER_FULLNAME
+mail: $USER_EMAIL
+uid: $USER_ID
+userPassword: $USER_PASSWORD
+objectClass: inetOrgPerson
+EOF
+    ret=$?
+    if [ $ret -ne 0 ] && [ $ret -ne 68 ]; then
+      echo "ldapadd user Bad Return Value : $ret"
+      exit $ret
+    fi
+
+    echo "Verifying user $USER_FULLNAME password"
+    ldapwhoami -H ldaps://openldap -D cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN -w $USER_PASSWORD
+    ret=$?
+    if [ $ret -ne 0 ]; then
+      echo "ldapwhoami simple bind Bad Return Value : $ret"
+      exit $ret
+    fi
+
+    if [ "${USER_GROUPS}" != "null" ]; then
+    	USER_GROUPS=$(echo ${USER} | base64 -d | jq -r .groups[])
+    	for GROUP in $USER_GROUPS; do
+          echo  "Add user $USER_ID to $GROUP group"
+          ldapadd -H ldaps://openldap -D cn=admin,$OPENLDAP_ORG_DN -w $OPENLDAP_ADMIN_PASSWORD << EOF
+dn: cn=$GROUP,ou=Users,$OPENLDAP_ORG_DN
+changetype: modify
+add: member
+member: cn=$USER_ID,ou=Users,$OPENLDAP_ORG_DN
+EOF
+          ret=$?
+          if [ $ret -ne 0 ] && [ $ret -ne 20 ]; then
+            echo "ldapadd user to group Bad Return Value : $ret"
+            exit $ret
+          fi
+    	done
+    fi
+
+  done
+  echo "Successfully generated Sensu LDAP Users!"
+  echo ""
+}
+
+
+echo "Start seeding ldap users"
+validate_io && \
+validate_json
+if [ $? -gt 0 ]; then
+  exit 2
+fi
+
+generate_openldap_users
+if [ $? -gt 0 ]; then
+  exit 2
+fi
+

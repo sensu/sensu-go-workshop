@@ -1,0 +1,58 @@
+type: ClusterRoleBinding
+api_version: core/v2
+metadata:
+  name: ldap-cluster-admin
+spec:
+  role_ref:
+    name: cluster-admin
+    type: ClusterRole
+  subjects:
+    - name: "ldap:sensu-cluster-admins"
+      type: Group
+---
+type: ClusterRoleBinding
+api_version: core/v2
+metadata:
+  name: ldap-cluster-view
+spec:
+  role_ref:
+    name: view
+    type: ClusterRole
+  subjects:
+    - name: "ldap:sensu-operations"
+      type: Group
+    - name: "ldap:sensu-trainee"
+      type: Group
+    - name: "ldap:sensu-engineering"
+      type: Group
+    - name: "ldap:sensu-workshop"
+      type: Group
+---
+type: Role
+api_version: core/v2
+metadata:
+  name: ldap:trainee
+  namespace: trainee
+spec:
+  rules:
+    - resources:
+      - "*"
+      verbs:
+      - "*"
+      resource_names: []
+---
+type: RoleBinding
+api_version: core/v2 
+metadata:
+  name: ldap:trainee
+  namespace: trainee
+spec:
+  role_ref:
+    name: ldap:trainee
+    type: Role
+  subjects:
+  - name: "ldap:sensu-trainee"
+    type: Group
+
+
+        

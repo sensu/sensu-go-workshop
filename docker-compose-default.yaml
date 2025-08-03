@@ -128,7 +128,44 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-
+  # OpenLDAP
+  #
+  # LDAP authentication provider
+  #
+  #
+  openldap:
+    build:
+      context: ./docker/openldap
+      dockerfile: Dockerfile
+    labels:
+    - io.sensu.role=ldap-server
+    healthcheck:
+      test: ldapwhoami -H ldaps://127.0.0.1 -D cn=admin,dc=example,dc=com  -w $$OPENLDAP_ADMIN_PASSWORD
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: ${WORKSHOP_SETUP_RETRIES}
+    environment:
+      - OPENLDAP_ORG_NAME
+      - OPENLDAP_ORG_DNS
+      - OPENLDAP_ORG_DN
+      - OPENLDAP_ADMIN_PASSWORD
+    ports:
+      - '389:389'
+      - '636:636'
+    volumes:
+    - type: volume
+      source: openldap_config
+      target: /config
+      consistency: consistent
+    - type: volume
+      source: openldap_data
+      target: /var/lib/ldap
+      consistency: consistent
+  
   # Sensu Asset Server
   #
   # Serve Sensu Assets over HTTP using NGINX.
@@ -323,6 +360,8 @@ services:
     - SENSU_BACKEND_CLUSTER_ADMIN_API_KEY
     - VAULT_ADDR
     - VAULT_TOKEN
+    - OPENLDAP_ORG_DN
+    - OPENLDAP_ADMIN_PASSWORD
     - WORKSHOP_HOSTNAME
     - WORKSHOP_SENSU_VERSION
     - WORKSHOP_SENSU_BUILD
@@ -383,4 +422,8 @@ volumes:
   mattermost_plugins:
     driver: local
   mattermost_plugins_extra:
+    driver: local
+  openldap_data:
+    driver: local
+  openldap_config:
     driver: local
